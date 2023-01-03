@@ -10,24 +10,25 @@
           <div class="text-center text-white">
             <h1 class="sign-in">Sign Up</h5>
           </div>
+          <p class="text-danger"><%= message %> </p>
           <form action="/register" method="POST">
             <div class="row">
-              <div class="mt-3 col-sm-6">
+              <div class=" col-sm-6">
                 <label class="col-12 login-label" for="fname">First Name</label>
-                <input class="col-12 login-input" type="text" name="fname" id="fname">
+                <input class="col-12 login-input" type="text" name="fname" id="fname" value="<%= user.fname %>">
               </div>
-              <div class="mt-3 col-sm-6">
+              <div class=" col-sm-6">
                 <label class="col-12 login-label" for="lname">Last Name</label>
-                <input class="col-12 login-input" type="text" name="lname" id="lname">
+                <input class="col-12 login-input" type="text" name="lname" id="lname" value="<%= user.lname %>">
               </div>
             </div>
             <div class="my-3">
               <label class="col-12 login-label" for="email">Email Address</label>
-              <input class="col-12 login-input" type="email" name="email" id="email">
+              <input class="col-12 login-input" type="email" name="email" id="email" value="<%= user.email %>">
             </div>
             <div class="my-3">
               <label class="col-12 login-label" for="phone">Phone Number</label>
-              <input class="col-12 login-input" type="text" name="phone" id="phone">
+              <input class="col-12 login-input" type="text" name="phone" id="phone" value="<%= user.phone %>">
             </div>
             <div class="my-3">
               <label class="col-12 login-label" for="password">Password</label>
