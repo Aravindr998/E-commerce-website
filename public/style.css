@@ -1,0 +1,99 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&display=swap');
+body{
+  font-family: 'Roboto', sans-serif !important;
+  height: 100vh !important;
+}
+.navbar-brand{
+  font-weight: 700;
+  font-size: 1rem;
+  min-width: 3rem;
+  min-height: 3rem;
+}
+.logo{
+  object-fit: contain;
+}
+.form-control{
+  border: none;
+  border-bottom: solid 2px black;
+  border-radius: 0;
+  background: transparent;
+  min-width: 24rem;
+}
+.form-control:focus{
+  box-shadow: none;
+}
+.search-button{
+  border: none;
+  border-bottom: solid 2px black;
+  border-radius: 0;
+  background-color: transparent;
+  max-width: 30px;
+}
+.search-icon{
+  width: 100%;
+  object-fit: cover;
+}
+.nav-item{
+  font-weight: 500;
+  font-size: 1rem;
+  color: black !important;
+}
+.navbar-parent{
+  background: transparent;
+  transition: background-color 0.3s;
+}
+.main-button{
+  border: none;
+  border-radius: 10em;
+  background-color: black;
+  color: white;
+  padding: 0.5rem 1.5rem;
+  font-weight: 500;
+}
+a{
+  color: black;
+  font-weight: var(--font-weight-subheading);
+}
+.login-card{
+  background-color: var(--color-teritiary-user);
+  border-radius: 2rem;
+}
+.login-input{
+  border: none;
+  border-radius: 2rem;
+  padding: 0.75rem;
+  outline: none;
+}
+.login-label{
+  font-weight: var(--font-weight-subheading);
+}
+.sign-in{
+  font-weight: var(--font-weight-subheading);
+}
+.banner{
+  background-image: url('/assets/banner/One stop shop.png');
+  background-size: cover;
+  background-repeat: no-repeat;
+  height: 90vh;
+  background-position: center center;
+}
+.banner-text{
+  font-weight: var(--font-weight-heading);
+  font-size: var(--font-size-heading);
+}
+footer{
+  background-color: var(--color-teritiary-user);
+  padding: 1rem;
+}
+footer div div div p{
+  font-size: var(--font-size-normal);
+}
+footer div div div p:first-child{
+  font-weight: var(--font-weight-subheading);
+  font-size: var(--font-size-normal);
+  padding-top: 1rem;
+}
+.navbar-icon{
+  height: 1rem;
+  padding-right: 5px;
+}
