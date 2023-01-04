@@ -36,30 +36,3 @@ mongoose.connect('mongodb://127.0.0.1:27017/kroma')
 })
 app.use('/', userRouter)
 
-// app.get('/login', (req, res) => {
-//   res.render('login')
-// })
-// app.get('/register', (req, res)=>{
-//   res.render('register')
-// })
-// app.get('/', (req, res)=>{
-//   res.render('home-page')
-// })
-// app.post('/register', async (req, res)=>{
-//   const user = new userModel({
-//     fname: req.body.fname,
-//     lname: req.body.lname,
-//     email: req.body.email,
-//     phone: req.body.phone,
-//     password: req.body.password,
-//     "billingAddress.state": req.body.state,
-//     "billingAddress.country": req.body.country
-//   })
-//   try{
-//     await user.save()
-//     res.send('Success')
-//   }catch(error){
-//     console.log(error.message)
-//     res.send(error)
-//   }
-// })

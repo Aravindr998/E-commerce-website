@@ -97,3 +97,6 @@ footer div div div p:first-child{
   height: 1rem;
   padding-right: 5px;
 }
+#otp-card{
+  display: none;
+}

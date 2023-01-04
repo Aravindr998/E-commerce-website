@@ -62,18 +62,22 @@ module.exports = {
       const user = new userModel({
         fname: req.body.fname,
         lname: req.body.lname,
+        phone: req.body.phone,
         email: req.body.email,
-        password: req.body.password,
-        phone: req.body.phone
+        password: req.body.password
+
       })
       if(req.body['confirm-password'] != req.body.password){
         req.session.Errmessage = "Password do not match"
         req.session.registerUser = user
-        return res.redirect('/register')
+        return res.json({
+          redirect: '/register',
+          saveStatus: false
+        })
       }
       try{
-        await user.save()
-        return res.redirect('/login')
+        await user.validate()
+        return res.json({saveStatus: true})
       }catch(error){
         let message;
         if(error.errors.fname){
@@ -88,12 +92,18 @@ module.exports = {
           req.session.Errmessage = error.errors.password.properties.message
         }
         req.session.registerUser = user
-        return res.redirect('/register')
+        return res.json({
+          saveStatus: false,
+          redirect: '/register'
+        })
       }
     }else{
       req.session.Errmessage = "User already exists"
-      req.session.registerUser = user
-      return res.redirect('/register')
+      req.session.registerUser = existing[0]
+      return res.json({
+        saveStatus: false,
+        redirect: '/register'
+      })
     }
   },
 
@@ -128,6 +138,36 @@ module.exports = {
     }else{
       req.session.destroy()
       return res.redirect('/')
+    }
+  },
+  checkOtp: async (req, res) => {
+    req.session.otp = '567890'
+    otp = req.body.otp
+    if(req.body.otp == req.session.otp){
+      const user = new userModel({
+        fname: req.body.fname,
+        lname: req.body.lname,
+        email: req.body.email,
+        phone: req.body.phone,
+        password: req.body.password
+      })
+      try{
+        await user.save()
+        res.json({
+          saveStatus: true,
+          redirect: '/login'
+        })
+      }catch(error){
+        console.log(error)
+        res.json({
+          saveStatus: true,
+          redirect: '/register'
+        })
+      }
+    }else{
+      res.json({
+        message: 'Invalid OTP'
+      })
     }
   }
 }

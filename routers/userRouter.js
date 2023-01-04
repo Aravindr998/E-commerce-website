@@ -15,5 +15,6 @@ router.post('/login', userController.isLoggedin, userController.loginUser)
 
 router.get('/logout', userController.logoutUser)
 
+router.post('/register/otp', userController.checkOtp)
 
 module.exports = router
