@@ -3,6 +3,7 @@ const session = require('express-session')
 const mongoose = require('mongoose')
 const userModel = require('./models/users')
 const userRouter = require('./routers/userRouter')
+const adminRouter = require('./routers/adminRouter')
 require('dotenv').config()
 
 const app = express()
@@ -35,4 +36,5 @@ mongoose.connect('mongodb://127.0.0.1:27017/kroma')
   console.log(`Couldn't connect to database`)
 })
 app.use('/', userRouter)
+app.use('/admin', adminRouter)
 

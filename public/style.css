@@ -104,3 +104,8 @@ footer div div div p:first-child{
   text-decoration: underline;
   cursor: pointer;
 }
+
+.admin-login-card{
+  background-color: var(--color-teritiary-admin);
+  border-radius: 2rem;
+}

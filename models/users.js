@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const bcrypt = require('bcrypt')
 
 const addressSchema = new mongoose.Schema({
   state: {
@@ -82,6 +83,16 @@ const userSchema = new mongoose.Schema({
   },
   cart: [cartSchema],
   wishlist: [wishlistSchema]
+})
+
+userSchema.pre('save', async function(next){
+  try {
+    hashedPassword = await bcrypt.hash(this.password, 10)
+    this.password = hashedPassword
+    next();
+  } catch (error) {
+    console.log(error)
+  }
 })
 
 const User = mongoose.model('User', userSchema)

@@ -1,4 +1,5 @@
 const userModel = require('../models/users')
+const bcrypt = require('bcrypt')
 
 module.exports = {
   getHomepage: function(req, res){
@@ -117,15 +118,22 @@ module.exports = {
       if(user.length == 0){
         req.session.Errmessage = "User does not exist"
         return res.redirect('/login')
-      }else if(req.body.password != user[0].password){
-        req.session.Errmessage = "Invalid password"
-        return res.redirect('/login')
-      }else if(user[0].isBlocked){
-        req.session.Errmessage = "Cannot sign in"
-        return res.redirect('/login')
       }else{
-        req.session.user = user[0]
-        res.redirect('/')
+        try {
+          const match = await bcrypt.compare(req.body.password, user[0].password)
+          if(!match){
+            req.session.Errmessage = "Invalid password"
+            return res.redirect('/login')
+          }else if(user[0].isBlocked){
+              req.session.Errmessage = "Cannot sign in"
+              return res.redirect('/login')
+            }else{
+              req.session.user = user[0]
+              res.redirect('/')
+            }
+        } catch (error) {
+          console.log(error)
+        }
       }
     }catch(error){
       return res.status(500).send(error)
