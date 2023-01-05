@@ -141,8 +141,6 @@ module.exports = {
     }
   },
   checkOtp: async (req, res) => {
-    req.session.otp = '567890'
-    otp = req.body.otp
     if(req.body.otp == req.session.otp){
       const user = new userModel({
         fname: req.body.fname,
@@ -169,5 +167,44 @@ module.exports = {
         message: 'Invalid OTP'
       })
     }
+  },
+
+  generateOtp: (req, res, next) => {
+    let otp
+    console.log(req.body.otp)
+    if(req.body.otp){
+      next()
+    }else{
+      otp = Math.floor(100000 + Math.random()*900000)
+      req.session.otp = otp
+      sendOtp(otp, req.body.phone)
+      .then(()=>{
+        next()
+      })
+      .catch((error) => {
+        console.log(error)
+        return res.redirect('/register')
+      })
+    }
+  },
+
+  resendOtp: (req, res, next) => {
+    let otp = Math.floor(100000 + Math.random()*900000)
+    req.session.otp = otp
+    sendOtp(otp, req.body.phone)
+    .then(()=>{
+      return res.json({message: "OTP sent successfully"})
+    })
+    .catch((error) => {
+      console.log(error)
+      return res.json({message: "Could not resend, Please try again"})
+    })
   }
+}
+
+function sendOtp(otp, number){
+  console.log(otp + " " + number)
+  return new Promise((resolve, reject) => {
+    resolve()
+  })
 }

@@ -65,3 +65,22 @@ document.addEventListener('submit', (e) =>{
     })
   }
 })
+
+function resendOtp(){
+  const otp = document.querySelector('#otp').value
+  const phone = document.querySelector('#phone').value
+  const url = 'http://localhost:4000/register/otp/resend'
+  fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      otp,
+      phone
+    })
+  }).then((response) => response.json())
+  .then((response) => {
+    document.querySelector('#success-text').innerHTML = response.message
+  })
+}
