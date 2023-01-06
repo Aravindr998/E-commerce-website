@@ -1,5 +1,8 @@
 const userModel = require('../models/users')
 const bcrypt = require('bcrypt')
+const fast2sms = require('fast-two-sms')
+const axios = require('axios')
+require('dotenv').config()
 
 module.exports = {
   getHomepage: function(req, res){
@@ -57,19 +60,26 @@ module.exports = {
     }
   },
 
-  registerUser: async (req, res)=>{
+  registerUser: async (req, res, next)=>{
     const existing = await userModel.find({email: req.body.email})
-    if(existing.length == 0){
-      const user = new userModel({
-        fname: req.body.fname,
-        lname: req.body.lname,
-        phone: req.body.phone,
-        email: req.body.email,
-        password: req.body.password
+    const user = new userModel({
+      fname: req.body.fname,
+      lname: req.body.lname,
+      phone: req.body.phone,
+      email: req.body.email,
+      password: req.body.password
 
-      })
+    })
+    if(existing.length == 0){
       if(req.body['confirm-password'] != req.body.password){
         req.session.Errmessage = "Password do not match"
+        req.session.registerUser = user
+        return res.json({
+          redirect: '/register',
+          saveStatus: false
+        })
+      }else if(!(req.body.phone).match(/^[789]\d{9}$/)){
+        req.session.Errmessage = "Invalid mobile number"
         req.session.registerUser = user
         return res.json({
           redirect: '/register',
@@ -78,8 +88,10 @@ module.exports = {
       }
       try{
         await user.validate()
-        return res.json({saveStatus: true})
+        res.json({saveStatus: true})
+        next()
       }catch(error){
+        console.log(error)
         let message;
         if(error.errors.fname){
           req.session.Errmessage = error.errors.fname.properties.message
@@ -100,7 +112,7 @@ module.exports = {
       }
     }else{
       req.session.Errmessage = "User already exists"
-      req.session.registerUser = existing[0]
+      req.session.registerUser = user
       return res.json({
         saveStatus: false,
         redirect: '/register'
@@ -186,7 +198,8 @@ module.exports = {
       otp = Math.floor(100000 + Math.random()*900000)
       req.session.otp = otp
       sendOtp(otp, req.body.phone)
-      .then(()=>{
+      .then((response)=>{
+        console.log(response.data)
         next()
       })
       .catch((error) => {
@@ -200,8 +213,13 @@ module.exports = {
     let otp = Math.floor(100000 + Math.random()*900000)
     req.session.otp = otp
     sendOtp(otp, req.body.phone)
-    .then(()=>{
-      return res.json({message: "OTP sent successfully"})
+    .then((response)=>{
+      console.log(response.data)
+      if(response.data.return){
+        return res.json({message: "OTP sent successfully"})
+      }else{
+        return res.json({message: "Some error occured"})
+      }
     })
     .catch((error) => {
       console.log(error)
@@ -211,8 +229,16 @@ module.exports = {
 }
 
 function sendOtp(otp, number){
-  console.log(otp + " " + number)
-  return new Promise((resolve, reject) => {
-    resolve()
+  console.log(otp)
+  const body = {
+    "authorization" : process.env.AUTHORIZATION_KEY,
+    "variables_values" : otp,
+    "route" : "otp",
+    "numbers" : number
+  }
+  return axios({
+    method : 'GET',
+    url : 'https://www.fast2sms.com/dev/bulkV2',
+    data: body
   })
 }

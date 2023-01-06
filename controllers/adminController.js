@@ -1,6 +1,7 @@
 const adminModel = require('../models/admin')
 const userModel = require('../models/users')
 const productModel = require('../models/products')
+const categoryModel = require('../models/categories')
 
 module.exports = {
   isLoggedin: (req, res, next) => {
@@ -54,5 +55,15 @@ module.exports = {
   },
   getHomepage: (req, res) => {
     res.render('admin/admin-dashboard')
+  },
+  getAddProducts: async (req, res) => {
+    const categories = await categoryModel.find();
+    res.render('admin/add-products', {categories})
+  },
+  addProducts: async(req, res) => {
+    const existing = await productModel.find({title: req.body.title})
+    if(existing.length == 0){
+      
+    }
   }
 }

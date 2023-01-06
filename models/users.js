@@ -54,8 +54,8 @@ const userSchema = new mongoose.Schema({
   phone: {
     type: String,
     required: [true, 'Phone number cannot be empty'],
-    minlength: [10, `Phone number must be atleast 10 digits`],
-    maxlength: [13, `Phone number must be less than 12 digits`]
+    minlength: [10, `Phone number must be 10 digits`],
+    maxlength: [10, `Phone number must be 10 digits`]
   },
   password: {
     type: String,

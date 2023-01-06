@@ -12,7 +12,7 @@ body{
 .logo{
   object-fit: contain;
 }
-.form-control{
+.form-search{
   border: none;
   border-bottom: solid 2px black;
   border-radius: 0;

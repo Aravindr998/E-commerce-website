@@ -9,7 +9,7 @@ router.get('/login', userController.isLoggedin, userController.getLogin)
 
 router.get('/register', userController.isLoggedin, userController.getRegister)
 
-router.post('/register', userController.isLoggedin, userController.generateOtp, userController.registerUser)
+router.post('/register', userController.isLoggedin, userController.registerUser, userController.generateOtp)
 
 router.post('/login', userController.isLoggedin, userController.loginUser)
 

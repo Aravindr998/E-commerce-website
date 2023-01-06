@@ -3,27 +3,27 @@ const mongoose = require('mongoose')
 const productSkuSchema = new mongoose.Schema({
   color:  {
     type: String,
-    required: true
+    required: [true, 'Color cannot be empty']
   },
   highlights: {
     type: String,
-    required: true
+    required: [true, 'Highlights cannot be empty']
   },
   price: {
     type: Number,
-    required: true
+    required: [true, 'Price cannot be empty']
   },
   dimension: {
     type: String,
-    required: true
+    required: [true, 'Dimensions cannot be empty']
   },
   images: {
     type: String,
-    required: true
+    required: [true, 'Images cannot be empty']
   },
   totalStock: {
     type: Number,
-    required: true
+    required: [true, 'Stock cannot be empty']
   },
   stockLeft: {
     type: Number
@@ -40,7 +40,7 @@ const productSchema = new mongoose.Schema({
     required: [true, "Product warranty details is required"]
   },
   rating: {
-    type: Number,
+    type: [Number],
   },
   skus: [productSkuSchema],
   categoryId: {
