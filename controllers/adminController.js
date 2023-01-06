@@ -3,6 +3,7 @@ const userModel = require('../models/users')
 const productModel = require('../models/products')
 const categoryModel = require('../models/categories')
 
+
 module.exports = {
   isLoggedin: (req, res, next) => {
     if(req.session.admin){
@@ -53,17 +54,66 @@ module.exports = {
       res.redirect('/admin/login')
     }
   },
-  getHomepage: (req, res) => {
-    res.render('admin/admin-dashboard')
+  getHomepage: async (req, res) => {
+    const product = await productModel.find()
+    res.render('admin/admin-dashboard', {product})
   },
   getAddProducts: async (req, res) => {
-    const categories = await categoryModel.find();
-    res.render('admin/add-products', {categories})
+    const categories = await categoryModel.find()
+    if(req.session.Errmessage){
+      const message = req.session.Errmessage
+      const product = req.session.addProducts
+      req.session.Errmessage = null
+      req.session.product = null
+      return res.render('admin/add-products', {categories, message, product})
+    }else{
+      const message = ""
+      const product = {}
+      return res.render('admin/add-products', {categories, message, product})
+    }
   },
   addProducts: async(req, res) => {
     const existing = await productModel.find({title: req.body.title})
     if(existing.length == 0){
-      
+      const images = []
+      req.files.forEach(element => {
+        images.push('./'+element.path)
+      })
+      console.log(images)
+      const product = new productModel({
+        title: req.body.title,
+        warranty: req.body.warranty,
+        categoryId: req.body.category,
+        'skus.0.color': req.body.color,
+        'skus.0.highlights': req.body.highlights,
+        'skus.0.dimension': req.body.dimension,
+        'skus.0.price': req.body.price,
+        'skus.0.totalStock': req.body.stock,
+        'skus.0.price': req.body.price,
+        'skus.0.images': images
+      })
+      try{
+        await product.save()
+        return res.redirect('/admin/products')
+      }catch(error){
+        console.log(error)
+        if(error.errors.title){
+          req.session.Errmessage = error.errors.title.properties.message
+        }else if(error.errors.warranty){
+          req.session.Errmessage = error.errors.warranty.properties.message
+        }else if(error.errors.categoryId){
+          req.session.Errmessage = error.errors.categoryId.properties.message
+        }else{
+          req.session.Errmessage = "Some error"
+          console.log(error)
+        }
+        req.session.addProducts = product
+        return res.redirect('/admin/products/new')
+      }
+    }else{
+      req.session.Errmessage = "Product already exists"
+      req.session.addProducts = product
+      return res.redirect('/admin/products/new')
     }
   }
 }

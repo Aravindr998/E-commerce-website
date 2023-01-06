@@ -1,10 +1,5 @@
-const express = require('express')
-const adminController = require('../controllers/adminController')
-// const { upload } = require('../config/fileUpload')
 const multer = require('multer')
 const path = require('path')
-
-const router = express.Router()
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -30,18 +25,4 @@ const upload = multer({
   }
 })
 
-
-
-router.get('/login',adminController.isLoggedin, adminController.getLogin)
-
-router.post('/login', adminController.isLoggedin, adminController.loginAdmin)
-
-router.get('/', adminController.authenticate, adminController.getHomepage)
-
-router.get('/products/new', adminController.authenticate, adminController.getAddProducts)
-
-router.post('/products/new', adminController.authenticate, upload.array('image', 3), adminController.addProducts)
-
-
-
-module.exports = router
+module.exports = upload

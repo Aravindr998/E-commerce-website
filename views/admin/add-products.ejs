@@ -4,20 +4,20 @@
 <body class="pt-5">
   <%- include('../partials/admin/admin-navbar') %> 
   <section class="container p-4">
-    <p class="text-danger">Error message</p>
-    <form class="row g-3" method="POST">
+    <p class="text-danger"><%= message %> </p>
+    <form class="row g-3" method="POST" enctype="multipart/form-data">
       <div class="col-md-6">
         <label for="title" class="form-label">Title</label>
-        <input type="title" class="form-control" name="title" id="title">
+        <input type="title" class="form-control" name="title" id="title" value="<%= product.title %>">
       </div>
       <div class="col-md-6">
         <label for="warranty" class="form-label">Warranty</label>
-        <input type="text" class="form-control" name="warranty" id="warranty">
+        <input type="text" class="form-control" name="warranty" id="warranty" value="<%= product.warranty %>">
       </div>
       <div class="col-md-4">
         <label for="category" class="form-label">Category</label>
         <select id="category" name="category" class="form-select">
-          <option selected>Choose...</option>
+          <!-- <option selected>Choose...</option> -->
           <% if(categories.length>0){ %> 
             <% categories.forEach(item => { %> 
               <option><%= item.categoryName %> </option>
@@ -48,16 +48,27 @@
         <label class="form-label" for="dimension">Dimension</label>
         <textarea type="text" name="dimension" id="dimension" class="form-control"></textarea>
       </div>
-      <div class="input-group mb-3">
-        <input type="file" class="form-control" id="inputGroupFile02">
-        <label class="input-group-text" for="inputGroupFile02">Upload</label>
+      <div class="input-group mb-3 col-md-4">
+        <input type="file" class="form-control" id="image1" name="image">
+        <label class="input-group-text" for="image1">Upload</label>
+      </div>
+      <div class="input-group mb-3 col-md-4">
+        <input type="file" class="form-control" id="image2" name="image">
+        <label class="input-group-text" for="image2">Upload</label>
+      </div>
+      <div class="input-group mb-3 col-md-4">
+        <input type="file" class="form-control" id="image3" name="image">
+        <label class="input-group-text" for="image3">Upload</label>
       </div>
       <div class="row">
         <div class="col-3">
-          <button type="submit" class="btn btn-primary" formaction="/products/new">Submit</button>
+          <button type="submit" class="btn btn-primary" formaction="/admin/products/new">Submit</button>
         </div>
         <div class="col-3">
-          <button type="submit" class="btn btn-primary" formaction="/products/new/skus">Add More Skus</button>
+          <button type="submit" class="btn btn-primary" formaction="/admin/products/new/skus">Add More Skus</button>
+        </div>
+        <div class="col-3">
+          <a href="/admin" class="btn btn-outline-primary">Cancel</a>
         </div>
       </div>
     </form>
