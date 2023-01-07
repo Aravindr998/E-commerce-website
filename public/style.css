@@ -109,3 +109,7 @@ footer div div div p:first-child{
   background-color: var(--color-teritiary-admin);
   border-radius: 2rem;
 }
+
+.image-table{
+  max-width: 5rem;
+}

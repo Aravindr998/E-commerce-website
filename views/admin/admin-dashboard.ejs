@@ -5,16 +5,19 @@
   <%- include('../partials/admin/admin-navbar') %> 
   <section class="container pt-5">
     <div class="row">
+      <div>
+        <a href="admin/products/new" class="btn btn-success mb-3">Add Products</a>
+      </div>
       <div class="col-12">
         <table class="table">
           <thead>
             <tr>
-              <th scope="col">#</th>
-              <th scope="col">Title</th>
-              <th scope="col">Price</th>
-              <th scope="col">Category</th>
-              <th scope="col">Image</th>
-              <th scope="col">Action</th>
+              <th class="text-center" scope="col">#</th>
+              <th class="text-center" scope="col">Title</th>
+              <th class="text-center" scope="col">Price</th>
+              <th class="text-center" scope="col">Category</th>
+              <th class="text-center" scope="col">Image</th>
+              <th class="text-center" scope="col">Action</th>
             </tr>
           </thead>
           <tbody>
@@ -22,17 +25,17 @@
               <% var count = 1 %> 
               <% product.forEach(item => { %> 
                 <% item.skus.forEach(sku => { %> 
-
-            <tr>
-              <th scope="row"><%= count++ %> </th>
-              <td><%= item.title %> </td>
-              <td><%= sku.price %> </td>
-              <td><%= item.categoryId %> </td>
-              <td><%= sku.images[0] %> </td>
-              <td><%=  %>  </td>
-            </tr>
-            <% }) %> 
-            <% }) %> 
+                  <tr>
+                    <th class="text-center align-middle" scope="row"><%= count++ %> </th>
+                    <td class="text-center align-middle"><%= item.title %> </td>
+                    <td class="text-center align-middle"><%= sku.price %> </td>
+                    <td class="text-center align-middle"><%= item.categoryId %> </td>
+                    <td class="text-center align-middle"><img class="image-table" src="/<%= sku.images[0] %> " alt=""></td>
+                    <td class="text-center align-middle"><a href="/admin/products/edit/<%= item._id %> " class="btn btn-primary">Edit</a></td>
+                    <td class="text-center align-middle"><a href="/admin/products/delete/<%= item._id %> " class="btn btn-danger">Delete</a></td>
+                  </tr>
+                <% }) %> 
+              <% }) %> 
             <% } %> 
           </tbody>
         </table>

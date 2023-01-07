@@ -42,6 +42,10 @@ router.get('/products/new', adminController.authenticate, adminController.getAdd
 
 router.post('/products/new', adminController.authenticate, upload.array('image', 3), adminController.addProducts)
 
+router.get('/products/new/skus', adminController.authenticate, adminController.newSku)
 
+router.post('/products/new/skus', adminController.authenticate, upload.array('image', 3), adminController.addNewSku)
+
+router.post('/products/new/skus/new', adminController.authenticate, upload.array('image', 3), adminController.saveSku)
 
 module.exports = router
