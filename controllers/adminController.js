@@ -51,8 +51,10 @@ module.exports = {
   authenticate: (req, res, next) => {
     if(req.session.admin){
       next()
+    }else if(req.session.user){
+      return res.redirect('/')
     }else{
-      res.redirect('/admin/login')
+      return res.redirect('/admin/login')
     }
   },
   getHomepage: async (req, res) => {
@@ -137,14 +139,17 @@ module.exports = {
   },
 
   newSku: async (req, res) => {
-    if(req.session.addProducts){
+    if(req.session.addProducts || req.session.update){
       const categories = await categoryModel.find()
       const product = req.session.addProducts
-      const skus = {}
+      const skus = req.session.skus || {}
+      const message = req.session.Errmessage || ""
       req.session.addProducts = null
-      res.render('admin/new-sku', {product, skus, categories})
+      req.session.Errmessage = null
+      req.session.skus = null
+      return res.render('admin/new-sku', {product, skus, categories, message})
     }else{
-      res.redirect('/admin')
+      return res.redirect('/admin')
     }
   },
 
@@ -221,14 +226,18 @@ module.exports = {
       dimension: req.body.dimension,
       images
     }
+    let repeat = false
     product.skus.forEach(item => {
       if(item.color == req.body.color){
-        req.session.Errmessage = "Sku already exists"
-        req.session.addProducts = product
-        req.session.skus = skus
-        return res.redirect('/admin/product/new/skus')
+        repeat = true
       }
     })
+    if(repeat){
+      req.session.Errmessage = "Sku already exists"
+      req.session.addProducts = product
+      req.session.skus = skus
+      return res.redirect('/admin/products/new/skus')
+    }
     if(images.length != 3){
       req.session.Errmessage = 'Images cannot be empty'
       req.session.addProducts = product
@@ -241,26 +250,100 @@ module.exports = {
           skus: skus
         }
       }, {runValidators: true})
+      req.session.update = true
       return res.redirect('/admin')
     } catch (error) {
       console.log(error)
       req.session.Errmessage = "Some error occured"
-        // const length = skus.length
-        // if(error.errors.skus['length'].color){
-        //   req.session.Errmessage = error.errors.skus['length'].color.properties.message
-        // }else if(error.errors.skus['length'].highlights){
-        //   req.session.Errmessage = error.errors.skus['length'].highlights.properties.message
-        // }else if(error.errors.skus['length'].dimension){
-        //   req.session.Errmessage = error.errors.skus['length'].dimension.properties.message
-        // }else if(error.errors.skus['length'].price){
-        //   req.session.Errmessage = error.errors.skus['length'].price.properties.message
-        // }else if(error.errors.skus['length'].totalStock){
-        //   req.session.Errmessage = error.errors.skus['length'].totalStock.properties.message
-        // }
+        const length = skus.length
+        if(error.errors['skus.color']){
+          req.session.Errmessage = error.errors['skus.color'].properties.message
+        }else if(error.errors['skus.highlights']){
+          req.session.Errmessage = error.errors['skus.highlights'].properties.message
+        }else if(error.errors['skus.dimension']){
+          req.session.Errmessage = error.errors['skus.dimension'].properties.message
+        }else if(error.errors['skus.price']){
+          req.session.Errmessage = error.errors['skus.price'].properties.message
+        }else if(error.errors['skus.totalStock']){
+          req.session.Errmessage = error.errors['skus.totalStock'].properties.message
+        }
         req.session.addProducts = product
         req.session.skus = skus
-        res.redirect('/admin/products/new/skus')
+        return res.redirect('/admin/products/new/skus')
     }
     
+  },
+
+  saveSku2: async(req, res, next) => {
+    const product = await productModel.findOne({title: req.body.title})
+    console.log(product)
+    console.log(req.body.title)
+    const images = []
+      req.files.forEach(element => {
+        images.push(element.path.slice(7))
+      })
+    const skus = {
+      color: req.body.color,
+      price: req.body.stock,
+      totalStock: req.body.stock,
+      highlights: req.body.highlights,
+      dimension: req.body.dimension,
+      images
+    }
+    let repeat = false
+    product.skus.forEach(item => {
+      if(item.color == req.body.color){
+        repeat = true
+      }
+    })
+    if(repeat){
+      req.session.Errmessage = "Sku already exists"
+      req.session.addProducts = product
+      req.session.skus = skus
+      return res.redirect('/admin/products/new/skus')
+    }
+    if(images.length != 3){
+      req.session.Errmessage = 'Images cannot be empty'
+      req.session.addProducts = product
+      req.session.skus = skus
+      return res.redirect('/admin/products/new/skus')
+    }
+    try {
+      await productModel.findOneAndUpdate({title: req.body.title}, {
+        $push: {
+          skus: skus
+        }
+      }, {runValidators: true})
+      req.session.addProducts = product
+      return res.redirect('/admin/products/new/skus')
+    } catch (error) {
+      console.log(error)
+      req.session.Errmessage = "Some error occured"
+        const length = skus.length
+        if(error.errors['skus.color']){
+          req.session.Errmessage = error.errors['skus.color'].properties.message
+        }else if(error.errors['skus.highlights']){
+          req.session.Errmessage = error.errors['skus.highlights'].properties.message
+        }else if(error.errors['skus.dimension']){
+          req.session.Errmessage = error.errors['skus.dimension'].properties.message
+        }else if(error.errors['skus.price']){
+          req.session.Errmessage = error.errors['skus.price'].properties.message
+        }else if(error.errors['skus.totalStock']){
+          req.session.Errmessage = error.errors['skus.totalStock'].properties.message
+        }
+        req.session.addProducts = product
+        req.session.skus = skus
+        return res.redirect('/admin/products/new/skus')
+    }
+    
+  },
+
+  getEditPage: async(req, res) => {
+    const id = req.params.id
+    console.log(id)
+    const product = await productModel.findById({_id: id})
+    const categories = await categoryModel.find()
+    console.log(product)
+    return res.render('admin/user-edit', {product, categories})
   }
 }

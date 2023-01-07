@@ -27,6 +27,7 @@
       <div class="col-md-12">
         <h2>Skus</h2>
       </div>
+      <p class="text-danger"><%= message %> </p>
       <div class="col-md-4">
         <label class="form-label" for="color">Color</label>
         <input type="text" name="color" id="color" class="form-control" value="<%= skus.color %>">
@@ -47,24 +48,26 @@
         <label class="form-label" for="dimension">Dimension</label>
         <textarea type="text" name="dimension" id="dimension" class="form-control"><%= skus.dimension%></textarea>
       </div>
-      <div class="input-group mb-3 col-md-4">
-        <input type="file" class="form-control" id="image1" name="image">
-        <label class="input-group-text" for="image1">Upload</label>
-      </div>
-      <div class="input-group mb-3 col-md-4">
-        <input type="file" class="form-control" id="image2" name="image">
-        <label class="input-group-text" for="image2">Upload</label>
-      </div>
-      <div class="input-group mb-3 col-md-4">
-        <input type="file" class="form-control" id="image3" name="image">
-        <label class="input-group-text" for="image3">Upload</label>
+      <div class="row">
+        <div class="input-group mb-3 col-md-4">
+          <input type="file" class="form-control" id="image1" name="image">
+          <label class="input-group-text" for="image1">Upload</label>
+        </div>
+        <div class="input-group mb-3 col-md-4">
+          <input type="file" class="form-control" id="image2" name="image">
+          <label class="input-group-text" for="image2">Upload</label>
+        </div>
+        <div class="input-group mb-3 col-md-4">
+          <input type="file" class="form-control" id="image3" name="image">
+          <label class="input-group-text" for="image3">Upload</label>
+        </div>
       </div>
       <div class="row">
         <div class="col-3">
           <button type="submit" class="btn btn-primary" formaction="/admin/products/new/skus/new">Submit</button>
         </div>
         <div class="col-3">
-          <a href="/admin/products/new/skus" class="btn btn-primary">Add more skus</a>
+          <button type="submit" class="btn btn-primary" formaction="/admin/products/new/skus/new/2">Add new sku</button>
         </div>
         <div class="col-3">
           <a href="/admin" class="btn btn-outline-primary">Cancel</a>

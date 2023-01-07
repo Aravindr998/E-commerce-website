@@ -48,4 +48,8 @@ router.post('/products/new/skus', adminController.authenticate, upload.array('im
 
 router.post('/products/new/skus/new', adminController.authenticate, upload.array('image', 3), adminController.saveSku)
 
+router.post('/products/new/skus/new/2', adminController.authenticate, upload.array('image', 3), adminController.saveSku2)
+
+router.get('/products/edit/:id', adminController.authenticate, adminController.getEditPage)
+
 module.exports = router
