@@ -40,16 +40,24 @@ router.get('/', adminController.authenticate, adminController.getHomepage)
 
 router.get('/products/new', adminController.authenticate, adminController.getAddProducts)
 
-router.post('/products/new', adminController.authenticate, upload.array('image', 3), adminController.addProducts)
+router.post('/products/new', adminController.authenticate, upload.fields([{name: 'image1', maxCount: 1}, {name: 'image2', maxCount: 1}, {name: 'image3', maxCount: 1},]), adminController.addProducts)
 
 router.get('/products/new/skus', adminController.authenticate, adminController.newSku)
 
-router.post('/products/new/skus', adminController.authenticate, upload.array('image', 3), adminController.addNewSku)
+router.post('/products/new/skus', adminController.authenticate, upload.fields([{name: 'image1', maxCount: 1}, {name: 'image2', maxCount: 1}, {name: 'image3', maxCount: 1},]), adminController.addNewSku)
 
-router.post('/products/new/skus/new', adminController.authenticate, upload.array('image', 3), adminController.saveSku)
+router.post('/products/new/skus/new', adminController.authenticate, upload.fields([{name: 'image1', maxCount: 1}, {name: 'image2', maxCount: 1}, {name: 'image3', maxCount: 1},]), adminController.saveSku)
 
-router.post('/products/new/skus/new/2', adminController.authenticate, upload.array('image', 3), adminController.saveSku2)
+router.post('/products/new/skus/new/2', adminController.authenticate, upload.fields([{name: 'image1', maxCount: 1}, {name: 'image2', maxCount: 1}, {name: 'image3', maxCount: 1},]), adminController.saveSku2)
+
+router.get('/products/view/:id', adminController.authenticate, adminController.getDetailsPage)
 
 router.get('/products/edit/:id', adminController.authenticate, adminController.getEditPage)
+
+router.put('/products/edit/:id', adminController.authenticate, adminController.updateProduct)
+
+router.get('/products/edit/:prodid/:skuid', adminController.authenticate, adminController.getSkuEditPage)
+
+router.put('/products/edit/skus/:id', adminController.authenticate, upload.fields([{name: 'image1', maxCount: 1}, {name: 'image2', maxCount: 1}, {name: 'image3', maxCount: 1},]), adminController.updateProductSku)
 
 module.exports = router

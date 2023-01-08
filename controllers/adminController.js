@@ -2,7 +2,7 @@ const adminModel = require('../models/admin')
 const userModel = require('../models/users')
 const productModel = require('../models/products')
 const categoryModel = require('../models/categories')
-const { findOne, findOneAndUpdate } = require('../models/products')
+const mongoose = require('mongoose')
 
 
 module.exports = {
@@ -84,9 +84,14 @@ module.exports = {
   addProducts: async(req, res) => {
     const existing = await productModel.find({title: req.body.title})
     const images = []
-      req.files.forEach(element => {
-        images.push(element.path.slice(7))
-      })
+    console.log(req.files)
+    for(key in req.files){
+      const paths = req.files[key][0].path
+      images.push(paths.slice(7))
+    }
+      // req.files.forEach(element => {
+      //   images.push(element.path.slice(7))
+      // })
       console.log(images)
       const product = new productModel({
         title: req.body.title,
@@ -108,7 +113,7 @@ module.exports = {
       }
       try{
         await product.save()
-        return res.redirect('/admin/products')
+        return res.redirect('/admin')
       }catch(error){
         console.log(error)
         if(error.errors.title){
@@ -156,9 +161,10 @@ module.exports = {
   addNewSku: async (req, res) => {
     const existing = await productModel.find({title: req.body.title})
     const images = []
-      req.files.forEach(element => {
-        images.push(element.path.slice(7))
-      })
+    for(key in req.files){
+      const paths = req.files[key][0].path
+      images.push(paths.slice(7))
+    }
       console.log(images)
       const product = new productModel({
         title: req.body.title,
@@ -215,12 +221,13 @@ module.exports = {
     console.log(product)
     console.log(req.body.title)
     const images = []
-      req.files.forEach(element => {
-        images.push(element.path.slice(7))
-      })
+    for(key in req.files){
+      const paths = req.files[key][0].path
+      images.push(paths.slice(7))
+    }
     const skus = {
       color: req.body.color,
-      price: req.body.stock,
+      price: req.body.price,
       totalStock: req.body.stock,
       highlights: req.body.highlights,
       dimension: req.body.dimension,
@@ -279,12 +286,13 @@ module.exports = {
     console.log(product)
     console.log(req.body.title)
     const images = []
-      req.files.forEach(element => {
-        images.push(element.path.slice(7))
-      })
+    for(key in req.files){
+      const paths = req.files[key][0].path
+      images.push(paths.slice(7))
+    }
     const skus = {
       color: req.body.color,
-      price: req.body.stock,
+      price: req.body.price,
       totalStock: req.body.stock,
       highlights: req.body.highlights,
       dimension: req.body.dimension,
@@ -338,12 +346,143 @@ module.exports = {
     
   },
 
-  getEditPage: async(req, res) => {
+  getDetailsPage: async(req, res) => {
     const id = req.params.id
-    console.log(id)
     const product = await productModel.findById({_id: id})
     const categories = await categoryModel.find()
-    console.log(product)
-    return res.render('admin/user-edit', {product, categories})
+    return res.render('admin/product-details', {product, categories})
+  },
+
+  getEditPage: async(req, res) => {
+    const id = req.params.id
+    const product = await productModel.findById({_id: id})
+    const categories = await categoryModel.find()
+    return res.render('admin/product-edit', {product, categories})
+  },
+
+  updateProduct: async (req, res) => {
+    const id = req.params.id
+    try {
+      await productModel.findOneAndUpdate({_id: id}, {
+        title: req.body.title,
+        warranty: req.body.warranty,
+        categoryId: req.body.category
+      }, {runValidators: true})
+      console.log('product updated')
+      return res.json({
+        successStatus: true,
+        redirect: '/admin/products/view/'+id
+      })
+    } catch (error) {
+      let message
+      if(error.errors.title){
+        message = error.errors.title.properties.message
+      }else if(error.errors.warranty){
+        message = error.errors.warranty.properties.message
+      }else if(error.errors.categoryId){
+        message = error.errors.categoryId.properties.message
+      }
+      return res.json({
+        successStatus: false,
+        message,
+      })
+    }
+  },
+
+  getSkuEditPage: async (req, res) => {
+    const prodId = req.params.prodid
+    const skuId = req.params.skuid
+    const product = await productModel.aggregate([
+      {
+        $match: {
+          _id: mongoose.Types.ObjectId(prodId)
+        }
+      },
+      {
+        $unwind: '$skus'
+      },
+      {
+        $match: {
+          'skus._id': mongoose.Types.ObjectId(skuId)
+        }
+      },
+      {
+        $project: {
+          skus: 1
+        }
+      }
+    ])
+    const skus = product[0].skus
+    res.render('admin/product-skus-edit', {skus})
+  },
+
+  updateProductSku: async (req, res) => {
+    const id = req.params.id
+    const product = await productModel.aggregate([
+      {
+        $match: {
+          skus: {
+            $elemMatch: {
+              _id: mongoose.Types.ObjectId(id)
+            }
+          }
+        }
+      },
+      {
+        $unwind: '$skus'
+      },
+      {
+        $match: {
+          'skus._id': mongoose.Types.ObjectId(id)
+        }
+      },
+      {
+        $project: {
+          skus: 1
+        }
+      }
+    ])
+    const skus = product[0].skus
+    const images = skus.images
+    if(req.files.image1){
+      const paths = req.files.image1[0].path
+      images.splice(0,1,paths.slice(7))
+    }
+    if(req.files.image2){
+      const paths = req.files.image2[0].path
+      images.splice(1,1,paths.slice(7))
+    }
+    if(req.files.image3){
+      const paths = req.files.image3[0].path
+      images.splice(2,1,paths.slice(7))
+    }
+    if(images.length != 3){
+      return res.json({
+        successStatus: false,
+        message: "Image cannot be empty"
+      })
+    }
+    try {
+      await productModel.findOneAndUpdate({skus: {$elemMatch: {_id: id}}}, {
+        $set: {
+          'skus.$.color': req.body.color,
+          'skus.$.price': req.body.price,
+          'skus.$.highlights': req.body.highlights,
+          'skus.$.dimension': req.body.dimension,
+          'skus.$.totalStock': req.body.stock,
+          'skus.$.images': images
+        }
+      }, {runValidators: true})
+      return res.json({
+        successStatus: true,
+        redirect: '/admin'
+      })
+    } catch (error) {
+      console.log(error)
+        return res.json({
+          successStatus: false,
+          message: "Field cannot be empty"
+        })
+    }
   }
 }
