@@ -72,6 +72,10 @@ router.delete('/products/delete/skus/:prodId/:skuId', adminController.authentica
 
 router.get('/users', adminController.authenticate, adminController.getUserList)
 
-// router.get('/users/view/:id', adminController.getUserDetails)
+router.get('/users/view/:id', adminController.authenticate, adminController.getUserDetails)
+
+router.put('/users/block/:id', adminController.authenticate, adminController.blockUser)
+
+router.get('/logout', adminController.logoutAdmin)
 
 module.exports = router

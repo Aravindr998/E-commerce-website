@@ -594,5 +594,61 @@ module.exports = {
   getUserList: async(req, res)=> {
     const users = await userModel.find().sort({fname: 1})
     res.render('admin/user/user-list', {users})
+  },
+
+  getUserDetails: async(req, res) => {
+    id = req.params.id
+    const user = await userModel.findById(id)
+    res.render('admin/user/user-details', {user})
+  },
+
+  blockUser: async(req, res) => {
+    const id = req.params.id
+    const user = await userModel.findById(id)
+    if(user.isBlocked){
+      try {
+        await userModel.findOneAndUpdate({_id:id}, {
+          $set: {
+            isBlocked: false
+          }
+        })
+        return res.json({
+          successStatus: true,
+          redirect: '/admin/users/view/'+id
+        })
+      } catch (error) {
+        console.log(error)
+        return res.json({
+          successStatus: false
+        })
+      }
+    }else{
+      try {
+        await userModel.findOneAndUpdate({_id:id}, {
+          $set: {
+            isBlocked: true
+          }
+        })
+        return res.json({
+          successStatus: true,
+          redirect: '/admin/users/view/'+id
+        })
+      } catch (error) {
+        console.log(error)
+        return res.json({
+          successStatus: false
+        })
+      }
+    }
+    
+  },
+
+  logoutAdmin: (req, res) => {
+    if(req.session.user){
+      return res.redirect('/')
+    }else{
+      req.session.destroy()
+      res.redirect('/admin')
+    }
   }
 }
