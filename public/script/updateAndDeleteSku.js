@@ -12,13 +12,6 @@ function updateSku(id){
   formData.append("image1", input1)
   formData.append("image2", input2)
   formData.append("image3", input3)
-  // const body = {
-  //   color: document.querySelector['#color'].value,
-  //   price: document.querySelector['#price'].value,
-  //   stock: document.querySelector['#stock'].value,
-  //   highlights: document.querySelector['#highlights'].value,
-  //   dimension: document.querySelector['#dimension'].value,
-  // }
   fetch(url, {
     method: 'PUT',
     body: formData
@@ -34,4 +27,48 @@ function updateSku(id){
   .catch(error => {
     console.log(error)
   })
+}
+
+async function deleteSku(id){
+  const data = document.getElementById(id).dataset.url
+  const prodId = document.getElementById(id).dataset.prodid
+  const url = 'http://localhost:4000/admin/products/delete/skus/'+ prodId + '/' + data
+  if(window.confirm('Are you sure?')){
+    fetch(url, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(response => response.json())
+    .then(response => {
+      if(response.successStatus){
+        window.location.href = response.redirect
+      }else{
+        document.querySelector('error-sku').innerHTML = response.message
+      }
+    })
+    .catch(error => {
+      console.log(error)
+    })
+    // try{
+    //   const response = await fetch(url,{
+    //     method: 'DELETE',
+    //     headers: {
+    //       'Content-Type': 'application/json'
+    //     },
+    //     body: {
+    //       id: document.getElementById(id).dataset.prodId
+    //     }
+    //   })
+    //   const res = await response.json()
+    //   if(res.successStatus){
+    //     window.location.href = res.redirect
+    //   }else{
+    //     document.querySelector('error-sku').innerHTML = res.message
+    //   }
+    // }catch(error){
+    //   console.log(error)
+    // }
+  }
 }

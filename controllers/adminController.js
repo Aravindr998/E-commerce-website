@@ -3,6 +3,9 @@ const userModel = require('../models/users')
 const productModel = require('../models/products')
 const categoryModel = require('../models/categories')
 const mongoose = require('mongoose')
+const fs = require('fs')
+const { promisify } = require('util')
+const unlinkAsync = promisify(fs.unlink)
 
 
 module.exports = {
@@ -446,15 +449,18 @@ module.exports = {
     const images = skus.images
     if(req.files.image1){
       const paths = req.files.image1[0].path
-      images.splice(0,1,paths.slice(7))
+      const deleted = images.splice(0,1,paths.slice(7))
+      await unlinkAsync('./public/'+deleted)
     }
     if(req.files.image2){
       const paths = req.files.image2[0].path
-      images.splice(1,1,paths.slice(7))
+      const deleted = images.splice(1,1,paths.slice(7))
+      await unlinkAsync('./public/'+deleted)
     }
     if(req.files.image3){
       const paths = req.files.image3[0].path
-      images.splice(2,1,paths.slice(7))
+      const deleted = images.splice(2,1,paths.slice(7))
+      await unlinkAsync('./public/'+deleted)
     }
     if(images.length != 3){
       return res.json({
@@ -484,5 +490,94 @@ module.exports = {
           message: "Field cannot be empty"
         })
     }
+  },
+
+  getAddSkusPage: async (req, res) => {
+    const id = req.params.id
+    const products = await productModel.find({_id: id})
+    const categories = await categoryModel.find()
+    const product = products[0]
+    const message = ""
+    const skus = {}
+    console.log(product)
+    res.render('admin/new-sku', {product, categories, skus, message})
+  },
+
+  deleteProduct: async (req, res) => {
+    const id = req.params.id
+    const product = await productModel.findById(id)
+    try {
+      for(item of product.skus){
+        for(path of item.images){
+          await unlinkAsync('./public/' + path)
+        }
+      }
+      await productModel.findByIdAndDelete({_id: id})
+      res.json({
+        successStatus: true,
+        redirect: '/admin'
+      })
+    } catch (error) {
+      console.log('Error')
+      res.json({
+        successStatus: false,
+        message: 'Some error occured, please try again later'
+      })
+    }
+  },
+
+  deleteSku: async (req, res) => {
+    const id = req.params.skuId
+    const prodId = req.params.prodId
+    const product = await productModel.findById(prodId)
+    try {
+      for(item of product.skus){
+        for(path of item.images){
+          await unlinkAsync('./public/' + path)
+        }
+      }
+    } catch (error) {
+      console.log(error)
+    }
+    if(product.skus.length == 1){
+      console.log('deleting product')
+      try {
+        await productModel.findByIdAndDelete({_id: prodId})
+        return res.json({
+          successStatus: true,
+          redirect: '/admin'
+        })
+      } catch (error) {
+        console.log('Error')
+        return res.json({
+          successStatus: false,
+          message: 'Some error occured, please try again later'
+        })
+      }
+    }else{
+      console.log(product)
+      console.log(id)
+      console.log(prodId)
+      try {
+        await productModel.findByIdAndUpdate({_id: prodId}, {
+          $pull: {
+            skus: {
+              _id: mongoose.Types.ObjectId(id)
+            }
+          }
+        })
+        return res.json({
+          successStatus: true,
+          redirect: '/admin'
+        })
+      } catch (error) {
+        console.log(error)
+        return res.json({
+          successStatus: false,
+          message: 'Some error occured, please try again later'
+        })
+      }
+    }
+  
   }
 }

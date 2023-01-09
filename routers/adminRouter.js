@@ -60,4 +60,10 @@ router.get('/products/edit/:prodid/:skuid', adminController.authenticate, adminC
 
 router.put('/products/edit/skus/:id', adminController.authenticate, upload.fields([{name: 'image1', maxCount: 1}, {name: 'image2', maxCount: 1}, {name: 'image3', maxCount: 1},]), adminController.updateProductSku)
 
+router.get('/products/skus/add/:id', adminController.authenticate, adminController.getAddSkusPage)
+
+router.delete('/products/delete/:id', adminController.authenticate, adminController.deleteProduct)
+
+router.delete('/products/delete/skus/:prodId/:skuId', adminController.authenticate, adminController.deleteSku)
+
 module.exports = router

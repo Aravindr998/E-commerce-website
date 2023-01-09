@@ -7,7 +7,7 @@ function updateProduct(){
   const title = document.querySelector('#title').value
   const warranty = document.querySelector('#warranty').value
   const category = document.querySelector('#category').value
-  const url = 'http://localhost:4000/admin/products/edit/skus/' + document.querySelector('#update-button').dataset.url
+  const url = 'http://localhost:4000/admin/products/edit/' + document.querySelector('#update-button').dataset.url
   const error = document.querySelector('#error')
   body = {
     title,
@@ -29,4 +29,26 @@ function updateProduct(){
       error.innerHTML = response.message
     }
   })
+}
+
+async function deleteProduct(id) {
+  if(window.confirm('Are you sure?')){
+    const data = document.getElementById(id).dataset.url
+    const url = 'http://localhost:4000/admin/products/delete/' + data
+    const response = await fetch(url, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    const res = await response.json()
+    console.log(res)
+    if(res.successStatus){
+      window.location.href = res.redirect
+    }else{
+      document.querySelector('#error').innerHTML = res.message
+    }
+  }else{
+    return
+  }
 }
