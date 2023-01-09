@@ -50,7 +50,8 @@ document.addEventListener('submit', (e) =>{
         email: email,
         phone: phone,
         password: password,
-        otp: otp
+        otp: otp,
+        otpEntered: true
       })
     })
     .then(response => response.json())

@@ -27,14 +27,14 @@
         <textarea type="text" name="dimension" id="dimension" class="form-control"><%= skus.dimension%></textarea>
       </div>
       <div class="row">
-        <div class="col-md-2">
-          <img class="w-100 p-md-2 p-sm-3 p-5" id="img1" src="/<%= skus.images[0] %> " alt="">
+        <div class="col-sm-2">
+          <img class="item-image p-md-2 p-sm-3 p-5" id="img1" src="/<%= skus.images[0] %> " alt="">
         </div>
-        <div class="col-md-2">
-          <img class="w-100 p-md-2 p-sm-3 p-5" id="img2" src="/<%= skus.images[1] %> " alt="">
+        <div class="col-sm-2">
+          <img class="item-image p-md-2 p-sm-3 p-5" id="img2" src="/<%= skus.images[1] %> " alt="">
         </div>
-        <div class="col-md-2">
-          <img class="w-100 p-md-2 p-sm-3 p-5" id="img3" src="/<%= skus.images[2] %> " alt="">
+        <div class="col-sm-2">
+          <img class="item-image p-md-2 p-sm-3 p-5" id="img3" src="/<%= skus.images[2] %> " alt="">
         </div>
       </div>
       <div class="input-group mb-3 col-md-4">
@@ -52,9 +52,6 @@
       <div class="row">
         <div class="col-3">
           <button id="update-button" class="btn btn-primary" data-url="<%= skus._id %> " onclick="updateSku(this.id)">Submit</button>
-        </div>
-        <div class="col-3">
-          <button type="submit" class="btn btn-primary" formaction="/admin/products/new/skus">Add More Skus</button>
         </div>
         <div class="col-3">
           <a href="/admin" class="btn btn-outline-primary">Cancel</a>

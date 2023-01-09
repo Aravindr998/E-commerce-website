@@ -24,17 +24,14 @@
             <% if(product.length>0){ %> 
               <% var count = 1 %> 
               <% product.forEach(item => { %> 
-                <% item.skus.forEach(sku => { %> 
                   <tr>
                     <th class="text-center align-middle" scope="row"><%= count++ %> </th>
                     <td class="text-center align-middle"><%= item.title %> </td>
-                    <td class="text-center align-middle"><%= sku.price %> </td>
+                    <td class="text-center align-middle"><%= item.skus[0].price %> </td>
                     <td class="text-center align-middle"><%= item.categoryId %> </td>
-                    <td class="text-center align-middle"><img class="image-table" src="/<%= sku.images[0] %> " alt=""></td>
+                    <td class="text-center align-middle"><img class="image-table" src="/<%= item.skus[0].images[0] %> " alt=""></td>
                     <td class="text-center align-middle"><a href="/admin/products/view/<%= item._id %> " class="btn btn-primary">View Details</a></td>
-                    <td class="text-center align-middle"><a href="/admin/products/delete/<%= item._id %> " class="btn btn-danger">Delete</a></td>
                   </tr>
-                <% }) %> 
               <% }) %> 
             <% } %> 
           </tbody>

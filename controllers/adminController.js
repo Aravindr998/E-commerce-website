@@ -155,6 +155,7 @@ module.exports = {
       req.session.addProducts = null
       req.session.Errmessage = null
       req.session.skus = null
+      req.session.update = null
       return res.render('admin/new-sku', {product, skus, categories, message})
     }else{
       return res.redirect('/admin')
@@ -162,6 +163,7 @@ module.exports = {
   },
 
   addNewSku: async (req, res) => {
+    console.log('in add new sku')
     const existing = await productModel.find({title: req.body.title})
     const images = []
     for(key in req.files){
@@ -352,8 +354,12 @@ module.exports = {
   getDetailsPage: async(req, res) => {
     const id = req.params.id
     const product = await productModel.findById({_id: id})
-    const categories = await categoryModel.find()
-    return res.render('admin/product-details', {product, categories})
+    if(product?.title){
+      const categories = await categoryModel.find()
+      return res.render('admin/product-details', {product, categories})
+    }else{
+      return res.redirect('/admin')
+    }
   },
 
   getEditPage: async(req, res) => {
@@ -533,7 +539,9 @@ module.exports = {
     try {
       for(item of product.skus){
         for(path of item.images){
-          await unlinkAsync('./public/' + path)
+          if(item._id == id){
+            await unlinkAsync('./public/' + path)
+          }
         }
       }
     } catch (error) {
@@ -579,5 +587,12 @@ module.exports = {
       }
     }
   
+  },
+
+  //users
+
+  getUserList: async(req, res)=> {
+    const users = await userModel.find().sort({fname: 1})
+    res.render('admin/user/user-list', {users})
   }
 }

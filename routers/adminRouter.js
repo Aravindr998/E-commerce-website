@@ -36,6 +36,8 @@ router.get('/login',adminController.isLoggedin, adminController.getLogin)
 
 router.post('/login', adminController.isLoggedin, adminController.loginAdmin)
 
+//products
+
 router.get('/', adminController.authenticate, adminController.getHomepage)
 
 router.get('/products/new', adminController.authenticate, adminController.getAddProducts)
@@ -65,5 +67,11 @@ router.get('/products/skus/add/:id', adminController.authenticate, adminControll
 router.delete('/products/delete/:id', adminController.authenticate, adminController.deleteProduct)
 
 router.delete('/products/delete/skus/:prodId/:skuId', adminController.authenticate, adminController.deleteSku)
+
+//users
+
+router.get('/users', adminController.authenticate, adminController.getUserList)
+
+// router.get('/users/view/:id', adminController.getUserDetails)
 
 module.exports = router

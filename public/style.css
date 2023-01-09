@@ -113,3 +113,7 @@ footer div div div p:first-child{
 .image-table{
   max-width: 5rem;
 }
+
+.item-image{
+  max-height: 5rem;
+}

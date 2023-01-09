@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt')
 const fast2sms = require('fast-two-sms')
 const axios = require('axios')
 require('dotenv').config()
+let otp
 
 module.exports = {
   getHomepage: function(req, res){
@@ -61,7 +62,7 @@ module.exports = {
   },
 
   registerUser: async (req, res, next)=>{
-    const existing = await userModel.find({email: req.body.email})
+    const existing = await userModel.find({$or: [{email: req.body.email}, {phone: req.body.phone}]})
     const user = new userModel({
       fname: req.body.fname,
       lname: req.body.lname,
@@ -161,7 +162,10 @@ module.exports = {
     }
   },
   checkOtp: async (req, res) => {
-    if(req.body.otp == req.session.otp){
+    console.log('check otp')
+    console.log(otp)
+    console.log(req.body.otp)
+    if(req.body.otp == otp){
       const user = new userModel({
         fname: req.body.fname,
         lname: req.body.lname,
@@ -190,13 +194,13 @@ module.exports = {
   },
 
   generateOtp: (req, res, next) => {
-    let otp
+    console.log('generate otp')
     console.log(req.body.otp)
-    if(req.body.otp){
+    if(req.body.otpEntered){
       next()
     }else{
       otp = Math.floor(100000 + Math.random()*900000)
-      req.session.otp = otp
+      console.log(otp)
       sendOtp(otp, req.body.phone)
       .then((response)=>{
         console.log(response.data)
@@ -210,8 +214,7 @@ module.exports = {
   },
 
   resendOtp: (req, res, next) => {
-    let otp = Math.floor(100000 + Math.random()*900000)
-    req.session.otp = otp
+    otp = Math.floor(100000 + Math.random()*900000)
     sendOtp(otp, req.body.phone)
     .then((response)=>{
       console.log(response.data)
@@ -229,6 +232,7 @@ module.exports = {
 }
 
 function sendOtp(otp, number){
+  console.log('sendotp')
   console.log(otp)
   const body = {
     "authorization" : process.env.AUTHORIZATION_KEY,
