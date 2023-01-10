@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
-<%- include('../../partials/head') %> 
+<%- include('../../partials/admin/admin-head-datatable') %> 
 <body class="mt-5">
   <%- include('../../partials/admin/admin-navbar') %> 
   <section class="container pt-5">
     <div class="row">
-      <div class="col-12">
-        <table class="table">
+      <div class="col-12 table-overflow">
+        <table id="datatable" class="table table-striped">
           <thead>
             <tr>
               <th class="text-center" scope="col">#</th>
@@ -25,7 +25,16 @@
                     <td class="text-center align-middle"><%= item.fname + ' ' + item.lname %> </td>
                     <td class="text-center align-middle"><%= item.email %> </td>
                     <td class="text-center align-middle"><%= item.phone %> </td>
-                    <td class="text-center align-middle"><a href="/admin/users/view/<%= item._id %> " class="btn btn-primary">View Details</a></td>
+                    <td class="text-center align-middle">
+                      <div>
+                        <a href="/admin/users/view/<%= item._id %> " class="btn btn-primary">View Details</a>
+                        <% if(item.isBlocked){ %> 
+                          <button class="btn btn-warning block-button" id="unblock-button<%= count %> " onclick="unblockUser(this.id)" data-url="<%= item._id %>">Unblock</button>
+                        <% }else{ %> 
+                          <button class="btn btn-danger block-button" id="block-button<%= count %>" onclick="unblockUser(this.id)" data-url="<%= item._id %>" >Block</button>
+                        <% } %> 
+                      </div>
+                    </td>
                   </tr>
               <% }) %> 
             <% } %> 
@@ -35,6 +44,8 @@
     </div>
   </section>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
+  <%- include('../../partials/admin/datatable-footer') %> 
   <script src="/script/navbarScroll.js"></script> 
+  <script src="/script/blockUser.js"></script>
 </body>
 </html>

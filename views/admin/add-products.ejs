@@ -20,7 +20,7 @@
           <!-- <option selected>Choose...</option> -->
           <% if(categories.length>0){ %> 
             <% categories.forEach(item => { %> 
-              <option><%= item.categoryName %> </option>
+              <option value="<%= item._id %>"><%= item.categoryName %> </option>
             <% }) %> 
           <% } %> 
         </select>
@@ -42,7 +42,7 @@
       </div>
       <div class="col-md-12">
         <label class="form-label" for="highlights">Highlights</label>
-        <textarea type="text" name="highlights" id="highlights" class="form-control"><%= skus.highlights%> </textarea>
+        <textarea type="text" name="highlights" id="highlights" class="form-control"><%= skus.highlights%></textarea>
       </div>
       <div class="col-md-12">
         <label class="form-label" for="dimension">Dimension</label>

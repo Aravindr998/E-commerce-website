@@ -6,51 +6,65 @@
   <section class="container pt-5">
     <div class="row">
       <div class="col-md-6">
-        <h5>Name: <%= user.fname + ' ' + user.lname %> </h5>
-        <p>Email: <%= user.email %> </p>
-        <p>Phone: <%= user.phone %> </p>
+        <div class="card p-3 m-2 user-card">
+          <h5>Name: <%= user.fname + ' ' + user.lname %> </h5>
+          <p>Email: <%= user.email %> </p>
+          <p>Phone: <%= user.phone %> </p>
+        </div>
       </div>
       <div class="col-md-6">
-        <p>Total Order: <%= user.totalOrders %> </p>
-        <p>Total Spent: <%= user.totalSpent %> </p>
+        <div class="card p-3 m-2 user-card">
+          <p>Total Order: <%= user.totalOrders %> </p>
+          <p>Total Spent: <%= user.totalSpent %> </p>
+        </div>
       </div>
-      <p>Address:</p>
-      <% if(user.shippingAddress.length > 0){ %>
-        <% let count = 0 %> 
-        <% user.shippingAddress.forEach(item => { %> 
-        <div class="col-12">
-          <p>Address<%= ++count %> :</p>
+      <div class="col-md-6">
+        <div class="card p-3 m-2">
+          <p>Address:</p>
+          <% if(user.shippingAddress.length > 0){ %>
+            <% let count = 0 %> 
+            <% user.shippingAddress.forEach(item => { %> 
+            <div class="col-12">
+              <p>Address<%= ++count %> :</p>
+            </div>
+            <div class="col-md-6">
+              <p><%= item %> </p>
+            </div>
+            <% }) %>
+          <% }else{ %>   
+            <p>No address added</p>
+          <% } %>
+        </div> 
+      </div>
+      <div class="col-md-6">
+        <div class="card p-3 m-2">
+          <p>Cart items:</p>
+          <% if(user.cart.length > 0){ %>
+            <% let count = 0 %> 
+            <% user.cart.forEach(item => { %> 
+            <div class="col-12">
+              <p>Item <%= ++count %> :</p>
+            </div>
+            <div class="col-md-6">
+              <p><%= item %> </p>
+            </div>
+            <% }) %>
+          <% }else{ %>   
+            <p>No items in cart</p>
+          <% } %>
         </div>
-        <div class="col-md-6">
-          <p><%= item %> </p>
-        </div>
-        <% }) %>
-      <% }else{ %>   
-        <p>No address added</p>
-      <% } %> 
-      <p>Cart items:</p>
-      <% if(user.cart.length > 0){ %>
-        <% let count = 0 %> 
-        <% user.cart.forEach(item => { %> 
-        <div class="col-12">
-          <p>Item <%= ++count %> :</p>
-        </div>
-        <div class="col-md-6">
-          <p><%= item %> </p>
-        </div>
-        <% }) %>
-      <% }else{ %>   
-        <p>No items in cart</p>
-      <% } %>
-      <% if(user.isBlocked){ %> 
-        <div class="col-md-12 p-3">
-          <button class="btn btn-warning" id="unblock-button" onclick="blockUser(this.id)" data-url="<%= user._id %>">Unblock</button>
-        </div>
-      <% }else{ %> 
-        <div class="col-md-12 p-3">
-          <button class="btn btn-danger" id="block-button" onclick="blockUser(this.id)" data-url="<%= user._id %>" >Block</button>
-        </div>
-      <% } %> 
+      </div>
+      <div class="col-12">
+        <% if(user.isBlocked){ %> 
+          <div class="col-md-12 p-3 d-flex justify-content-end">
+            <button class="btn btn-warning" id="unblock-button" onclick="blockUser(this.id)" data-url="<%= user._id %>">Unblock</button>
+          </div>
+        <% }else{ %> 
+          <div class="col-md-12 p-3 d-flex justify-content-end">
+            <button class="btn btn-danger" id="block-button" onclick="blockUser(this.id)" data-url="<%= user._id %>" >Block</button>
+          </div>
+        <% } %> 
+      </div>
       <p id="error" class="text-danger"></p>
     </div>
   </section>

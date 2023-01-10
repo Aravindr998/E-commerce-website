@@ -117,3 +117,13 @@ footer div div div p:first-child{
 .item-image{
   max-height: 5rem;
 }
+
+.table-overflow{
+  overflow-x: scroll;
+}
+.user-card{
+  min-height: 10rem;
+}
+.block-button{
+  min-width: 6rem;
+}

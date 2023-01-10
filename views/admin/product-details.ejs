@@ -1,86 +1,86 @@
 <!DOCTYPE html>
 <html lang="en">
-<%- include('../partials/head') %> 
+<%- include('../partials/admin/admin-head-datatable') %> 
 <body class="pt-5">
   <%- include('../partials/admin/admin-navbar') %> 
   <section class="container p-4">
-      <div class="row">
-        <div class="col-md-6">
+      <div class="row d-flex">
+        <div class="col-md-6 order-sm-1 order-1">
           <label for="title" class="form-label">Title:</label>
           <h3><%= product.title %></h3>
         </div>
-        <div class="col-md-6">
-          <label for="warranty" class="form-label">Warranty:</label>
-          <p><%= product.warranty %></p>
-        </div>
-        <div class="col-md-3 my-4">
-          <label for="category" class="form-label">Category:</label>
-          <h5><%= product.categoryId %> </h5>
-        </div>
-        <div class="row">
-          <div class="col-md-2 m-2">
-            <a href="/admin/products/edit/<%= product.id %>" class="btn btn-primary w-100">Edit</a>
+        <div class="col-md-6 d-flex justify-content-end order-md-2 order-4">
+          <div class="m-2">
+            <a href="/admin/products/edit/<%= product.id %>" class="btn btn-primary">Edit</a>
           </div>
-          <div class="col-md-2 m-2">
-            <button id="delete-button" class="btn btn-danger w-100" onclick="deleteProduct(this.id)" data-url="<%= product.id %> ">Delete</button>
+          <div class="m-2">
+            <button id="delete-button" class="btn btn-danger" onclick="deleteProduct(this.id)" data-url="<%= product.id %> ">Delete</button>
           </div>
-          <div class="col-md-2 m-2">
-            <a href="/admin/products/skus/add/<%= product.id %>" class="btn btn-outline-success w-100">Add Skus</a>
+          <div class="m-2">
+            <a href="/admin/products/skus/add/<%= product.id %>" class="btn btn-outline-success">Add Skus</a>
           </div>
           <p id="error" class="text-danger"></p>
         </div>
+        <div class="col-12 my-4 order-md-3 order-2">
+          <label for="category" class="form-label">Category:</label>
+          <h5><%= product.categoryId %> </h5>
+        </div>
+        <div class="col-12 order-md-4 order-3">
+          <label for="warranty" class="form-label">Warranty:</label>
+          <p><%= product.warranty %></p>
+        </div>
+        
         <hr>
-        <% let count = 0 %>
-        <% product.skus.forEach(item => { %>  
-          <div class="col-md-12 mt-5">
-            <h2>Sku <%= ++count %> </h2>
-          </div>
-          <div class="col-md-4">
-            <label class="form-label" for="color">Color:</label>
-            <p><%= item.color %></p>
-          </div>
-          <div class="col-md-4">
-            <label class="form-label" for="price">Price:</label>
-            <p><%= item.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") %></p>
-          </div>
-          <div class="col-md-4">
-            <label class="form-label" for="stock">Total Stock:</label>
-            <p><%= item.totalStock %></p>
-          </div>
-          <div class="col-md-12">
-            <label class="form-label" for="highlights">Highlights:</label>
-            <p><%= item.highlights %></p>
-          </div>
-          <div class="col-md-12">
-            <label class="form-label" for="dimension">Dimension:</label>
-            <%= item.dimension %>
-          </div>
-          <p>Images:</p>
-          <div class="col-sm-2 p-lg-5 p-sm-2 p-5">
-            <img class="item-image" src="/<%= item.images[0] %> " alt="">
-          </div>
-          <div class="col-sm-2 p-lg-5 p-sm-2 p-5">
-            <img class="item-image" src="/<%= item.images[1] %> " alt="">
-          </div>
-          <div class="col-sm-2 p-lg-5 p-sm-2 p-5">
-            <img class="item-image" src="/<%= item.images[2] %> " alt="">
-          </div>
-          <div class="row">
-            <div class="col-md-3 m-2">
-              <a href="/admin/products/edit/<%= product.id %>/<%= item.id %>" class="btn btn-primary w-100">Edit</a>
-            </div>
-            <div class="col-md-3 m-2">
-              <button class="btn btn-danger w-100" id="delete-sku<%= count %> " data-url="<%= item.id %>" data-prodId =<%= product.id %>  onclick="deleteSku(this.id)">Delete</button>
-            </div>
-            <p class="text-danger" id="error-sku"></p>
-          </div>
-        <% }) %> 
-        <div class="m-2">
-          <a href="/admin" class="btn btn-outline-primary w-100">Back to home</a>
+        <div class="table-overflow order-5">
+          <table id="datatable" class="table table-striped">
+            <thead>
+              <tr>
+                <th>Color</th>
+                <th>Price</th>
+                <th>Stock</th>
+                <th>Highlights</th>
+                <th>Dimension</th>
+                <th>Images</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% let count = 0 %>
+              <% product.skus.forEach(item => { %> 
+              <tr class="align-middle">
+                <td><%= item.color %></td>
+                <td><%= item.price %></td>
+                <td><%= item.totalStock %></td>
+                <td><%= item.highlights %></td>
+                <td><%= item.dimension %></td>
+                <td>
+                  <div class="d-sm-flex">
+                    <div class="col-2 p-lg-5 p-sm-2 p-5">
+                      <img class="item-image" src="/<%= item.images[0] %> " alt="">
+                    </div>
+                    <div class="col-2 p-lg-5 p-sm-2 p-5">
+                      <img class="item-image" src="/<%= item.images[1] %> " alt="">
+                    </div>
+                    <div class="col-2 p-lg-5 p-sm-2 p-5">
+                      <img class="item-image" src="/<%= item.images[2] %> " alt="">
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <div class="d-sm-flex">
+                    <a href="/admin/products/edit/<%= product.id %>/<%= item.id %>" class="btn btn-primary m-1">Edit</a>
+                    <button class="btn btn-danger m-1" id="delete-sku<%= count %> " data-url="<%= item.id %>" data-prodId =<%= product.id %>  onclick="deleteSku(this.id)">Delete</button>
+                  </div>
+                </td>
+              </tr>
+              <% }) %>
+            </tbody>
+          </table>
         </div>
       </div>
   </section>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
+  <%- include('../partials/admin/datatable-footer') %> 
   <script src="/script/navbarScroll.js"></script> 
   <script src="/script/updateAndDelete.js"></script>
   <script src="/script/updateAndDeleteSku.js"></script>

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('../../partials/admin/admin-head-datatable) %> 
+<body>
+ <%- include('../../partials/admin/admin-navbar') %>
+ <div>
+  <table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Category</th>
+        <th>Product</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% list.forEach(item => { %>
+        <tr>
+          <td><%= item.categoryName %> </td>
+          <td><%= item.forEach(product => product.title) %> </td>
+        </tr>
+      <% }) %> 
+    </tbody>
+  </table>
+ </div>  
+</body>
+</html>

@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<%- include('../partials/head') %> 
+<%- include('../partials/admin/admin-head-datatable') %> 
 <body class="mt-5">
   <%- include('../partials/admin/admin-navbar') %> 
   <section class="container pt-5">
@@ -8,38 +8,49 @@
       <div>
         <a href="admin/products/new" class="btn btn-success mb-3">Add Products</a>
       </div>
-      <div class="col-12">
-        <table class="table">
+      <div class="col-12 table-overflow">
+        <table id="datatable" class="table table-striped">
           <thead>
             <tr>
-              <th class="text-center" scope="col">#</th>
-              <th class="text-center" scope="col">Title</th>
-              <th class="text-center" scope="col">Price</th>
-              <th class="text-center" scope="col">Category</th>
-              <th class="text-center" scope="col">Image</th>
-              <th class="text-center" scope="col">Action</th>
+              <th>#</th>
+              <th>Title</th>
+              <th>Price</th>
+              <th>Category</th>
+              <th>Image</th>
+              <th>Action</th>
             </tr>
           </thead>
           <tbody>
             <% if(product.length>0){ %> 
               <% var count = 1 %> 
               <% product.forEach(item => { %> 
-                  <tr>
-                    <th class="text-center align-middle" scope="row"><%= count++ %> </th>
-                    <td class="text-center align-middle"><%= item.title %> </td>
-                    <td class="text-center align-middle"><%= item.skus[0].price %> </td>
-                    <td class="text-center align-middle"><%= item.categoryId %> </td>
-                    <td class="text-center align-middle"><img class="image-table" src="/<%= item.skus[0].images[0] %> " alt=""></td>
-                    <td class="text-center align-middle"><a href="/admin/products/view/<%= item._id %> " class="btn btn-primary">View Details</a></td>
+                  <tr class="align-middle">
+                    <td><%= count++ %> </td>
+                    <td><%= item.title %> </td>
+                    <td>₹<%= item.skus[0].price %> </td>
+                    <td><%= item.categoryId %> </td>
+                    <td><img class="image-table" src="/<%= item.skus[0].images[0] %> " alt=""></td>
+                    <td><a href="/admin/products/view/<%= item._id %> " class="btn btn-primary">View Details</a></td>
                   </tr>
               <% }) %> 
             <% } %> 
           </tbody>
+          <tfoot>
+            <tr>
+              <th>#</th>
+              <th>Title</th>
+              <th>Price</th>
+              <th>Category</th>
+              <th>Image</th>
+              <th>Action</th>
+            </tr>
+          </tfoot>
         </table>
       </div>
     </div>
   </section>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
+  <%- include('../partials/admin/datatable-footer') %> 
   <script src="/script/navbarScroll.js"></script> 
 </body>
 </html>

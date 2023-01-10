@@ -9,8 +9,6 @@ module.exports = {
   getHomepage: function(req, res){
     if(req.session.user){
       return res.render('home-page')
-    }else if(req.session.admin){
-      return res.redirect('/admin')
     }else{
       return res.render('landing-page')
     }
@@ -44,8 +42,6 @@ module.exports = {
   authenticate: (req, res, next)=>{
     if(req.session.user){
       next()
-    }else if(req.session.admin){
-      return res.redirect('/admin')
     }else{
       return res.redirect('/login')
     }
@@ -54,8 +50,6 @@ module.exports = {
   isLoggedin: (req, res, next) =>{
     if(req.session.user){
       return res.redirect('/')
-    }else if(req.session.admin){
-      return res.redirect('/admin')
     }else{
       next()
     }
@@ -154,12 +148,8 @@ module.exports = {
   },
 
   logoutUser: (req, res) => {
-    if(req.session.admin){
-      return res.redirect('/admin')
-    }else{
-      req.session.destroy()
-      return res.redirect('/')
-    }
+    req.session.user = null
+    return res.redirect('/')
   },
   checkOtp: async (req, res) => {
     console.log('check otp')

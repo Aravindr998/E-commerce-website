@@ -12,8 +12,6 @@ module.exports = {
   isLoggedin: (req, res, next) => {
     if(req.session.admin){
       res.redirect('/admin')
-    }else if(req.session.user){
-      res.redirect('/')
     }else{
       next()
     }
@@ -54,8 +52,6 @@ module.exports = {
   authenticate: (req, res, next) => {
     if(req.session.admin){
       next()
-    }else if(req.session.user){
-      return res.redirect('/')
     }else{
       return res.redirect('/admin/login')
     }
@@ -92,9 +88,6 @@ module.exports = {
       const paths = req.files[key][0].path
       images.push(paths.slice(7))
     }
-      // req.files.forEach(element => {
-      //   images.push(element.path.slice(7))
-      // })
       console.log(images)
       const product = new productModel({
         title: req.body.title,
@@ -644,11 +637,7 @@ module.exports = {
   },
 
   logoutAdmin: (req, res) => {
-    if(req.session.user){
-      return res.redirect('/')
-    }else{
-      req.session.destroy()
+      req.session.admin = null
       res.redirect('/admin')
-    }
   }
 }
