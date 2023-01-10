@@ -41,7 +41,7 @@
           </div>
           <div class="col-md-4">
             <label class="form-label" for="price">Price:</label>
-            <p><%= item.price %></p>
+            <p><%= item.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") %></p>
           </div>
           <div class="col-md-4">
             <label class="form-label" for="stock">Total Stock:</label>
