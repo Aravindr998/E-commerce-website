@@ -76,6 +76,16 @@ router.get('/users/view/:id', adminController.authenticate, adminController.getU
 
 router.put('/users/block/:id', adminController.authenticate, adminController.blockUser)
 
+//categories
+
+router.get('/categories', adminController.authenticate, adminController.getCategoriesPage)
+
+router.post('/categories', adminController.authenticate, adminController.addNewCategory)
+
+router.patch('/categories/:id', adminController.authenticate, adminController.deleteCategory)
+
 router.get('/logout', adminController.logoutAdmin)
+
+ 
 
 module.exports = router

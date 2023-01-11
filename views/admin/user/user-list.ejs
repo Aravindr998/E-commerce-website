@@ -9,11 +9,11 @@
         <table id="datatable" class="table table-striped">
           <thead>
             <tr>
-              <th class="text-center" scope="col">#</th>
-              <th class="text-center" scope="col">Name</th>
-              <th class="text-center" scope="col">Email</th>
-              <th class="text-center" scope="col">Phone</th>
-              <th class="text-center" scope="col">Action</th>
+              <th class="" scope="col">#</th>
+              <th class="" scope="col">Name</th>
+              <th class="" scope="col">Email</th>
+              <th class="" scope="col">Phone</th>
+              <th class="" scope="col">Action</th>
             </tr>
           </thead>
           <tbody>
@@ -21,11 +21,11 @@
               <% var count = 1 %> 
               <% users.forEach(item => { %> 
                   <tr>
-                    <th class="text-center align-middle" scope="row"><%= count++ %> </th>
-                    <td class="text-center align-middle"><%= item.fname + ' ' + item.lname %> </td>
-                    <td class="text-center align-middle"><%= item.email %> </td>
-                    <td class="text-center align-middle"><%= item.phone %> </td>
-                    <td class="text-center align-middle">
+                    <th class="align-middle" scope="row"><%= count++ %> </th>
+                    <td class="align-middle"><%= item.fname + ' ' + item.lname %> </td>
+                    <td class="align-middle"><%= item.email %> </td>
+                    <td class="align-middle"><%= item.phone %> </td>
+                    <td class="align-middle">
                       <div>
                         <a href="/admin/users/view/<%= item._id %> " class="btn btn-primary">View Details</a>
                         <% if(item.isBlocked){ %> 

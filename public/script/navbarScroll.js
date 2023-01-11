@@ -9,3 +9,11 @@ function scrollFunction(){
     document.getElementById('navbar').style.backgroundColor = 'transparent'
   }
 }
+
+document.querySelector('button.navbar-toggler').addEventListener('click', (e) => {
+  if( document.getElementById('navbar').style.backgroundColor == 'white'){
+    document.getElementById('navbar').style.backgroundColor = 'transparent'
+  }else{
+    document.getElementById('navbar').style.backgroundColor = 'white'
+  }
+})

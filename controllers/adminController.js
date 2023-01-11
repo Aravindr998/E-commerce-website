@@ -57,7 +57,7 @@ module.exports = {
     }
   },
   getHomepage: async (req, res) => {
-    const product = await productModel.find()
+    const product = await productModel.find({isDeleted: false}).populate('categoryId')
     res.render('admin/admin-dashboard', {product})
   },
   getAddProducts: async (req, res) => {
@@ -347,7 +347,9 @@ module.exports = {
   getDetailsPage: async(req, res) => {
     const id = req.params.id
     const product = await productModel.findById({_id: id})
-    if(product?.title){
+    .populate('categoryId')
+    console.log(product)
+    if(product?.title && !product?.isDeleted){
       const categories = await categoryModel.find()
       return res.render('admin/product-details', {product, categories})
     }else{
@@ -639,5 +641,54 @@ module.exports = {
   logoutAdmin: (req, res) => {
       req.session.admin = null
       res.redirect('/admin')
+  },
+
+  //categories
+
+  getCategoriesPage: async(req, res) => {
+    try {
+      const categories = await categoryModel.find()
+      if(req.session.Errmessage){
+        const message = req.session.Errmessage
+        req.session.Errmessage = null
+        res.render('admin/categories/categories', {categories, message})
+      }else{
+        const message = ''
+        res.render('admin/categories/categories', {categories, message})
+      }
+    } catch (error) {
+      console.log(error)
+      res.redirect('/')
+    }
+  },
+
+  addNewCategory: async(req, res) => {
+    const category = new categoryModel({
+      categoryName: req.body.category
+    })
+    try {
+      await category.save()
+      res.redirect('/admin/categories')
+    } catch (error) {
+      req.session.Errmessage = error.errors.categoryName.properties.message
+      res.redirect('/admin/categories')
+    }
+  },
+
+  deleteCategory: async(req, res) => {
+    try {
+      await categoryModel.findOneAndUpdate({_id: req.params.id}, {$set: {isDeleted: true}})
+      await productModel.updateMany({categoryId: mongoose.Types.ObjectId(req.params.id)}, {$set: {isDeleted: true}})
+      return res.json({
+        successStatus: true,
+        redirect: '/admin/categories'
+      })
+    } catch (error) {
+      console.log(error)
+      return res.json({
+        successStatus: false,
+        message: 'Error'
+      })
+    }
   }
 }

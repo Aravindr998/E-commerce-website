@@ -28,7 +28,7 @@
                     <td><%= count++ %> </td>
                     <td><%= item.title %> </td>
                     <td>₹<%= item.skus[0].price %> </td>
-                    <td><%= item.categoryId %> </td>
+                    <td><%= item.categoryId.categoryName %> </td>
                     <td><img class="image-table" src="/<%= item.skus[0].images[0] %> " alt=""></td>
                     <td><a href="/admin/products/view/<%= item._id %> " class="btn btn-primary">View Details</a></td>
                   </tr>
