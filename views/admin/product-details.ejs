@@ -69,7 +69,7 @@
                 <td>
                   <div class="d-sm-flex">
                     <a href="/admin/products/edit/<%= product.id %>/<%= item.id %>" class="btn btn-primary m-1">Edit</a>
-                    <button class="btn btn-danger m-1" id="delete-sku<%= count %> " data-url="<%= item.id %>" data-prodId =<%= product.id %>  onclick="deleteSku(this.id)">Delete</button>
+                    <button class="btn btn-danger m-1" id="delete-sku<%= ++count %> " data-url="<%= item.id %>" data-prodId =<%= product.id %>  onclick="deleteSku(this.id)">Delete</button>
                   </div>
                 </td>
               </tr>

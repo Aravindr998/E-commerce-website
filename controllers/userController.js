@@ -2,16 +2,30 @@ const userModel = require('../models/users')
 const bcrypt = require('bcrypt')
 const fast2sms = require('fast-two-sms')
 const axios = require('axios')
+const productModel = require('../models/products')
+const categoryModel = require('../models/categories')
+const mongoose = require('mongoose')
 require('dotenv').config()
 let otp
 
 module.exports = {
-  getHomepage: function(req, res){
-    if(req.session.user){
-      return res.render('home-page')
-    }else{
-      return res.render('landing-page')
-    }
+  getHomepage: async(req, res) => {
+  try {
+    const categories = await categoryModel.find()
+    .populate('products')
+    categories.forEach(item => {
+      item.products.splice(3, Infinity)
+    })
+    console.log(categories)
+      if(req.session.user){
+        return res.render('home-page', {categories})
+      }else{
+        return res.render('landing-page', {categories})
+      }
+  } catch (error) {
+    console.log(error)
+    return res.render('404')
+  }
   },
 
   getLogin: (req, res)=> {
@@ -218,7 +232,18 @@ module.exports = {
       console.log(error)
       return res.json({message: "Could not resend, Please try again"})
     })
+  },
+  getProductsPage: async(req, res) => {
+    try {
+      const products = await productModel.find()
+      .sort({categoryId: 1})
+      const categories = await categoryModel.find()
+      res.render('users/product-page', {products, categories})
+    } catch (error) {
+      
+    }
   }
+
 }
 
 function sendOtp(otp, number){

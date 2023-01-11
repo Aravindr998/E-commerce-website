@@ -1,5 +1,6 @@
 const express = require('express')
 const userController = require('../controllers/userController')
+const userAuth = require('../middlewares/userAuthenticate')
 
 const router = express.Router()
 
@@ -18,5 +19,7 @@ router.get('/logout', userController.logoutUser)
 router.post('/register/otp', userController.generateOtp, userController.checkOtp)
 
 router.post('/register/otp/resend', userController.resendOtp)
+
+router.get('/products', userAuth.authenticate, userController.getProductsPage)
 
 module.exports = router

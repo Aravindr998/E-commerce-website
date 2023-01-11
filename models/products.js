@@ -40,6 +40,10 @@ const productSchema = new mongoose.Schema({
       },
       stockLeft: {
         type: Number
+      },
+      isDeleted: {
+        type: Boolean,
+        default: false
       }
     }],
     required: true
@@ -53,6 +57,23 @@ const productSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   }
+})
+
+productSchema.pre('find', function(){
+  console.log('pre find product')
+  this.where({isDeleted: false})
+})
+productSchema.pre('findOne', function(){
+  console.log('pre findOne product')
+  this.where({isDeleted: false})
+})
+productSchema.pre('findById', function(){
+  console.log('pre findById product')
+  this.where({isDeleted: false})
+})
+productSchema.pre('findOneAndUpdate', function(){
+  console.log('pre findOneAndUpdate product')
+  this.where({isDeleted: false})
 })
 
 const Products = mongoose.model('Products', productSchema)

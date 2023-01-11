@@ -9,6 +9,9 @@ const categorySchema = new mongoose.Schema({
     type: Boolean,
     default: false
   }
+}, {
+  toJSON: {virtuals: true},
+  toObject: {virtuals: true}
 })
 
 categorySchema.pre('find', function(){
@@ -22,6 +25,11 @@ categorySchema.pre('findOne', function(){
 categorySchema.pre('findById', function(){
   console.log('pre findById')
   this.where({isDeleted: false})
+})
+categorySchema.virtual('products',{
+  ref: 'Products',
+  localField: '_id',
+  foreignField: 'categoryId'
 })
 
 const Category = mongoose.model('Category', categorySchema)

@@ -349,7 +349,12 @@ module.exports = {
     const product = await productModel.findById({_id: id})
     .populate('categoryId')
     console.log(product)
-    if(product?.title && !product?.isDeleted){
+    if(product?.title){
+      product.skus.forEach((item, index, array)=> {
+        if(item.isDeleted == true){
+          array.splice(index, 1)
+        }
+      })
       const categories = await categoryModel.find()
       return res.render('admin/product-details', {product, categories})
     }else{
@@ -506,81 +511,127 @@ module.exports = {
 
   deleteProduct: async (req, res) => {
     const id = req.params.id
-    const product = await productModel.findById(id)
     try {
-      for(item of product.skus){
-        for(path of item.images){
-          await unlinkAsync('./public/' + path)
-        }
-      }
-      await productModel.findByIdAndDelete({_id: id})
-      res.json({
+      await productModel.findOneAndUpdate({_id: id}, {$set: {isDeleted: true}})
+      return res.json({
         successStatus: true,
         redirect: '/admin'
       })
     } catch (error) {
-      console.log('Error')
-      res.json({
+      console.log(error)
+      return res.json({
         successStatus: false,
         message: 'Some error occured, please try again later'
       })
     }
+    // const product = await productModel.findById(id)
+    // try {
+    //   for(item of product.skus){
+    //     for(path of item.images){
+    //       await unlinkAsync('./public/' + path)
+    //     }
+    //   }
+    //   await productModel.findByIdAndDelete({_id: id})
+    //   res.json({
+    //     successStatus: true,
+    //     redirect: '/admin'
+    //   })
+    // } catch (error) {
+    //   console.log('Error')
+    //   res.json({
+    //     successStatus: false,
+    //     message: 'Some error occured, please try again later'
+    //   })
+    // }
   },
 
   deleteSku: async (req, res) => {
     const id = req.params.skuId
     const prodId = req.params.prodId
-    const product = await productModel.findById(prodId)
     try {
-      for(item of product.skus){
-        for(path of item.images){
-          if(item._id == id){
-            await unlinkAsync('./public/' + path)
-          }
+      let count = 0
+      const product = await productModel.findById(prodId)
+      product.skus.forEach(item => {
+        if(item.isDeleted == false){
+          count++
         }
-      }
-    } catch (error) {
-      console.log(error)
-    }
-    if(product.skus.length == 1){
-      console.log('deleting product')
-      try {
-        await productModel.findByIdAndDelete({_id: prodId})
+      })
+      if(count == 1){
+        product.isDeleted = true
+        product.skus.forEach(item => item.isDeleted = true)
+        await product.save()
         return res.json({
           successStatus: true,
           redirect: '/admin'
         })
-      } catch (error) {
-        console.log('Error')
-        return res.json({
-          successStatus: false,
-          message: 'Some error occured, please try again later'
-        })
-      }
-    }else{
-      console.log(product)
-      console.log(id)
-      console.log(prodId)
-      try {
-        await productModel.findByIdAndUpdate({_id: prodId}, {
-          $pull: {
-            skus: {
-              _id: mongoose.Types.ObjectId(id)
-            }
+      }else{
+        const result = await productModel.findOneAndUpdate({skus: {$elemMatch: {_id: id}}}, {
+          $set: {
+            'skus.$.isDeleted': true,
           }
         })
         return res.json({
           successStatus: true,
           redirect: '/admin'
         })
-      } catch (error) {
-        console.log(error)
-        return res.json({
-          successStatus: false,
-          message: 'Some error occured, please try again later'
-        })
       }
+    }catch (error) {
+      console.log(error)
+      return res.json({
+        successStatus: false,
+        message: 'Some error occured please try again later'
+      })
     }
+    // try {
+    //   for(item of product.skus){
+    //     for(path of item.images){
+    //       if(item._id == id){
+    //         await unlinkAsync('./public/' + path)
+    //       }
+    //     }
+    //   }
+    // } catch (error) {
+    //   console.log(error)
+    // }
+    // if(product.skus.length == 1){
+    //   console.log('deleting product')
+    //   try {
+    //     await productModel.findByIdAndDelete({_id: prodId})
+    //     return res.json({
+    //       successStatus: true,
+    //       redirect: '/admin'
+    //     })
+    //   } catch (error) {
+    //     console.log('Error')
+    //     return res.json({
+    //       successStatus: false,
+    //       message: 'Some error occured, please try again later'
+    //     })
+    //   }
+    // }else{
+    //   console.log(product)
+    //   console.log(id)
+    //   console.log(prodId)
+    //   try {
+    //     await productModel.findByIdAndUpdate({_id: prodId}, {
+    //       $pull: {
+    //         skus: {
+    //           _id: mongoose.Types.ObjectId(id)
+    //         }
+    //       }
+    //     })
+    //     return res.json({
+    //       successStatus: true,
+    //       redirect: '/admin'
+    //     })
+    //   } catch (error) {
+    //     console.log(error)
+    //     return res.json({
+    //       successStatus: false,
+    //       message: 'Some error occured, please try again later'
+    //     })
+    //   }
+    // }
   
   },
 
