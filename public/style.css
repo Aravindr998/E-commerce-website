@@ -2,6 +2,7 @@
 body{
   font-family: 'Roboto', sans-serif !important;
   height: 100vh !important;
+  overflow-x: hidden;
 }
 .navbar-brand{
   font-weight: 700;
@@ -244,3 +245,32 @@ footer div div div p:first-child{
 .image-selected{
   outline: solid 4px var(--color-teritiary-user);
 }
+
+.img-cont{
+  position: relative;
+}
+.lens{
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100px;
+  height: 100px;
+  background-color: rgba(31, 180, 255, 0.3);
+  visibility: hidden;
+}
+.result{
+  position: absolute;
+  left: calc(100% + 10rem);
+  top: 1rem;
+  width: 400px;
+  height: 400px;
+  background-repeat: no-repeat;
+  visibility: hidden;
+  z-index: 99;
+}
+
+/* @media (max-width: 770px) {
+  .result{
+    left: 0;
+  }
+} */
