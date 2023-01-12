@@ -178,3 +178,69 @@ footer div div div p:first-child{
 .product-anchor{
   text-decoration: none;
 }
+
+.product-alt-images{
+  object-fit: contain;
+  max-height: 5rem;
+  cursor: pointer;
+}
+.product-alt-card{
+  min-width: 6rem;
+}
+
+@media (max-width: 576px){
+  .product-alt-card{
+    min-width: 0;
+  }
+  .product-alt-images{
+    max-height: 2rem;
+  }
+}
+
+.product-details-title{
+  font-size: var(--font-size-title);
+  font-weight: var(--font-weight-subheading);
+}
+.rating{
+  background-color: var(--color-secondary);
+  color: var(--color-primary)
+}
+.product-details-price{
+  font-size: var(--font-size-price);
+  font-weight: var(--font-weight-subheading);
+}
+.label-text{
+  font-weight: var(--font-weight-subheading);
+}
+.highlights{
+  max-width: 15rem;
+}
+.wishlist{
+  max-width: 1.5rem;
+  fill: var(--color-primary);
+  transition: fill 0.3s;
+}
+.wishlist-button{
+  width: 3rem;
+  height: 3rem;
+  border: 1px;
+  border-radius: 5rem;
+  background-color: var(--color-button-background);
+  transition: background-color 0.3s;
+}
+.wishlist-added{
+  fill: var(--color-secondary);
+}
+.wishlist-button:hover{
+  background-color: var(--color-button-hover);
+}
+.wishlist-parent{
+  top: 2.5rem;
+  right: 3rem;
+}
+.product-main-image{
+  max-height: 20rem;
+}
+.image-selected{
+  outline: solid 4px var(--color-teritiary-user);
+}

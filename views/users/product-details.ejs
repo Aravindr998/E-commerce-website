@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('../partials/head') %> 
+<body class="pt-5">
+<%- include('../partials/user-navbar') %> 
+<section class="container">
+  <div class="row">
+    <div class="col-md-6 position-relative">
+      <div class="d-flex justify-content-center p-5">
+        <img id="main-image" class="product-main-image" src="/<%= sku.images[0] %> " alt="">
+      </div>
+      <div class="d-flex px-5 justify-content-center">
+        <div class="col-2 d-flex justify-content-center mx-3">
+          <div class="card product-alt-card p-2" id="image1" onclick="changeImage(this.id)">
+            <img class="product-alt-images" src="/<%= sku.images[0] %> " alt="">
+          </div>
+        </div>
+        <div class="col-2 d-flex justify-content-center mx-3">
+          <div class="card product-alt-card p-2" id="image2" onclick="changeImage(this.id)">
+            <img class="product-alt-images" src="/<%= sku.images[1] %> " alt="">
+          </div>
+        </div>
+        <div class="col-2 d-flex justify-content-center mx-3">
+          <div class="card product-alt-card p-2" id="image3" onclick="changeImage(this.id)">
+            <img class="product-alt-images" src="/<%= sku.images[2] %> " alt="">
+          </div>
+        </div>
+      </div>
+      <div class="d-flex my-sm-5 my-1 justify-content-center">
+        <div class="col-3 d-flex justify-content-center align-items-center">
+          <button class="main-button w-100">Buy Now</button>
+        </div>
+        <div class="col-4 d-flex justify-content-center ps-sm-5 ps-1">
+          <button class="sub-button w-100">Add to cart</button>
+        </div>
+      </div>
+      <div class="position-absolute wishlist-parent">
+        <button class="wishlist-button">
+          <svg class="wishlist" fill="#000000" viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <title>heart-filled</title> <path d="M31.426 8.364c-0.864-3.129-3.279-5.544-6.344-6.393l-0.064-0.015c-0.692-0.172-1.486-0.271-2.304-0.271-2.596 0-4.96 0.998-6.727 2.631l0.007-0.006c-1.606-1.408-3.724-2.268-6.043-2.268-0.807 0-1.589 0.104-2.335 0.299l0.064-0.014c-3.276 0.931-5.804 3.458-6.718 6.666l-0.017 0.068c-0.175 0.678-0.276 1.457-0.276 2.259 0 2.724 1.161 5.178 3.015 6.892l0.006 0.006 11.381 12.619c0.23 0.254 0.561 0.412 0.929 0.412s0.699-0.159 0.928-0.411l0.001-0.001 11.358-12.596c2.088-1.877 3.396-4.587 3.396-7.602 0-0.807-0.094-1.592-0.271-2.345l0.014 0.069z"></path> </g></svg>
+        </button>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div>
+        <p class="product-details-title pt-4 mb-0"><%= product.title.toUpperCase() %> </p>
+        <p class="rating d-inline p-1 rounded-1">Not yet rated</p>
+      </div>
+      <div class="pt-5 product-details-price">
+        <p>₹<%= sku.price %> </p>
+      </div>
+      <div>
+        <p><%= product.warranty %> </p>
+      </div>
+      <div>
+        <p class="mb-0 label-text">Colors:</p>
+        <div class="d-flex pt-1 mb-4">
+          <% product.skus.forEach(item => { %> 
+          <div class="col-2 p-2">
+            <a href="/products/details/<%= product._id %>/<%= item._id %>  ">
+              <div class="card product-alt-card p-2 <%= item._id == sku._id?'image-selected':'' %> ">
+                <img class="h-100 product-alt-images" src="/<%= item.images[0] %> " alt="">
+              </div>
+            </a>
+          </div>
+          <% }) %> 
+        </div>
+      </div>
+      <div class="d-flex mb-3">
+        <div class="pe-3">
+          <p class="label-text">Highlights: </p>
+        </div>
+        <div class="highlights">
+          <P><%= sku.highlights %> </P>
+        </div>
+      </div>
+      <div class="d-flex">
+        <div class="pe-2">
+          <p class="label-text">Dimensions: </p>
+        </div>
+        <div class="highlights">
+          <p><%= sku.dimension %> </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<%- include('../partials/footer') %> 
+</body>
+</html>

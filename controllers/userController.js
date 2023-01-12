@@ -16,7 +16,6 @@ module.exports = {
     categories.forEach(item => {
       item.products.splice(3, Infinity)
     })
-    console.log(categories)
       if(req.session.user){
         return res.render('home-page', {categories})
       }else{
@@ -239,6 +238,26 @@ module.exports = {
       .sort({categoryId: 1})
       const categories = await categoryModel.find()
       res.render('users/product-page', {products, categories})
+    } catch (error) {
+      
+    }
+  },
+
+  getDetailsPage: async(req, res) => {
+    try {
+      const prodId = req.params.prodid
+      const skuId = req.params.skuid
+      const product = await productModel.findById(prodId)
+      .populate('categoryId')
+      let sku
+      product.skus.forEach(item => {
+        if(item._id == skuId){
+          sku = item
+        }
+      })
+      console.log(product)
+      console.log(sku)
+      res.render('users/product-details', {product, sku})
     } catch (error) {
       
     }

@@ -17,3 +17,10 @@ document.querySelector('button.navbar-toggler').addEventListener('click', (e) =>
     document.getElementById('navbar').style.backgroundColor = 'white'
   }
 })
+
+function changeImage(id) {
+  const image = document.querySelector(`#${id} img`).src
+  console.log(image)
+  const mainImage = document.querySelector('#main-image')
+  mainImage.src = image
+}

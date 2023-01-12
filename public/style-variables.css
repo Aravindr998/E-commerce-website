@@ -3,10 +3,14 @@
   --color-secondary: black;
   --color-teritiary-user: #87AFB4;
   --color-teritiary-admin: #B48787;
+  --color-button-background: #DADADA;
+  --color-button-hover: #bababa;
 
   --font-weight-subheading: 500;
   --font-weight-heading: 700;
 
   --font-size-normal: 1rem;
-  --font-size-heading: 4rem
+  --font-size-heading: 4rem;
+  --font-size-title: 3rem;
+  --font-size-price: 2.5rem;
 }

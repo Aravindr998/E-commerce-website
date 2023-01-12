@@ -57,7 +57,7 @@ module.exports = {
     }
   },
   getHomepage: async (req, res) => {
-    const product = await productModel.find({isDeleted: false}).populate('categoryId')
+    const product = await productModel.find().populate('categoryId')
     res.render('admin/admin-dashboard', {product})
   },
   getAddProducts: async (req, res) => {

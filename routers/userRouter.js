@@ -22,4 +22,6 @@ router.post('/register/otp/resend', userController.resendOtp)
 
 router.get('/products', userAuth.authenticate, userController.getProductsPage)
 
+router.get('/products/details/:prodid/:skuid', userAuth.authenticate, userController.getDetailsPage)
+
 module.exports = router
