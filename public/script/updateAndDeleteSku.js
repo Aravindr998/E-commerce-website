@@ -35,7 +35,7 @@ async function deleteSku(id){
   const url = 'http://localhost:4000/admin/products/delete/skus/'+ prodId + '/' + data
   if(window.confirm('Are you sure?')){
     fetch(url, {
-      method: 'DELETE',
+      method: 'PATCH',
       headers: {
         'Content-Type': 'application/json'
       }

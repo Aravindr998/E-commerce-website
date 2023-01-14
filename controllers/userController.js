@@ -5,6 +5,7 @@ const axios = require('axios')
 const productModel = require('../models/products')
 const categoryModel = require('../models/categories')
 const mongoose = require('mongoose')
+const User = require('../models/users')
 require('dotenv').config()
 let otp
 
@@ -59,14 +60,6 @@ module.exports = {
       return res.redirect('/login')
     }
   },
-  
-  isLoggedin: (req, res, next) =>{
-    if(req.session.user){
-      return res.redirect('/')
-    }else{
-      next()
-    }
-  },
 
   registerUser: async (req, res, next)=>{
     const existing = await userModel.find({$or: [{email: req.body.email}, {phone: req.body.phone}]})
@@ -86,7 +79,7 @@ module.exports = {
           redirect: '/register',
           saveStatus: false
         })
-      }else if(!(req.body.phone).match(/^[789]\d{9}$/)){
+      }else if(!(req.body.phone).match(/^[6789]\d{9}$/)){
         req.session.Errmessage = "Invalid mobile number"
         req.session.registerUser = user
         return res.json({
@@ -255,11 +248,128 @@ module.exports = {
           sku = item
         }
       })
-      console.log(product)
-      console.log(sku)
       res.render('users/product-details', {product, sku})
     } catch (error) {
       
+    }
+  },
+
+  getCartPage: async(req, res) => {
+    try {
+      const user = await userModel.findOne({_id: req.session.user._id})
+      .populate('cart.productId')
+      console.log(user.cart)
+      if(user.cart.length>0){
+        user.cart.forEach((item, index, array) => {
+          let temp
+          item.productId.skus.forEach( sku => {
+            if(sku._id.toString() == item.skuId.toString()){
+              console.log('entered')
+              console.log(sku)
+              temp = sku
+            }
+          })
+          array[index].skus = temp
+        })
+        
+        const cart = user.cart
+        const {cartTotal} = user
+        console.log(cart[0].skus)
+        res.render('users/cart', {cart, cartTotal})
+      }else{
+        const cart = []
+        const cartTotal = 0
+        res.render('users/cart', {cart, cartTotal})
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  },
+
+  addToCart: async(req, res) => {
+    const prodId = req.params.prodid
+    const skuid = req.params.skuid
+    try {
+      const user = await userModel.findById(req.session.user._id)
+      const product = await productModel.findById(prodId)
+      let sku
+      let total;
+      product.skus.forEach(item => {
+        if(item._id == skuid){
+          total= item.price
+        }
+      })
+      const cartItem = {
+        productId: prodId,
+        skuId: skuid,
+        quantity: 1
+      }
+      let flag = 0
+      user.cart.forEach(item => {
+        if(skuid == item?.skuId){
+          flag = 1
+        }
+      })
+      console.log(total)
+      if(flag == 0){
+        console.log()
+        await userModel.findOneAndUpdate({_id: req.session.user._id}, {$push: {cart: cartItem}})
+        await userModel.findOneAndUpdate({_id: req.session.user._id}, {$inc: {cartTotal: total}})
+      }else{
+        console.log(flag)
+        await userModel.findOneAndUpdate({_id: req.session.user._id, 'cart.skuId': skuid}, {$inc: {'cart.$.quantity': 1, cartTotal: total}})
+      }
+      res.json({
+        successStatus: true,
+        message: "Item added to cart successfully"
+      })
+    } catch (error) {
+      console.log(error)
+      res.json({
+        successStatus: false,
+        message: "Some error occured. Please try again later"
+      })
+    }
+  },
+  changeQuantity: async(req, res) => {
+    try {
+      const product = await productModel.findById(req.body.prodId)
+      let total
+      product.skus.forEach(item => {
+        if(item._id == req.body.skuId){
+          total= item.price*req.body.amount
+        }
+      })
+      const user = await userModel.findById(req.session.user._id)
+      let flag = true
+      let quantity
+      user.cart.forEach(item => {
+        if(item.skuId.toString() == req.body.skuId){
+          quantity = item.quantity
+          if(item.quantity == 1 && req.body.amount<0){
+            flag = false
+          }
+        }
+      })
+      if(flag){
+        await userModel.findOneAndUpdate({_id: req.session.user._id, 'cart.skuId': req.body.skuId}, {
+          $inc: {'cart.$.quantity': req.body.amount, cartTotal: total}
+        })
+        return res.json({
+          successStatus: true,
+          quantity: quantity + req.body.amount,
+          cartTotal: user.cartTotal + total
+        })
+      }else{
+        return res.json({
+          successStatus: false
+        })
+      }
+    } catch (error) {
+      console.log(error)
+      return res.json({
+        successStatus: false
+      })
     }
   }
 
@@ -276,7 +386,7 @@ function sendOtp(otp, number){
   }
   return axios({
     method : 'GET',
-    url : 'https://www.fast2sms.com/dev/bulkV2',
+    url : "https://www.fast2sms.com/dev/bulkV2",
     data: body
   })
 }

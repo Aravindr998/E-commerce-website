@@ -35,7 +35,7 @@
           <button class="main-button w-100">Buy Now</button>
         </div>
         <div class="col-4 d-flex justify-content-center ps-sm-5 ps-1">
-          <button class="sub-button w-100">Add to cart</button>
+          <button class="sub-button w-100" onclick="addToCart(this.id)" id="add-to-cart-button" data-prodid="<%= product._id %>" data-skuid="<%= sku._id %> ">Add to cart</button>
         </div>
       </div>
       <div class="position-absolute wishlist-parent">
@@ -86,6 +86,10 @@
         </div>
       </div>
     </div>
+  </div>
+  <div class="alert alert-dismissible fade show added-to-cart" role="alert">
+    <p>Hello</p>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
   </div>
 </section>
 <%- include('../partials/footer') %> 

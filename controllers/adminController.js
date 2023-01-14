@@ -1,4 +1,3 @@
-const adminModel = require('../models/admin')
 const userModel = require('../models/users')
 const productModel = require('../models/products')
 const categoryModel = require('../models/categories')
@@ -9,14 +8,6 @@ const unlinkAsync = promisify(fs.unlink)
 
 
 module.exports = {
-  isLoggedin: (req, res, next) => {
-    if(req.session.admin){
-      res.redirect('/admin')
-    }else{
-      next()
-    }
-  },
-
   getLogin: (req, res) => {
     if(req.session.Errmessage){
       const message = req.session.Errmessage
@@ -25,35 +16,6 @@ module.exports = {
     }else{
       const message = ""
       res.render('admin/admin-login', {message})
-    }
-  },
-
-  loginAdmin: async (req, res) => {
-    try{
-      if(req.body.email == "" || req.body.password == ""){
-        req.session.Errmessage = "Email and password cannot be empty"
-        return res.redirect('/admin/login')
-      }
-      const admin = await adminModel.find({email: req.body.email})
-      if(admin.length == 0){
-        req.session.Errmessage = "Invalid Email"
-        return res.redirect('/admin/login')
-      }else if(req.body.password != admin[0].password){
-        req.session.Errmessage = "Invalid password"
-        return res.redirect('/admin/login')
-      }else{
-        req.session.admin = admin[0]
-        res.redirect('/admin')
-      }
-    }catch(error){
-      return res.status(500).send(error)
-    }
-  },
-  authenticate: (req, res, next) => {
-    if(req.session.admin){
-      next()
-    }else{
-      return res.redirect('/admin/login')
     }
   },
   getHomepage: async (req, res) => {
@@ -512,7 +474,7 @@ module.exports = {
   deleteProduct: async (req, res) => {
     const id = req.params.id
     try {
-      await productModel.findOneAndUpdate({_id: id}, {$set: {isDeleted: true}})
+      await productModel.findOneAndUpdate({_id: id}, {$set: {isDeleted: true, "skus.$[].isDeleted": true}})
       return res.json({
         successStatus: true,
         redirect: '/admin'
@@ -524,25 +486,6 @@ module.exports = {
         message: 'Some error occured, please try again later'
       })
     }
-    // const product = await productModel.findById(id)
-    // try {
-    //   for(item of product.skus){
-    //     for(path of item.images){
-    //       await unlinkAsync('./public/' + path)
-    //     }
-    //   }
-    //   await productModel.findByIdAndDelete({_id: id})
-    //   res.json({
-    //     successStatus: true,
-    //     redirect: '/admin'
-    //   })
-    // } catch (error) {
-    //   console.log('Error')
-    //   res.json({
-    //     successStatus: false,
-    //     message: 'Some error occured, please try again later'
-    //   })
-    // }
   },
 
   deleteSku: async (req, res) => {
@@ -582,57 +525,6 @@ module.exports = {
         message: 'Some error occured please try again later'
       })
     }
-    // try {
-    //   for(item of product.skus){
-    //     for(path of item.images){
-    //       if(item._id == id){
-    //         await unlinkAsync('./public/' + path)
-    //       }
-    //     }
-    //   }
-    // } catch (error) {
-    //   console.log(error)
-    // }
-    // if(product.skus.length == 1){
-    //   console.log('deleting product')
-    //   try {
-    //     await productModel.findByIdAndDelete({_id: prodId})
-    //     return res.json({
-    //       successStatus: true,
-    //       redirect: '/admin'
-    //     })
-    //   } catch (error) {
-    //     console.log('Error')
-    //     return res.json({
-    //       successStatus: false,
-    //       message: 'Some error occured, please try again later'
-    //     })
-    //   }
-    // }else{
-    //   console.log(product)
-    //   console.log(id)
-    //   console.log(prodId)
-    //   try {
-    //     await productModel.findByIdAndUpdate({_id: prodId}, {
-    //       $pull: {
-    //         skus: {
-    //           _id: mongoose.Types.ObjectId(id)
-    //         }
-    //       }
-    //     })
-    //     return res.json({
-    //       successStatus: true,
-    //       redirect: '/admin'
-    //     })
-    //   } catch (error) {
-    //     console.log(error)
-    //     return res.json({
-    //       successStatus: false,
-    //       message: 'Some error occured, please try again later'
-    //     })
-    //   }
-    // }
-  
   },
 
   //users

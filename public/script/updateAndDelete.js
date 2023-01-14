@@ -36,7 +36,7 @@ async function deleteProduct(id) {
     const data = document.getElementById(id).dataset.url
     const url = 'http://localhost:4000/admin/products/delete/' + data
     const response = await fetch(url, {
-      method: 'DELETE',
+      method: 'PATCH',
       headers: {
         'Content-Type': 'application/json'
       }

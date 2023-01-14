@@ -15,7 +15,7 @@ body{
 }
 .form-search{
   border: none;
-  border-bottom: solid 2px black;
+  border-bottom: solid 2px var(--color-secondary);
   border-radius: 0;
   background: transparent;
   min-width: 24rem;
@@ -25,7 +25,7 @@ body{
 }
 .search-button{
   border: none;
-  border-bottom: solid 2px black;
+  border-bottom: solid 2px var(--color-secondary);
   border-radius: 0;
   background-color: transparent;
   max-width: 30px;
@@ -37,36 +37,36 @@ body{
 .nav-item{
   font-weight: 500;
   font-size: 1rem;
-  color: black !important;
+  color: var(--color-secondary) !important;
 }
 .navbar-parent{
   background: transparent;
   transition: background-color 0.3s;
 }
 .main-button{
-  border: none;
+  border: solid 2px var(--color-secondary);
   border-radius: 10em;
-  background-color: black;
+  background-color: var(--color-secondary);
   color: white;
   padding: 0.5rem 1.5rem;
   font-weight: 500;
 }
 .sub-button{
-  border: solid 2px black;
+  border: solid 2px var(--color-secondary);
   border-radius: 10em;
-  background-color: rgb(255, 255, 255);
-  color: rgb(0, 0, 0);
+  background-color: var(--color-primary);
+  color: var(--color-secondary);
   padding: 0.5rem 1.5rem;
   font-weight: 500;
   transition: background-color 0.3s, color 0.3s;
 }
 .sub-button:hover{
-  background-color: rgb(0, 0, 0);
-  color: rgb(255, 255, 255);
+  background-color: var(--color-secondary);
+  color: var(--color-primary);
 }
 
 a{
-  color: black;
+  color: var(--color-secondary);
   font-weight: var(--font-weight-subheading);
 }
 .login-card{
@@ -269,8 +269,60 @@ footer div div div p:first-child{
   z-index: 99;
 }
 
-/* @media (max-width: 770px) {
+@media (max-width: 768px){
   .result{
-    left: 0;
+    display: none;
   }
-} */
+}
+
+.product-text-cart{
+  font-size: var(--font-size-cart-items);
+  font-weight: var(--font-weight-subheading);
+}
+
+.item-count{
+  background-color: var(--color-button-background);
+  margin-bottom: 0;
+  padding: 0.25rem 1rem;
+  border-left: solid 1px var(--color-button-hover);
+  border-right: solid 1px var(--color-button-hover);
+}
+
+.reduce-button{
+  border: none;
+  background-color: var(--color-button-background);
+  border-top-left-radius: 1rem;
+  border-bottom-left-radius: 1rem;
+  width: 1.75rem;
+  height: 2rem;
+  font-weight: var(--font-weight-subheading);
+}
+.add-button{
+  border: none;
+  background-color: var(--color-button-background);
+  border-top-right-radius: 1rem;
+  border-bottom-right-radius: 1rem;
+  width: 1.75rem;
+  height: 2rem;
+  font-weight: var(--font-weight-subheading);
+}
+
+.added-to-cart{
+  position: fixed;
+  bottom: 1rem;
+  right: 50%;
+  margin: 2rem;
+  transform: translateY(5rem);
+  visibility: hidden;
+  transition: transform 0.3s, visibility 0.3s;
+}
+
+@media (max-width: 700px){
+  .added-to-cart{
+    right: 0;
+  }
+}
+
+.cart-images{
+  max-height: 14rem;
+}

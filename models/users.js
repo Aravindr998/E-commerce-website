@@ -1,42 +1,6 @@
 const mongoose = require('mongoose')
 const bcrypt = require('bcrypt')
 
-const addressSchema = new mongoose.Schema({
-  state: {
-    type: String,
-  },
-  street1: {
-    type: String
-  },
-  street2: {
-    type: String
-  },
-  city: {
-    type: String
-  },
-  state: {
-    type: String
-  },
-  zip: {
-    type: Number
-  }
-})
-
-const cartSchema = new mongoose.Schema({
-  productId: {
-    type: String,
-  },
-  quantity: {
-    type: Number
-  }
-})
-
-const wishlistSchema = new mongoose.Schema({
-  productId: {
-    type: String
-  }
-})
-
 const userSchema = new mongoose.Schema({
   fname: {
     type: String,
@@ -61,11 +25,50 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Password cannot be empty']
   },
-  shippingAddress: {
-    
+  billingAddress: {
+    type: {
+      state: {
+        type: String,
+      },
+      street1: {
+        type: String
+      },
+      street2: {
+        type: String
+      },
+      city: {
+        type: String
+      },
+      state: {
+        type: String
+      },
+      zip: {
+        type: Number
+      }
+    }
   },
-  billingAddress: addressSchema,
-  shippingAddress: [addressSchema],
+  shippingAddress: [{
+    type: {
+      state: {
+        type: String,
+      },
+      street1: {
+        type: String
+      },
+      street2: {
+        type: String
+      },
+      city: {
+        type: String
+      },
+      state: {
+        type: String
+      },
+      zip: {
+        type: Number
+      }
+    }
+  }],
   isBlocked: {
     type: Boolean,
     default: false
@@ -81,8 +84,38 @@ const userSchema = new mongoose.Schema({
   profilePicture: {
     type: String
   },
-  cart: [cartSchema],
-  wishlist: [wishlistSchema]
+  cart: {
+    type: [{
+      productId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Products'
+      },
+      skuId:{
+        type: mongoose.Schema.Types.ObjectId
+      },
+      quantity: {
+        type: Number
+      },
+      skus: {
+        type: Array 
+      }
+    }]
+  },
+  cartTotal: {
+    type: Number,
+    default: 0
+  },
+  wishlist: [{
+    type: {
+      productId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Products'
+      },
+      skuId: {
+        type: mongoose.Schema.Types.ObjectId
+      }
+    }
+  }]
 })
 
 userSchema.pre('save', async function(next){

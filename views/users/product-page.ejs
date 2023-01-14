@@ -67,7 +67,7 @@
         <% product.skus.forEach(sku => { %> 
           <div class="col-md-4">
               <a class="product-anchor" href="/products/details/<%= product._id %>/<%= sku._id %>  ">
-              <div class="card product-display-card d-flex flex-sm-column flex-row p-2 my-3">
+              <div class="card product-display-card d-flex flex-sm-column flex-row p-2 my-3 justify-content-center">
                 <div class="col-sm-12 col-6 d-flex justify-content-center">
                   <img class="product-card-image" src="/<%= sku.images[0] %> " alt="">
                 </div>

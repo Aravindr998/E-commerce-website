@@ -68,3 +68,85 @@ function hideZoom() {
   lens.style.visibility = 'hidden'
   result.style.visibility = 'hidden'
 }
+
+async function addToCart(id){
+  const button = document.getElementById(id)
+  const prodId = button.dataset.prodid
+  const skuId = button.dataset.skuid
+  const url = 'http://localhost:4000/cart/add/' + prodId + '/' + skuId
+  const body = {
+    prodId,
+    skuId
+  }
+  try {
+    const response = await fetch(url, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(body)
+    })
+    const res = await response.json()
+    console.log(res)
+    if(res.successStatus){
+      document.querySelector('.added-to-cart').classList.add('alert-success')
+      document.querySelector('.added-to-cart p').innerHTML = res.message
+      document.querySelector('.added-to-cart').style.transform = 'translateY(0rem)'
+      document.querySelector('.added-to-cart').style.visibility = 'visible'
+      button.value = 'Added To Cart'
+    }else{
+      document.querySelector('.added-to-cart').classList.add('alert-danger')
+      document.querySelector('.added-to-cart p').innerHTML = res.message
+      document.querySelector('.added-to-cart').style.transform = 'translateY(0rem)'
+      document.querySelector('.added-to-cart').style.visibility = 'visible'
+    }
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+async function changeQty(id, amount, count){
+  const idb = 'dec-button'+count
+  const button = document.getElementById(id)
+  let reduceButton = document.getElementById(idb)
+  const data = button.dataset.id
+  const prodId = button.dataset.prodid
+  const url = 'http://localhost:4000/cart/update/'+data
+  const body = {
+    skuId: data,
+    amount,
+    prodId
+  }
+  try {
+    const response = await fetch(url, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(body)
+    })
+    const res = await response.json()
+    if(res.successStatus){
+      document.getElementById(prodId).innerHTML = res.quantity
+      document.getElementById('cart-total').innerHTML = '₹'+res.cartTotal
+      document.getElementById('tax').innerHTML = '₹'+Math.round(res.cartTotal*0.18)
+      document.getElementById('total').innerHTML = '₹'+Math.round(res.cartTotal*1.18)
+      if(res.quantity == 1){
+        console.log('entered')
+         reduceButton.disabled = true
+      }else{
+        console.log('entered2')
+        console.log(reduceButton)
+        reduceButton.disabled = false
+      }
+    }else{
+      location.reload()
+    }
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+function removeProducts(id, prodId, skuId) {
+  const url = 'http://localhost:4000/cart/remove/' + prodId + '/' + skuId
+}
