@@ -326,3 +326,17 @@ footer div div div p:first-child{
 .cart-images{
   max-height: 14rem;
 }
+
+.button-link{
+  color: var(--color-secondary);
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+.button-link:hover{
+  color: var(--color-primary);
+}
+
+.sub-button:hover .button-link{
+  color: var(--color-primary);
+}

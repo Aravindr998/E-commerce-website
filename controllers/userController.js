@@ -6,6 +6,7 @@ const productModel = require('../models/products')
 const categoryModel = require('../models/categories')
 const mongoose = require('mongoose')
 const User = require('../models/users')
+const { findById } = require('../models/users')
 require('dotenv').config()
 let otp
 
@@ -371,6 +372,131 @@ module.exports = {
         successStatus: false
       })
     }
+  },
+  removeItem: async(req, res) => {
+    try {
+      const userCart = await userModel.aggregate([
+        {
+          $match: {
+            _id: mongoose.Types.ObjectId(req.session.user._id)
+          }
+        },
+        {
+          $unwind: '$cart'
+        },
+        {
+          $match: {
+            'cart.skuId': mongoose.Types.ObjectId(req.body.skuId)
+          }
+        },
+        {
+          $project: {
+            'cart.quantity': 1
+          }
+        }
+      ])
+      const sku = await productModel.aggregate([
+        {
+          $match: {
+            _id: mongoose.Types.ObjectId(req.body.prodId)
+          },
+        },
+        {
+          $unwind: '$skus'
+        },
+        {
+          $match: {
+            'skus._id': mongoose.Types.ObjectId(req.body.skuId)
+          }
+        },
+        {
+          $project: {
+            skus: 1
+          }
+        }
+      ])
+      const quantity = userCart[0].cart.quantity
+      const totalPrice = -sku[0].skus.price*quantity
+      await userModel.findOneAndUpdate({_id: req.session.user._id}, {$pull: {cart: {skuId: req.body.skuId}}})
+      await userModel.findOneAndUpdate({_id: req.session.user._id}, {$inc: {cartTotal: totalPrice}})
+      return res.json({
+        successStatus: true
+      })
+    } catch (error) {
+      console.log(error)
+      return res.json({
+        successStatus: false
+      })
+    }
+  },
+  getWishlishPage: async(req, res) => {
+    const user = await userModel.find({_id: req.session.user._id}, {wishlist: 1})
+    .populate('wishlist.productId')
+    const wishlist = user[0].wishlist
+    console.log(wishlist)
+    let wishlistClone = JSON.parse(JSON.stringify(wishlist))
+    wishlistClone.forEach((item, index, array) => {
+      let temp
+      item.productId.skus.forEach( sku => {
+        if(sku._id.toString() == item.skuId.toString()){
+          console.log('entered')
+          console.log(sku)
+          temp = sku
+        }
+      })
+      array[index].skus = temp
+    })
+
+    console.log(wishlistClone[0])
+    res.render('users/wishlist', {wishlist: wishlistClone})
+  },
+  addToWishlist: async(req, res, next) => {
+    const wishlist = {
+      productId: req.body.prodId,
+      skuId: req.body.skuId
+    }
+    try {
+      let flag = true
+      const user = await userModel.findById({_id: req.session.user._id})
+      user.wishlist.forEach(item => {
+        if(item.skuId == req.body.skuId){
+          flag = false
+        }
+      })
+      if(flag){
+        await userModel.findOneAndUpdate({_id: req.session.user._id}, {$push: {wishlist: wishlist}})
+      }
+      next()
+    } catch (error) {
+      console.log(error)
+      return res.json({
+        successStatus: false
+      })
+    }
+  },
+  deleteFromWishlist: async(req, res, next) => {
+    try {
+      await userModel.findOneAndUpdate({_id: req.session.user._id}, {$pull: {wishlist: {skuId: req.body.skuId}}})
+      next()
+    } catch (error) {
+      console.log(error)
+      return res.json({
+        successStatus: false
+      })
+    }
+  },
+  sendResponse: (req, res) => {
+    return res.json({
+      successStatus: true
+    })
+  },
+  getDashboard: async(req, res) => {
+    const user = await userModel.findById(req.session.user._id)
+    return res.render('users/dashboard', {user})
+  },
+  getDashboardEdit: async(req, res) => {
+    const user = await userModel.findById(req.session.user._id)
+    return res.render('users/dashboard-edit', {user})
   }
 
 }

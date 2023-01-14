@@ -93,7 +93,9 @@ async function addToCart(id){
       document.querySelector('.added-to-cart p').innerHTML = res.message
       document.querySelector('.added-to-cart').style.transform = 'translateY(0rem)'
       document.querySelector('.added-to-cart').style.visibility = 'visible'
-      button.value = 'Added To Cart'
+      console.log(button)
+      button.removeAttribute('onclick')
+      button.innerHTML = '<a href="/cart" class = "button-link">Go To Cart</a>'
     }else{
       document.querySelector('.added-to-cart').classList.add('alert-danger')
       document.querySelector('.added-to-cart p').innerHTML = res.message
@@ -147,6 +149,133 @@ async function changeQty(id, amount, count){
   }
 }
 
-function removeProducts(id, prodId, skuId) {
+async function removeProduct(id, prodId, skuId) {
   const url = 'http://localhost:4000/cart/remove/' + prodId + '/' + skuId
+  body = {
+    prodId,
+    skuId
+  }
+  try {
+    const response = await fetch(url, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(body)
+    })
+    const res = await response.json()
+    if(res.successStatus){
+      window.location.href = 'http://localhost:4000/cart'
+    }else{
+      document.querySelector('#error').innerHTML = 'Some error occured. Please try again later'
+    }
+  } catch (error) {
+   console.log(error) 
+  }
+}
+
+async function moveToWishlist(id, prodId, skuId){
+  const url = 'http://localhost:4000/cart/wishlist/add'
+  const body = {
+    prodId,
+    skuId
+  }
+  try {
+    const response = await fetch(url, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(body)
+    })
+    const res = await response.json()
+    if(res.successStatus){
+      window.location.href = 'http://localhost:4000/cart'
+    }else{
+      document.querySelector('#error').innerHTML = 'Some error occured. Please try again later'
+    }
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+async function moveToCart(id, prodId, skuId){
+  const url = 'http://localhost:4000/wishlist/cart/add/'+prodId+'/'+skuId
+  const body = {
+    prodId,
+    skuId
+  }
+ try {
+  const response = await fetch(url, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(body)
+  })
+  const res = await response.json()
+  if(res.successStatus){
+    window.location.href = 'http://localhost:4000/wishlist'
+  }else{
+    document.getElementById('error').innerHTML = 'Some error occured. Please try again later'
+  }
+ } catch (error) {
+  console.log(error)
+ }
+}
+
+async function addToWishlist(id, prodId, skuId){
+  const button = document.getElementById(id)
+  const url = 'http://localhost:4000/products/wishlist/add'
+  const body = {
+    prodId,
+    skuId
+  }
+  const response = await fetch(url, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(body)
+  })
+  const res = await response.json()
+  if(res.successStatus){
+    document.querySelector('.added-to-cart').classList.add('alert-success')
+    document.querySelector('.added-to-cart p').innerHTML = 'Item added to wishlist!'
+    document.querySelector('.added-to-cart').style.transform = 'translateY(0rem)'
+    document.querySelector('.added-to-cart').style.visibility = 'visible'
+    console.log(button)
+    button.removeAttribute('onclick')
+    document.querySelector('svg.wishlist').style.fill = 'black'
+  }else{
+    document.querySelector('.added-to-cart').classList.add('alert-danger')
+    document.querySelector('.added-to-cart p').innerHTML = 'Some error occured. Please try again later'
+    document.querySelector('.added-to-cart').style.transform = 'translateY(0rem)'
+    document.querySelector('.added-to-cart').style.visibility = 'visible'
+  }
+}
+
+async function removeFromCart(id, prodId, skuId){
+  const url = 'http://localhost:4000/wishlist/remove'
+  const body = {
+    prodId,
+    skuId
+  }
+  try {
+    const response = await fetch(url, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(body)
+    })
+    const res = await response.json()
+    if(res.successStatus){
+      window.location.href = '/wishlist'
+    }else{
+      document.querySelector('#error').innerHTML = 'Some error occured. Please try again later'
+    }
+  } catch (error) {
+    console.log(error)    
+  }
 }

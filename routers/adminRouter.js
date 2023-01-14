@@ -9,7 +9,7 @@ const router = express.Router()
 
 router.get('/login',auth.isLoggedin, adminController.getLogin)
 
-router.post('/login', auth.isLoggedin, auth.validateLogin, adminController.getHomepage)
+router.post('/login', auth.isLoggedin, auth.validateLogin, adminController.redirectHomepage)
 
 //products
 

@@ -30,4 +30,20 @@ router.patch('/cart/add/:prodid/:skuid', userAuth.authenticate, userController.a
 
 router.patch('/cart/update/:id', userAuth.authenticate, userController.changeQuantity)
 
+router.patch('/cart/remove/:prodid/:skuid', userAuth.authenticate, userController.removeItem)
+
+router.get('/wishlist', userAuth.authenticate, userController.getWishlishPage)
+
+router.patch('/cart/wishlist/add',userAuth.authenticate, userController.addToWishlist, userController.removeItem)
+
+router.patch('/wishlist/cart/add/:prodid/:skuid', userAuth.authenticate, userController.deleteFromWishlist, userController.addToCart)
+
+router.patch('/products/wishlist/add', userAuth.authenticate, userController.addToWishlist, userController.sendResponse)
+
+router.patch('/wishlist/remove', userAuth.authenticate, userController.deleteFromWishlist, userController.sendResponse)
+
+router.get('/dashboard', userAuth.authenticate, userController.getDashboard)
+
+router.get('/dashboard/edit', userAuth.authenticate, userController.getDashboardEdit)
+
 module.exports = router

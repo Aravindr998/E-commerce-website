@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('../partials/head') %> 
+<body class="pt-5">
+<%- include('../partials/user-navbar') %> 
+<section class="container min-vh-100 pt-5">
+  <p class="text-danger" id="error"></p>
+  <div class="row">
+    <% if(wishlist.length>0){ %> 
+      <% wishlist.forEach(item => { %> 
+    <div class="col-md-12">
+      <div class="card row d-flex flex-row p-4 m-4">
+        <div class="col-md-4">
+          <img class="cart-images" src="<%= item.skus.images[0] %> " alt="">
+        </div>
+        <div class="col-md-8 d-flex flex-column justify-content-between">
+          <div>
+            <p class="product-text-cart"><%= item.productId.title %> </p>
+          </div>
+          <div>
+            <p><%= item.skus.color %> </p>
+          </div>
+          <div>
+            <p class="product-text-cart">₹<%= item.skus.price %> </p>
+          </div>
+          <div class="d-flex justify-content-end">
+            <button class="main-button" id="move-to-cart" onclick="moveToCart(this.id, '<%= item.productId._id %>', '<%=item.skus._id%>')">Move To Cart</button>
+            <button class="sub-button ms-3" id="remove-from-cart" onclick="removeFromCart(this.id, '<%= item.productId._id %>', '<%=item.skus._id%>')">Remove</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <% }) %> 
+    <% }else{ %>
+      <div class="text-center">
+        <p class="product-text-cart">No items in wishlist</p>
+      </div>
+    <% } %>  
+  </div>
+</section>
+<%- include('../partials/footer') %> 
+<script src="/script/userScript.js"></script>
+</body>
+</html>

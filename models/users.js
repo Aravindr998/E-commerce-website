@@ -25,33 +25,8 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Password cannot be empty']
   },
-  billingAddress: {
-    type: {
-      state: {
-        type: String,
-      },
-      street1: {
-        type: String
-      },
-      street2: {
-        type: String
-      },
-      city: {
-        type: String
-      },
-      state: {
-        type: String
-      },
-      zip: {
-        type: Number
-      }
-    }
-  },
   shippingAddress: [{
     type: {
-      state: {
-        type: String,
-      },
       street1: {
         type: String
       },

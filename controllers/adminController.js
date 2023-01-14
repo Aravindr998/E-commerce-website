@@ -22,6 +22,9 @@ module.exports = {
     const product = await productModel.find().populate('categoryId')
     res.render('admin/admin-dashboard', {product})
   },
+  redirectHomepage: async(req, res) => {
+    return res.redirect('/admin')
+  },
   getAddProducts: async (req, res) => {
     const categories = await categoryModel.find()
     if(req.session.Errmessage){
