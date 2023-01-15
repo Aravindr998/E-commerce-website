@@ -46,4 +46,22 @@ router.get('/dashboard', userAuth.authenticate, userController.getDashboard)
 
 router.get('/dashboard/edit', userAuth.authenticate, userController.getDashboardEdit)
 
+router.put('/dashboard/edit', userAuth.authenticate, userController.editUser, userController.generateOtp)
+
+router.put('/dashboard/edit/otp', userAuth.authenticate, userController.updateUser)
+
+router.get('/dashboard/address/add', userAuth.authenticate, userController.getAddAddress)
+
+router.post('/dashboard/address/add', userAuth.authenticate, userAuth.validateAddress, userController.saveAddress)
+
+router.get('/dashboard/address/edit/:id', userAuth.authenticate, userController.getEditAddressPage)
+
+router.post('/dashboard/address/update/:id', userAuth.authenticate, userAuth.validateAddress, userController.updateAddress)
+
+router.get('/checkout', userAuth.authenticate, userController.getCheckoutPage)
+
+router.post('/checkout/cod', userAuth.authenticate, userController.checkoutCod)
+
+router.get('/orderplaced', userAuth.authenticate, userController.getOrderPlacedPage)
+
 module.exports = router

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('../partials/head') %> 
+<body class="pt-5">
+<%- include('../partials/user-navbar') %> 
+<section class="container min-vh-100 pt-5">
+  <div>
+    <div>
+      <p class="text-danger"><%= message %> </p>
+      <form class="row g-3" method="POST" action="/dashboard/address/add">
+        <div class="col-12">
+          <label for="street1" class="form-label">Street 1</label>
+          <input type="text" class="form-control" name="street1" id="street1" placeholder="1234 Main St" value="<%= address.street1 %>">
+        </div>
+        <div class="col-12">
+          <label for="street2" class="form-label">Street 2</label>
+          <input type="text" class="form-control" name="street2" id="street2" placeholder="Apartment, studio, or floor" value="<%= address.street2 %>">
+        </div>
+        <div class="col-md-6">
+          <label for="city" class="form-label">City</label>
+          <input type="text" name="city" class="form-control" id="city" value="<%= address.city %>">
+        </div>
+        <div class="col-md-4">
+          <label for="state" class="form-label">State</label>
+          <input type="text" class="form-control" name="state" id="state" value="<%= address.state %>">
+        </div>
+        <div class="col-md-2">
+          <label for="zip" class="form-label">Zip</label>
+          <input type="text" name="zip" class="form-control" id="zip" value="<%= address.zip %>">
+        </div>
+        <div class="col-12 d-flex justify-content-end">
+          <a href="/dashboard" class="sub-button text-decoration-none me-3">Cancel</a>
+          <button type="submit" class="main-button">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+<%- include('../partials/footer') %> 
+<script src="/script/userScript.js"></script>
+</body>
+</html>

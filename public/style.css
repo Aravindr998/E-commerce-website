@@ -340,3 +340,19 @@ footer div div div p:first-child{
 .sub-button:hover .button-link{
   color: var(--color-primary);
 }
+
+.edit-button-address{
+  bottom: 3rem;
+}
+
+.order-card{
+  min-height: 7rem;
+}
+
+.checkout-images{
+  height: 10rem;
+}
+
+.success-tick{
+  width: 10rem;
+}

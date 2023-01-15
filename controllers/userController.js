@@ -5,8 +5,7 @@ const axios = require('axios')
 const productModel = require('../models/products')
 const categoryModel = require('../models/categories')
 const mongoose = require('mongoose')
-const User = require('../models/users')
-const { findById } = require('../models/users')
+const orderModel = require('../models/orders')
 require('dotenv').config()
 let otp
 
@@ -496,9 +495,367 @@ module.exports = {
   },
   getDashboardEdit: async(req, res) => {
     const user = await userModel.findById(req.session.user._id)
-    return res.render('users/dashboard-edit', {user})
-  }
+    if(req.session.Errmessage){
+      const message = req.session.Errmessage
+      req.session.Errmessage = null
+      return res.render('users/dashboard-edit', {user, message})
+    }else{
+      const message = ''
+      return res.render('users/dashboard-edit', {user, message})
+    }
+  },
+  editUser: async(req, res, next) => {
+    const user = new userModel({
+      fname: req.body.fname,
+      lname: req.body.lname,
+      email: req.body.email,
+      phone: req.body.phone,
+      password: '1234'
+    })
+    try {
+      await user.validate()
+      res.json({saveStatus: true})
+      next()
+      
+    } catch (error) {
+      console.log(error)
+      if(error.errors.fname){
+        req.session.Errmessage = error.errors.fname.properties.message
+      }else if(error.errors.lname){
+        req.session.Errmessage = error.errors.lname.properties.message
+      }else if(error.errors.email){
+        req.session.Errmessage = error.errors.email.properties.message
+      }else if(error.errors.phone){
+        req.session.Errmessage = error.errors.phone.properties.message
+      }else if(error.errors.password){
+        req.session.Errmessage = error.errors.password.properties.message
+      }
+      return res.json({
+        saveStatus: false
+      })
+    }
+  },
+  updateUser: async(req, res) => {
+    if(otp == req.body.otp){
+      try {
+        await userModel.findOneAndUpdate({
+          _id: req.session.user._id
+        },
+        {
+          $set: {
+            fname: req.body.fname,
+            lname: req.body.lname,
+            email: req.body.email,
+            phone: req.body.phone
+          }
+        })
+        res.json({saveStatus: true})
+      } catch (error) {
+        console.log(error)
+        res.json({saveStatus: false})
+      }
+    }else{
+      res.json({message:'Invalid OTP'})
+    }
+  },
+  getAddAddress: (req, res) => {
+    if(req.session.Errmessage){
+      const message = req.session.Errmessage
+      const address = req.session.address
+      req.session.Errmessage = null
+      req.session.address = null
+      res.render('users/add-address', {message, address})
+    }else{
+      const message = ''
+      const address = {}
+      res.render('users/add-address', {message, address})
+    }
+  },
+  saveAddress: async(req, res) => {
+    const address = {
+      street1: req.body.street1,
+      street2: req.body.street2,
+      city: req.body.city,
+      state: req.body.state,
+      zip: req.body.zip
+    }
+    try {
+      await userModel.findOneAndUpdate({
+        _id: req.session.user._id
+      }, {
+        $push: {
+          shippingAddress: address
+        }
+      })
+      res.redirect('/dashboard')
+    } catch (error) {
+      console.log(error)
+      res.redirect('/dashboard')
+    }
+  },
+  getEditAddressPage: async(req, res) => {
+    try {
+      const address = await userModel.aggregate([
+        {
+          $match: {
+            _id: mongoose.Types.ObjectId(req.session.user._id)
+          }
+        },
+        {
+          $unwind: '$shippingAddress'
+        },
+        {
+          $match: {
+            'shippingAddress._id': mongoose.Types.ObjectId(req.params.id)
+          }
+        },
+        {
+          $project: {
+            shippingAddress: 1
+          }
+        }
+      ])
+      if(req.session.Errmessage){
+        const message = req.session.Errmessage
+        req.session.Errmessage = null
+        res.render('users/edit-address', {address: address[0].shippingAddress, message})
+      }else{
+        const message = ''
+        res.render('users/edit-address', {address: address[0].shippingAddress, message})
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  },
+  updateAddress: async(req, res) => {
+    try {
+      await userModel.findOneAndUpdate({
+        shippingAddress: {
+          $elemMatch: {
+            _id: mongoose.Types.ObjectId(req.params.id)
+          }
+        }
+      }, 
+      {
+        $set: {
+          'shippingAddress.$.street1': req.body.street1,
+          'shippingAddress.$.street2': req.body.street2,
+          'shippingAddress.$.city': req.body.city,
+          'shippingAddress.$.state': req.body.state,
+          'shippingAddress.$.zip': req.body.zip,
+        }
+      })
+      res.redirect('/dashboard')
+    } catch (error) {
+      console.log(error)
+    }
+  },
+  getCheckoutPage: async(req, res) => {
+    let message = ''
+    if(req.session.Errmessage){
+      message = req.session.Errmessage
+      req.session.Errmessage = null
+    }
+    try {
+      const user = await userModel.findById(req.session.user._id)
+      let skuId = []
+      user.cart.forEach(item => {
+        skuId.push(item.skuId)
+      })
+      if(user.cart.length>0){
+        const user1 = await userModel.aggregate([
+          {
+            $match: {
+              _id: mongoose.Types.ObjectId(req.session.user._id)
+            }
+          },
+          {
+            $lookup: {
+              from: 'products',
+              localField: 'cart.skuId',
+              foreignField: 'skus._id',
+              pipeline: [
+                {
+                  $unwind: '$skus'
+                },
+                {
+                  $match: {
+                    'skus._id': {
+                      $in: skuId
+                    }
+                  }
+                }
+              ],
+              as: 'skus1'
+            }
+          },
+          {
+            $set: {
+              'cart': {
+                $map: {
+                  input: '$cart',
+                  as: 's',
+                  in: {
+                    $mergeObjects: [
+                      '$$s',
+                      {
+                        skus: {
+                          $filter: {
+                            input:'$skus1',
+                            as: 's2',
+                            cond: {$eq: ['$$s2._id', '$$s.productId']}
+                          }
+                        } 
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          {
+            $unset: ['skus1']
+          }
+        ])
+        res.render('users/checkout', {user: user1[0], message})
+      }else{
+        res.redirect('/cart')
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  },
 
+  checkoutCod: async(req, res) => {
+    if(!req.body.address){
+      req.session.Errmessage = 'Please add an address'
+      res.redirect('/checkout')
+    }
+    try {
+      const users = await userModel.aggregate([
+        {
+          $match: {
+            _id: mongoose.Types.ObjectId(req.session.user._id)
+          }
+        },
+        {
+          $unwind: '$shippingAddress'
+        },
+        {
+          $match: {
+            'shippingAddress._id': mongoose.Types.ObjectId(req.body.address)
+          }
+        }
+      ])
+      const user = users[0]
+      const order = new orderModel({
+        customerId: req.session.user._id,
+        'address.street1': user.shippingAddress.street1,
+        'address.street2': user.shippingAddress.street2,
+        'address.city': user.shippingAddress.city,
+        'address.state': user.shippingAddress.state,
+        'address.zip': user.shippingAddress.zip,
+        phone: user.phone,
+        totalAmount: Math.round(user.cartTotal * 1.18),
+        paymentMethod: 'COD',
+        paymentVerified: true,
+        orderStatus: 'Placed'
+      })
+      let skuId = []
+      user.cart.forEach(item => {
+        skuId.push(item.skuId)
+      })
+      const user1 = await userModel.aggregate([
+        {
+          $match: {
+            _id: mongoose.Types.ObjectId(req.session.user._id)
+          }
+        },
+        {
+          $lookup: {
+            from: 'products',
+            localField: 'cart.skuId',
+            foreignField: 'skus._id',
+            pipeline: [
+              {
+                $unwind: '$skus'
+              },
+              {
+                $match: {
+                  'skus._id': {
+                    $in: skuId
+                  }
+                }
+              }
+            ],
+            as: 'skus1'
+          }
+        },
+        {
+          $set: {
+            'cart': {
+              $map: {
+                input: '$cart',
+                as: 's',
+                in: {
+                  $mergeObjects: [
+                    '$$s',
+                    {
+                      skus: {
+                        $filter: {
+                          input:'$skus1',
+                          as: 's2',
+                          cond: {$eq: ['$$s2._id', '$$s.productId']}
+                        }
+                      } 
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        {
+          $unset: ['skus1']
+        }
+      ])
+      user1[0].cart.forEach(item => {
+        const items = {
+          productId: item.productId,
+          skuId: item.skuId,
+          productName: item.skus[0].title,
+          color: item.skus[0].skus.color,
+          quantity: item.quantity,
+          price: item.skus[0].skus.price,
+          image: item.skus[0].skus.images[0]
+        }
+        order.items.push(items)
+      }) 
+      await order.save()
+      console.log(order)
+      await userModel.findOneAndUpdate({
+        _id: req.session.user._id
+      },
+      {
+        $set:{
+          cart: [],
+          cartTotal: 0
+        }
+      })
+      req.session.orderplaced = true
+      return res.redirect('/orderplaced')
+    } catch (error) {
+      console.log(error)
+    }
+  },
+  getOrderPlacedPage: (req, res) => {
+    if(req.session.orderplaced){
+      req.session.orderplaced = null
+      return res.render('users/order-placed')
+    }else{
+      return res.redirect('/')
+    }
+  }
 }
 
 function sendOtp(otp, number){

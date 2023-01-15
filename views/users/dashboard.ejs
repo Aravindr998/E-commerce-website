@@ -5,10 +5,10 @@
 <%- include('../partials/user-navbar') %> 
 <section class="container min-vh-100 pt-5">
   <div class="row">
-    <h1>Dashboard</h1>
-    <div class="col-12 d-flex justify-content-end">
-      <a class="main-button text-decoration-none" href="/dashboard/edit">Edit Details</a>
+    <div class="d-flex justify-content-end">
+      <a href="/dashboard/address/add" class="main-button text-decoration-none">Add Address</a>
     </div>
+    <h1>Dashboard</h1>
     <div class="row d-flex">
       <div class="col-md-4">
         <div class="card p-3 my-4">
@@ -24,16 +24,19 @@
             <p>Phone: </p>
             <p><%= user.phone %> </p>
           </div>
+          <div class="col-12 d-flex justify-content-end">
+            <a class="main-button text-decoration-none" href="/dashboard/edit">Edit</a>
+          </div>
         </div> 
       </div>
-      <div class="col-md-4 my-4">
+      <div class="col-md-4 my-4 order-card">
         <a href="/orders" class="text-decoration-none">
           <div class="card h-100 d-flex align-items-center justify-content-center">
             <h3>Orders</h3>
           </div>
         </a>
       </div>
-      <div class="col-md-4 my-4">
+      <div class="col-md-4 my-4 order-card">
         <a href="/wishlist" class="text-decoration-none">
           <div class="card h-100 d-flex align-items-center justify-content-center">
             <h3>Wishlist</h3>
@@ -41,19 +44,25 @@
         </a>
       </div>
     </div>
+    <% let count = 0 %> 
     <% if(user.shippingAddress.length>0){ %> 
       <div class="row">
       <% user.shippingAddress.forEach(item => { %> 
-      <div class="card d-flex flex-row justify-content-between p-5 col-md-6">
-        <p>Address: </p>
-        <div class="text-end">
-          <p>State</p>
-          <p>Street1</p>
-          <p>Street2</p>
-          <p>city</p>
-          <p>zip</p>
+        <div class="col-md-6">
+          <div class="card d-flex flex-row justify-content-between p-5 position-relative">
+            <p class="col-6">Address <%= ++count %>:</p>
+            <div class="text-end col-6">
+              <p><%= item.street1 %></p>
+              <p><%= item.street2 %></p>
+              <p><%= item.city %></p>
+              <p><%= item.state %></p>
+              <p><%= item.zip %></p>
+            </div>
+            <div class="position-absolute edit-button-address">
+              <a href="/dashboard/address/edit/<%= item._id %> " class="main-button text-decoration-none">Edit</a>
+            </div>
+          </div>
         </div>
-      </div>
       <% }) %> 
     </div>
     <% }else{ %>

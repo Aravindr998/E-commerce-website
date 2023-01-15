@@ -4,74 +4,62 @@
 <body class="pt-5">
 <%- include('../partials/user-navbar') %> 
 <section class="container min-vh-100 pt-5">
-  <div>
+  <div id="dashboard-card">
     <div>
       <form class="row g-3" method="POST">
         <div class="col-md-6">
           <label for="fname" class="form-label">First Name</label>
-          <input type="text" class="form-control" id="fname" value="<%= user.fname %>">
+          <input type="text" class="form-control" name="fname" id="fname" value="<%= user.fname %>">
         </div>
         <div class="col-md-6">
           <label for="lname" class="form-label">Last Name</label>
-          <input type="text" class="form-control" id="lname" value="<%= user.lname %>">
+          <input type="text" class="form-control" name="lname" id="lname" value="<%= user.lname %>">
         </div>
-        <div class="col-12">
+        <div class="col-6">
           <label for="email" class="form-label">Email</label>
-          <input type="email" class="form-control" id="email" value="<%= user.email %>">
+          <input type="email" class="form-control" name="email" id="email" value="<%= user.email %>">
         </div>
-        <p>Address:</p>
-        <% user.shippingAddress.forEach(item => { %> 
-        <div class="col-12">
-          <label for="street1" class="form-label">Line 1</label>
-          <input type="text" class="form-control" id="street1" placeholder="1234 Main St" value="<%= item.street1 %> ">
+        <div class="col-6">
+          <label for="phone" class="form-label">Phone</label>
+          <input type="text" class="form-control" name="phone" id="phone" value="<%= user.phone %>">
         </div>
-        <div class="col-12">
-          <label for="Street2" class="form-label">Line 2</label>
-          <input type="text" class="form-control" id="Street2" placeholder="Apartment, studio, or floor" value="<%= item.street2 %> ">
-        </div>
-        <div class="col-md-6">
-          <label for="city" class="form-label">City</label>
-          <input type="text" class="form-control" id="city" value="<%= item.city %> ">
-        </div>
-        <div class="col-md-4">
-          <label for="state" class="form-label">State</label>
-          <input type="text" class="form-control" id="state" value="<%= item.state %> ">
-        </div>
-        <div class="col-md-2">
-          <label for="zip" class="form-label">Zip</label>
-          <input type="text" class="form-control" id="zip" value="<%= item.zip %> ">
-        </div>
-        <% }) %> 
-        <div class="col-12">
-          <label for="street1" class="form-label">Line 1</label>
-          <input type="text" class="form-control" id="street1" placeholder="1234 Main St">
-        </div>
-        <div class="col-12">
-          <label for="Street2" class="form-label">Line 2</label>
-          <input type="text" class="form-control" id="Street2" placeholder="Apartment, studio, or floor" >
-        </div>
-        <div class="col-md-6">
-          <label for="city" class="form-label">City</label>
-          <input type="text" class="form-control" id="city" >
-        </div>
-        <div class="col-md-4">
-          <label for="state" class="form-label">State</label>
-          <input type="text" class="form-control" id="state" >
-        </div>
-        <div class="col-md-2">
-          <label for="zip" class="form-label">Zip</label>
-          <input type="text" class="form-control" id="zip">
-        </div>
-        <div class="col-12 d-flex justify-content-between">
-          <button type="submit" formaction="/users/save" class="main-button">Submit</button>
-          <button type="submit" formaction="/edit/address" class="sub-button">Add more addresses</button>
+        <div class="d-flex justify-content-end">
+          <a href="/dashboard" class="sub-button me-3 text-decoration-none">Cancel</a>
+          <button class="main-button" id="save-changes" onclick="editUser(this.id)">Save Changes</button>
         </div>
       </form>
+    </div>
+  </div>
+  <div class="container h-100" id="otp-card">
+    <div class="row h-100 d-flex justify-content-center align-items-center">
+      <div class="col-md-5">
+        <div class="login-card p-5">
+          <div class="text-center text-white">
+            <h1 class="sign-in">Enter OTP</h5>
+          </div>
+          <p class="text-danger" id="error-text"></p>
+          <p class="text-success" id="success-text"></p>
+          <p class="text-white text-center">OTP has been sent to your register phone number</p>
+          <form>
+            <div class="mt-3 mb-3">
+              <label class="col-12 login-label" for="otp">OTP</label>
+              <input class="col-12 login-input" type="text" name="otp" id="otp">
+            </div>
+            <div class="my-3">
+              <p class="a-tag" onclick="resendOtp()">Didn't recieve otp? Send again</p>
+            </div>
+            <div class="d-flex justify-content-center m-4">
+              <button class="main-button" type="submit">Submit</button>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
   </div>
 </section>
 <%- include('../partials/footer') %> 
 <script src="/script/userScript.js"></script>
+<script src="/script/editUser.js"></script>
 </body>
 </html>
 
