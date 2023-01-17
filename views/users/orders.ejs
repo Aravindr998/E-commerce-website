@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('../partials/head') %> 
+<body class="pt-5">
+<%- include('../partials/user-navbar') %> 
+<section class="container min-vh-100 pt-5">
+  <div class="row">
+    <% orders.forEach(order => { %> 
+      <% order.items.forEach(item => { %> 
+    <div class="col-12 my-2">
+      <a href="/orders/<%= order._id %> " class="text-decoration-none">
+        <div class="card row d-flex flex-row p-3">
+          <div class="col-lg-3 d-flex justify-content-center">
+            <img class="checkout-images" src="/<%= item.image %> " alt="">
+          </div>
+          <div class="col-lg-3">
+            <div>
+              <p class="fw-bold"><%= item.productName %></p>
+            </div>
+            <div>
+              <p><%= item.color %></p>
+            </div>
+            <div>
+              <p class="text-muted fw-light">Order id: <%= order._id %> </p>
+            </div>
+          </div>
+          <div class="col-lg-3">
+            <div>
+              <p class="fw-bold">₹<%= Math.round(item.price * 1.18) %></p>
+            </div>
+            <div>
+              <p class="">Quantity: <%= item.quantity %> </p>
+            </div>
+          </div>
+          <div class="col-lg-3">
+            <div>
+              <p><strong>Order Status: </strong><%= order.orderStatus %> </p>
+            </div>
+            <div>
+              <p>Payment Status: <%= order.paymentMethod == 'COD'? order.paymentMethod : (order.PaymentVerified? 'Completed' : 'Pending') %>  </p>
+            </div>
+          </div>
+        </div>
+      </a>
+    </div>
+    <% }) %> 
+    <% }) %> 
+  </div>
+</section>
+<%- include('../partials/footer') %> 
+<script src="/script/userScript.js"></script>
+</body>
+</html>

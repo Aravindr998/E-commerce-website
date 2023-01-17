@@ -41,6 +41,6 @@ db.once('open', () => {
   })
 })
 
-app.use('/', userRouter)
 app.use('/admin', adminRouter)
+app.use('/', userRouter)
 

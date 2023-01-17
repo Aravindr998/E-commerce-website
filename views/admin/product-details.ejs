@@ -40,7 +40,8 @@
                 <th>Stock</th>
                 <th>Highlights</th>
                 <th>Dimension</th>
-                <th>Images</th>
+                <th class="text-center">Images</th>
+                <th>Stock</th>
                 <th>Action</th>
               </tr>
             </thead>
@@ -54,7 +55,7 @@
                 <td><%= item.highlights %></td>
                 <td><%= item.dimension %></td>
                 <td>
-                  <div class="d-sm-flex">
+                  <div class="d-sm-flex justify-content-center">
                     <div class="col-2 p-lg-5 p-sm-2 p-5">
                       <img class="item-image" src="/<%= item.images[0] %> " alt="">
                     </div>
@@ -66,6 +67,7 @@
                     </div>
                   </div>
                 </td>
+                <td><%= item.totalStock %> </td>
                 <td>
                   <div class="d-sm-flex">
                     <a href="/admin/products/edit/<%= product.id %>/<%= item.id %>" class="btn btn-primary m-1">Edit</a>

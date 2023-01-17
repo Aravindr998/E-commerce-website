@@ -4,6 +4,7 @@ const fast2sms = require('fast-two-sms')
 const axios = require('axios')
 const productModel = require('../models/products')
 const categoryModel = require('../models/categories')
+const bannerModel = require('../models/banners')
 const mongoose = require('mongoose')
 const orderModel = require('../models/orders')
 require('dotenv').config()
@@ -12,15 +13,21 @@ let otp
 module.exports = {
   getHomepage: async(req, res) => {
   try {
+    const banner = await bannerModel.findOne({setCurrent: true})
     const categories = await categoryModel.find()
     .populate('products')
     categories.forEach(item => {
       item.products.splice(3, Infinity)
+      item.products[0].skus.forEach((sku, index, array) => {
+        if(sku.isDeleted || sku.totalStock<= 0){
+          array.splice(index, 1)
+        }
+      })
     })
       if(req.session.user){
-        return res.render('home-page', {categories})
+        return res.render('home-page', {categories, banner})
       }else{
-        return res.render('landing-page', {categories})
+        return res.render('landing-page', {categories, banner})
       }
   } catch (error) {
     console.log(error)
@@ -62,7 +69,12 @@ module.exports = {
   },
 
   registerUser: async (req, res, next)=>{
-    const existing = await userModel.find({$or: [{email: req.body.email}, {phone: req.body.phone}]})
+    let existing
+    try {
+      existing = await userModel.find({$or: [{email: req.body.email}, {phone: req.body.phone}]})
+    } catch (error) {
+      console.log(error)
+    }
     const user = new userModel({
       fname: req.body.fname,
       lname: req.body.lname,
@@ -229,10 +241,18 @@ module.exports = {
     try {
       const products = await productModel.find()
       .sort({categoryId: 1})
+      products.forEach(product => {
+        product.skus.forEach((item, index, array) => {
+          if(item.isDeleted || item.totalStock<=0){
+            console.log(item)
+            array.splice(index,1)
+          }
+        })
+      })
       const categories = await categoryModel.find()
       res.render('users/product-page', {products, categories})
     } catch (error) {
-      
+     console.log(error) 
     }
   },
 
@@ -242,6 +262,12 @@ module.exports = {
       const skuId = req.params.skuid
       const product = await productModel.findById(prodId)
       .populate('categoryId')
+      product.skus.forEach((item, index, array) => {
+        if(item.isDeleted || item.totalStock<=0){
+          console.log(item)
+          array.splice(index,1)
+        }
+      })
       let sku
       product.skus.forEach(item => {
         if(item._id == skuId){
@@ -830,7 +856,21 @@ module.exports = {
           image: item.skus[0].skus.images[0]
         }
         order.items.push(items)
-      }) 
+      })
+      for( let item of user1[0].cart){
+        await productModel.findOneAndUpdate({
+          skus:{
+            $elemMatch: {
+              _id: mongoose.Types.ObjectId(item.skuId)
+            }
+          }
+        },
+        {
+          $inc: {
+            'skus.$.totalStock': -item.quantity
+          }
+        })
+      }
       await order.save()
       console.log(order)
       await userModel.findOneAndUpdate({
@@ -854,6 +894,24 @@ module.exports = {
       return res.render('users/order-placed')
     }else{
       return res.redirect('/')
+    }
+  },
+  getOrdersPage: async(req, res) => {
+    try {
+      const orders = await orderModel.find({customerId: req.session.user._id})
+      console.log(orders[0].items[0]);
+      res.render('users/orders', {orders})
+    } catch (error) {
+      
+    }
+  },
+  getOrderDetails: async(req, res) => {
+    try {
+      const orderId = req.params.id
+      const order = await orderModel.findById(orderId)
+      res.render('users/order-details', {order})
+    } catch (error) {
+      
     }
   }
 }

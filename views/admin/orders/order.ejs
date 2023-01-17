@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('../../partials/admin/admin-head-datatable') %> 
+<body class="p-5">
+ <%- include('../../partials/admin/admin-navbar') %>
+ <section class="container">
+  <div class="row">
+    <div class="col-12">
+      <div>
+        <table id="datatable" class="table table-striped">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Order Details</th>
+              <th>Ordered By</th>
+              <th>Ordered On</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% let count = 0 %> 
+            <% orders.forEach(order => { %>
+              <% order.items.forEach(item => { %>
+                <tr>
+                  <td class="align-middle"><%= ++count %></td>
+                  <td class="align-middle">
+                    <div>
+                      <div>
+                        <img class="image-table" src="/<%= item.image %> " alt="">
+                      </div>
+                      <div>
+                        <p class="fw-bold"><%= item.productName %></p>
+                        <p class="text-muted"><%= item.color %></p>
+                        <p>Quantity: <%= item.quantity %></p>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="align-middle"><%= order.customerId.email %> </td>
+                  <td class="align-middle"><%= order.createdAt.toString().slice(0,16) %></td>
+                  <td class="align-middle">
+                    <div>
+                      <select class="form-select" name="orderStatus" id="order-status">
+                        <option value="Placed" <%= order.orderStatus == 'Placed' ? 'selected' : '' %> >Placed</option>
+                        <option value="Confirmed" <%= order.orderStatus == 'Confirmed' ? 'selected' : '' %>>Confirmed</option>
+                        <option value="Shipped" <%= order.orderStatus == 'Shipped' ? 'selected' : '' %>>Shipped</option>
+                        <option value="Delivered" <%= order.orderStatus == 'Delivered' ? 'selected' : '' %>>Delivered</option>
+                      </select>
+                    </div>
+                  </td>
+                  <td class="align-middle">
+                    <div>
+                      <button class="btn btn-primary">Save Changes</button>
+                      <button class="btn btn-danger">Cancel Order</button>
+                    </div>
+                  </td>
+                </tr>
+              <% }) %>  
+            <% }) %>  
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+ </section>  
+ <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
+ <%- include('../../partials/admin/datatable-footer') %> 
+ <script src="/script/navbarScroll.js"></script> 
+ <script src="/script/deleteCategory.js"></script>
+</body>
+</html>

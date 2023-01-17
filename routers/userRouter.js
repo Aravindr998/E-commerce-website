@@ -64,4 +64,8 @@ router.post('/checkout/cod', userAuth.authenticate, userController.checkoutCod)
 
 router.get('/orderplaced', userAuth.authenticate, userController.getOrderPlacedPage)
 
+router.get('/orders', userAuth.authenticate, userController.getOrdersPage)
+
+router.get('/orders/:id', userAuth.authenticate, userController.getOrderDetails)
+
 module.exports = router

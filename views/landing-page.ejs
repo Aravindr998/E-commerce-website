@@ -3,8 +3,8 @@
 <%- include('./partials/head') %> 
 <body>
 <%- include('./partials/guest-navbar') %> 
-<header class="banner d-flex justify-content-center align-items-center">
-  <h1 class="banner-text text-white">one stop shop for all your<br>phone essentials</h1>
+<header class="banner d-flex justify-content-center align-items-center" style="background-image: url('/<%= banner.image %>')">
+  <h1 class="banner-text text-white"><%= banner.caption %></h1>
 </header>
 <%- include('./partials/users/landing-body') %> 
 <%- include('./partials/footer') %> 

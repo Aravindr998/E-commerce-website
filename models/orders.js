@@ -3,7 +3,7 @@ const mongoose = require('mongoose')
 const orderSchema = new mongoose.Schema({
   customerId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Users',
+    ref: 'User',
     required: true
   },
   items: [{
@@ -77,6 +77,9 @@ const orderSchema = new mongoose.Schema({
     type: String,
     required: true
   }
+},
+{
+  timestamps: true
 })
 
 const Orders = mongoose.model('Orders', orderSchema)
