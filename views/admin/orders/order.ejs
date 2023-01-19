@@ -7,6 +7,7 @@
   <div class="row">
     <div class="col-12">
       <div>
+        <p class="text-danger" id="error"></p>
         <table id="datatable" class="table table-striped">
           <thead>
             <tr>
@@ -40,21 +41,47 @@
                   <td class="align-middle"><%= order.createdAt.toString().slice(0,16) %></td>
                   <td class="align-middle">
                     <div>
-                      <select class="form-select" name="orderStatus" id="order-status">
-                        <option value="Placed" <%= order.orderStatus == 'Placed' ? 'selected' : '' %> >Placed</option>
-                        <option value="Confirmed" <%= order.orderStatus == 'Confirmed' ? 'selected' : '' %>>Confirmed</option>
-                        <option value="Shipped" <%= order.orderStatus == 'Shipped' ? 'selected' : '' %>>Shipped</option>
-                        <option value="Delivered" <%= order.orderStatus == 'Delivered' ? 'selected' : '' %>>Delivered</option>
+                      <select class="form-select" name="orderStatus" id="status<%= count %>" <%= item.isCancelled ? 'disabled' : '' %> >
+                        <option value="Placed" <%= item.orderStatus == 'Placed' ? 'selected' : '' %> >Placed</option>
+                        <option value="Confirmed" <%= item.orderStatus == 'Confirmed' ? 'selected' : '' %>>Confirmed</option>
+                        <option value="Shipped" <%= item.orderStatus == 'Shipped' ? 'selected' : '' %>>Shipped</option>
+                        <option value="Delivered" <%= item.orderStatus == 'Delivered' ? 'selected' : '' %>>Delivered</option>
                       </select>
                     </div>
                   </td>
                   <td class="align-middle">
                     <div>
-                      <button class="btn btn-primary">Save Changes</button>
-                      <button class="btn btn-danger">Cancel Order</button>
+                      <% if(item.isCancelled){ %>
+                        <button class="btn btn-danger" disabled>Cancelled</button>
+                        <% }else{ %>  
+                          <div id="button-div<%= count %>">
+                            <button class="btn btn-primary" id="change-status-button<%= count  %> " onclick="changeStatus(this.id, 'status<%= count %>', '<%= order._id %>', '<%= item._id %>')">Save Changes</button>
+                            <button class="btn btn-danger" id="cancel-button<%= count %>" data-bs-toggle="modal" data-bs-target="#modal<%= count %>">Cancel Order</button>
+                          </div>
+                          <div class="d-none" id="cancelled-div<%= count %>">
+                            <button class="btn btn-danger" disabled>Cancelled</button>
+                          </div>
+                      <% } %> 
                     </div>
                   </td>
                 </tr>
+                <div class="modal fade" id="modal<%= count %>" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+                  <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="modalLabel">Confirm cancel order</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <div class="modal-body">
+                        Are you sure you want to cancel this order?
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="cancelOrder('button-div<%= count %>', 'cancelled-div<%= count %>', '<%= item._id %>', 'status<%= count %>')">Confirm</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               <% }) %>  
             <% }) %>  
           </tbody>

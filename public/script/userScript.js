@@ -279,3 +279,48 @@ async function removeFromCart(id, prodId, skuId){
     console.log(error)    
   }
 }
+
+async function cancelOrder(id, divStatus, divCancel){
+  const url = 'http://localhost:4000/orders/cancel'
+  const body = {
+    id
+  } 
+  try {
+    const response = await fetch(url, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(body)
+    })
+    const res = await response.json()
+    if(res.successStatus){
+      const div = document.getElementById(divStatus)
+      div.classList.remove('d-flex')
+      div.classList.add('d-none')
+      document.getElementById(divCancel).classList.remove('d-none')
+    }else{
+      document.querySelector('#error').innerHTML = 'Some Error occured. Please try again later'
+    }
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+async function addCoupon(id){
+  const url = 'http://localhost:4000/checkout/coupons'
+  const error = document.querySelector('#coupon-error')
+  const response = await fetch(url, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({id})
+  })
+  const res = await response.json()
+  if(res.successStatus){
+    window.location.href = '/checkout'
+  }else{
+    error.innerHTML = res.message
+  }
+}

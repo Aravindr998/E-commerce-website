@@ -35,6 +35,14 @@ const orderSchema = new mongoose.Schema({
     image: {
       type: String,
       required: true
+    },
+    orderStatus: {
+      type: String,
+      default: 'Placed'
+    },
+    isCancelled: {
+      type: Boolean,
+      default: false
     }
   }],
   address: {
@@ -73,9 +81,9 @@ const orderSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
-  orderStatus: {
-    type: String,
-    required: true
+  couponId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Coupon'
   }
 },
 {

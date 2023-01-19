@@ -75,4 +75,16 @@ router.delete('/banner/:id', authenticate, adminController.deleteBanner)
 
 router.get('/orders', authenticate, adminController.getOrdersPage)
 
+router.patch('/orders', authenticate, adminController.changeOrderStatus)
+
+router.patch('/orders/cancel', authenticate, adminController.cancelOrder)
+
+//coupons
+
+router.get('/coupons', authenticate, adminController.getCouponPage)
+
+router.post('/coupons', authenticate, adminController.addCoupon)
+
+router.patch('/coupons', authenticate, adminController.deleteCoupon)
+
 module.exports = router

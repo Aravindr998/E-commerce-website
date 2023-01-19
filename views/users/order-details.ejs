@@ -20,7 +20,9 @@
         </div>
       </div>
     </div>
+    <% let count = 0 %> 
     <% order.items.forEach(item => { %> 
+      <% count++ %> 
     <div class="col-12">
       <div class="card row d-flex flex-row p-3 my-2">
         <div class="col-md-4 d-flex justify-content-center">
@@ -33,8 +35,45 @@
           <p class="">Quantity: <%= item.quantity %> </p>
         </div>
         <div class="col-md-4">
-          <p>Order status: <%= order.orderStatus %> </p>
-          <p>Payment status: <%= order.paymentMethod == 'COD'? order.paymentMethod : (order.PaymentVerified? 'Completed' : 'Pending') %></p>
+          <% if(item.isCancelled){ %>
+            <div>
+              <p class="text-danger">Order status: Cancelled</p>
+            </div>
+          <% }else if(item.orderStatus == 'Delivered'){ %>
+            <div>
+              <p class="fw-bold text-success">Order status: Delivered</p>
+            </div> 
+          <% }else{ %>
+            <div class="h-100 d-flex flex-column justify-content-between" id="status<%= count %>">
+              <div>
+                <p id="order-status<%= count %>">Order status: <%= item.orderStatus %> </p>
+                <p>Payment status: <%= order.paymentMethod == 'COD'? order.paymentMethod : (order.PaymentVerified? 'Completed' : 'Pending') %></p>
+              </div>
+              <div>
+                <button class="sub-button" data-bs-toggle="modal" data-bs-target="#modal<%= count %>">Cancel Order</button>
+              </div>
+            </div>
+            <div id="cancel<%= count %>" class="d-none">
+              <p class="text-danger">Order status: Cancelled</p>
+            </div>
+          <% } %>   
+        </div>
+      </div>
+    </div>
+    <div class="modal fade" id="modal<%= count %>" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="modalLabel">Confirm Order Cancellation</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            Are you sure you want to cancel this order?
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="sub-button" data-bs-dismiss="modal">Close</button>
+            <button type="button" class="main-button" data-bs-dismiss="modal" onclick="cancelOrder('<%= item._id %>', 'status<%= count %>', 'cancel<%= count %>')">Confirm</button>
+          </div>
         </div>
       </div>
     </div>

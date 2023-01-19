@@ -1,6 +1,7 @@
 const express = require('express')
 const userController = require('../controllers/userController')
 const userAuth = require('../middlewares/userAuth')
+const userMiddlewares = require('../middlewares/userMiddlewares')
 
 const router = express.Router()
 
@@ -58,7 +59,7 @@ router.get('/dashboard/address/edit/:id', userAuth.authenticate, userController.
 
 router.post('/dashboard/address/update/:id', userAuth.authenticate, userAuth.validateAddress, userController.updateAddress)
 
-router.get('/checkout', userAuth.authenticate, userController.getCheckoutPage)
+router.get('/checkout', userAuth.authenticate, userMiddlewares.checkCoupon, userController.getCheckoutPage)
 
 router.post('/checkout/cod', userAuth.authenticate, userController.checkoutCod)
 
@@ -67,5 +68,9 @@ router.get('/orderplaced', userAuth.authenticate, userController.getOrderPlacedP
 router.get('/orders', userAuth.authenticate, userController.getOrdersPage)
 
 router.get('/orders/:id', userAuth.authenticate, userController.getOrderDetails)
+
+router.patch('/orders/cancel', userAuth.authenticate, userController.cancelOrder)
+
+router.patch('/checkout/coupons', userAuth.authenticate, userController.addCoupon)
 
 module.exports = router

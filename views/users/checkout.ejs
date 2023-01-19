@@ -3,10 +3,41 @@
 <%- include('../partials/head') %> 
 <body class="pt-5">
 <%- include('../partials/user-navbar') %> 
-<section class="container min-vh-100 pt-5">
+<section class="container min-vh-100">
   <div class="row">
     <p class="text-danger"><%= message  %> </p>
-    <form method="POST" class="row">
+    <div class="mb-3 d-flex justify-content-end">
+      <button class="sub-button" data-bs-toggle="modal" data-bs-target="#modal">Apply Coupons</button>
+    </div>
+    <div class="modal fade" id="modal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="modalLabel">Select Coupons</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="col-12">
+              <p id="coupon-error" class="text-danger"></p>
+              <% coupons.forEach(coupon => { %>
+                <div class="card p-3 m-2" onclick="addCoupon('<%= coupon._id %>')">
+                  <div>
+                    <p class="fw-bold"><%= coupon.code %> </p>
+                  </div>
+                  <div>
+                    <p class="text-muted"><%= coupon.description %> </p>
+                  </div>
+                </div>
+              <% }) %>  
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <form method="POST" class="row" id="payment-form">
       <div class="col-sm-6">
         <div class="col-12">
           <div class="card p-4">
@@ -62,15 +93,28 @@
             <p>Tax</p>
             <p id="tax">₹<%= Math.round(user.cartTotal * 0.18) %></p>
           </div>
+          <% if(discount.couponCode) {%> 
+          <div class="d-flex justify-content-between text-success fw-bold">
+            <p>Discount(<%= discount.couponCode %>)</p>
+            <p>-₹<%= Math.round(discount.discount) %></p>
+          </div>
+          <div class="d-none">
+            <input type="text" name="couponId" value="<%= discount.couponId %>">
+          </div>
+          <% } %> 
           <hr>
           <div class="d-flex justify-content-between">
             <p>Total</p>
-            <p id="total">₹<%= Math.round(user.cartTotal * 1.18) %></p>
+            <% if(discount.couponCode) {%> 
+                <p id="total">₹<%= Math.round(user.cartTotal * 1.18 - discount.discount) %></p>
+              <% }else{ %>
+                <p id="total">₹<%= Math.round(user.cartTotal * 1.18) %></p>
+            <% } %>  
           </div>
           <hr>
           <p class="fw-bold">Choose Payment Method</p>
           <div class="d-flex flex-sm-row flex-column justify-content-between mt-3">
-            <button type="submit" formaction="/checkout/pay" class="main-button">Pay Via Razorpay</button>
+            <button type="button" onclick="payment()" class="main-button">Pay Via Razorpay</button>
             <button type="submit" formaction="/checkout/cod" class="main-button mt-sm-0 mt-3">Cash On Delivery</button>
           </div>
         </div>
@@ -80,5 +124,6 @@
 </section>
 <%- include('../partials/footer') %> 
 <script src="/script/userScript.js"></script>
+<script src="/script/payment.js"></script>
 </body>
 </html>
