@@ -10,7 +10,8 @@ const couponModel = require('../models/coupons')
 const paymentModel = require('../models/payment')
 const mongoose = require('mongoose')
 const orderModel = require('../models/orders')
-const stripe = require('stripe')(process.env.STRIPE_PRIVATE_KEY)
+const Razorpay = require('razorpay')
+const crypto = require('crypto')
 let otp
 
 const getHomepage = async(req, res) => {
@@ -1082,7 +1083,11 @@ const addCoupon = async(req, res) => {
   }
 }
 
-const checkOrder = async(req, res, next) => {
+const getFailurePage = async(req, res) => {
+  res.render('users/payment-failed')
+}
+
+const createOrder = async(req, res) => {
   if(!req.body.address){
     req.session.Errmessage = 'Please add an address'
     res.redirect('/checkout')
@@ -1113,7 +1118,7 @@ const checkOrder = async(req, res, next) => {
       'address.zip': user.shippingAddress.zip,
       phone: user.phone,
       totalAmount: Math.round(user.cartTotal * 1.18),
-      paymentMethod: 'Stripe',
+      paymentMethod: 'Razorpay',
       paymentVerified: false,
     })
     if(req.body.couponId){
@@ -1209,31 +1214,25 @@ const checkOrder = async(req, res, next) => {
       }
       order.items.push(items)
     })
-
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
-      mode: 'payment',
-      customer_email: user1[0].email,
-      line_items: [
-        {
-          price_data: {
-            currency: 'inr',
-            unit_amount: order.totalAmount * 100,
-            product_data: {
-              name: 'Sub Total'
-            }
-          },
-          quantity: 1
-        }
-      ],
-      success_url: `${process.env.SERVER_URL}/payment/${order._id}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.SERVER_URL}/payment/failed/${order._id}?session_id={CHECKOUT_SESSION_ID}`
-    })
     await order.save()
-    req.session.payment = true
-    return res.json({
-      successStatus: true,
-      url: session.url 
+    const instance = new Razorpay({
+      key_id: process.env.RAZORPAY_KEY_ID,
+      key_secret: process.env.RAZORPAY_SECRET_KEY,
+    })
+    instance.orders.create({
+      amount: order.totalAmount*100,
+      currency: "INR",
+      receipt: order._id.toString()
+    }, (err, orderInstance) => {
+      if(err){
+        console.log(err)
+        return res.json({successStatus: false})
+      }
+      console.log(orderInstance)
+      return res.json({
+        successStatus: true,
+        orderInstance
+      })
     })
   } catch (error) {
     console.log(error)
@@ -1242,72 +1241,33 @@ const checkOrder = async(req, res, next) => {
   }
 }
 
-const getSuccessPage = async(req, res) => {
+const verifyPayment = async(req, res) => {
   try {
-    if(req.session.payment){
-      const session = await stripe.checkout.sessions.retrieve(req.query.session_id)
-      console.log(session)
-      if(session.payment_status == 'paid'){
-        req.session.payment = null
-        const order = await orderModel.findById(req.params.id)
-        console.log(order)
-        for(let item of order.items){
-          await productModel.findOneAndUpdate({
-            skus:{
-              $elemMatch: {
-                _id: mongoose.Types.ObjectId(item.skuId)
-              }
-            }
-          },
-          {
-            $inc: {
-              'skus.$.totalStock': -item.quantity
-            }
-          })
+    console.log(req.body.payment)
+    let hmac = crypto.createHmac('sha256', process.env.RAZORPAY_SECRET_KEY)
+    hmac.update(req.body.payment['razorpay_order_id']+'|'+req.body.payment['razorpay_payment_id'])
+    hmac = hmac.digest('hex')
+    if(hmac == req.body.payment['razorpay_signature']){
+      const order = await orderModel.findOneAndUpdate({_id: req.body.order.receipt}, {
+        $set: {
+          'items.$[].orderStatus': 'Placed',
+          paymentVerified: true
         }
-        await userModel.findOneAndUpdate({
-          _id: req.session.user._id
+      })
+      for(let item of order.items){
+        await productModel.findOneAndUpdate({
+          skus:{
+            $elemMatch: {
+              _id: mongoose.Types.ObjectId(item.skuId)
+            }
+          }
         },
         {
-          $set:{
-            cart: [],
-            cartTotal: 0
+          $inc: {
+            'skus.$.totalStock': -item.quantity
           }
         })
-        await orderModel.findOneAndUpdate({_id: req.params.id}, {
-          $set: {
-            paymentVerified: true,
-            'items.$[].orderStatus': 'Placed'
-          }
-        })
-  
-        const payment = new paymentModel({
-          orderId : req.params.id,
-          customerId: req.session.user._id,
-          stripeSessionId: req.query.session_id,
-          status: true
-        })
-        await payment.save()
-        res.render('users/payment-successful')
-      }else{
-        return res.redirect(`/payment/failed/${req.params.id}`)
       }
-    }else{
-      res.redirect('/')
-    }
-  } catch (error) {
-    console.log(error)
-  }
-}
-
-const getFailurePage = async(req, res) => {
-  try {
-    if(req.session.payment){
-      req.session.payment = null
-      if(req.query?.session_id){
-        const session = await stripe.checkout.sessions.expire(req.query.session_id)
-      }
-      await orderModel.findOneAndUpdate({_id: req.params.id}, {$set: {'items.$[].isCancelled': true}})
       await userModel.findOneAndUpdate({
         _id: req.session.user._id
       },
@@ -1317,10 +1277,61 @@ const getFailurePage = async(req, res) => {
           cartTotal: 0
         }
       })
-      res.render('users/payment-failed')
+      const payment = new paymentModel({
+        orderId: req.body.order.receipt,
+        customerId: req.session.user._id,
+        paymentId: req.body.payment['razorpay_payment_id'],
+        razorpayOrderId: req.body.payment['razorpay_order_id'],
+        paymentSignature: req.body.payment['razorpay_signature'],
+        status: true
+      })
+      await payment.save()
+      req.session.orderplaced = true
+      return res.json({successStatus: true})
     }else{
-      res.redirect('/')
+      const order = await orderModel.findOneAndUpdate({_id: req.body.order.receipt}, {
+        $set: {
+          'items.$[].isCancelled': true
+        }
+      })
+      return res.json({successStatus:false})
     }
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+const cancelPayment = async(req, res) => {
+  try {
+    const order = await orderModel.findOneAndUpdate({_id: req.body.order.receipt}, {
+      $set: {
+        'items.$[].isCancelled': true,
+      }
+    })
+    res.json({successStatus: true})
+  } catch (error) {
+    console.log(error)
+    res.json({successStatus: false})
+  }
+}
+
+const paymentFailure = async(req, res) => {
+  try {
+    const payment = new paymentModel({
+      orderId: req.body.order.receipt,
+      customerId: req.session.user._id,
+      paymentId: req.body.payment['razorpay_payment_id'],
+      razorpayOrderId: req.body.payment['razorpay_order_id'],
+      paymentSignature: req.body.payment['razorpay_signature'],
+      status: false
+    })
+    await payment.save()
+    const order = await orderModel.findOneAndUpdate({_id: req.body.order.receipt}, {
+      $set: {
+        'items.$[].isCancelled': true,
+      }
+    })
+    res.json({successStatus: true})
   } catch (error) {
     console.log(error)
   }
@@ -1362,7 +1373,9 @@ module.exports = {
   getOrderDetails,
   cancelOrder,
   addCoupon,
-  checkOrder,
-  getSuccessPage,
-  getFailurePage
+  getFailurePage,
+  createOrder,
+  verifyPayment,
+  cancelPayment,
+  paymentFailure
 }

@@ -13,9 +13,17 @@ const paymentSchema = new mongoose.Schema({
   },
   paymentGateway: {
     type: String,
-    default: 'Stripe'
+    default: 'Razorpay'
   },
-  stripeSessionId: {
+  paymentId: {
+    type: String,
+    required: true
+  },
+  razorpayOrderId: {
+    type: String,
+    required: true
+  },
+  paymentSignature: {
     type: String,
     required: true
   },

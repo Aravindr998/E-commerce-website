@@ -63,6 +63,8 @@ router.get('/checkout', userAuth.authenticate, userMiddlewares.checkCoupon, user
 
 router.post('/checkout/cod', userAuth.authenticate, userController.checkoutCod)
 
+router.post('/checkout/razorpay', userAuth.authenticate, userController.createOrder)
+
 router.get('/orderplaced', userAuth.authenticate, userController.getOrderPlacedPage)
 
 router.get('/orders', userAuth.authenticate, userController.getOrdersPage)
@@ -73,10 +75,13 @@ router.patch('/orders/cancel', userAuth.authenticate, userController.cancelOrder
 
 router.patch('/checkout/coupons', userAuth.authenticate, userController.addCoupon)
 
-router.post('/checkout/payment', userAuth.authenticate, userController.checkOrder)
+router.get('/payment/fail', userAuth.authenticate, userController.getFailurePage)
 
-router.get('/payment/:id/success', userAuth.authenticate, userController.getSuccessPage)
+router.post('/payment/verify', userAuth.authenticate, userController.verifyPayment)
 
-router.get('/payment/failed/:id', userAuth.authenticate, userController.getFailurePage)
+router.post('/payment/cancel', userAuth.authenticate, userController.cancelPayment)
+
+router.post('/payment/fail', userAuth.authenticate, userController.paymentFailure)
+
 
 module.exports = router
