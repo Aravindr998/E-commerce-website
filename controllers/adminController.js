@@ -919,6 +919,92 @@ const deleteCoupon = async(req, res) => {
   }
 }
 
+const getDashboard = async(req, res) => {
+  try {
+    const orders = await orderModel.find({isCancelled: false})
+    const users = await userModel.find()
+    const totalSales = orders.reduce((sum, order) => sum+=order.totalAmount, 0)
+    const products = await productModel.find()
+    res.render('admin/dashboard/dashboard', {orders, totalSales, users, products})
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+const getOrderDetails = async(req, res) => {
+  try {
+    const orders = await orderModel.aggregate([
+      {
+        $unwind: '$items'
+      },
+      {
+        $match: {
+          'items.isCancelled': false,
+          paymentVerified: true
+        }
+      },
+      {
+        $group: {
+          _id: {$dayOfYear: '$createdAt'},
+          date: {$first: '$createdAt'},
+          totalSpent: {$sum: '$totalAmount'} 
+        }
+      },
+      {
+        $sort: {
+          date: 1
+        }
+      }
+
+    ])
+    console.log(orders);
+    res.json({orders})
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+const getProductDetails = async(req, res) => {
+  try {
+    const products = await orderModel.aggregate([
+      {
+        $unwind: '$items'
+      },
+      {
+        $addFields: {
+          currMonth: {
+            '$month' : new Date()
+          },
+          docMonth: {
+            '$month': '$createdAt'
+          }
+        }
+      },
+      {
+        $match: {
+          'items.isCancelled': false,
+          paymentVerified: true,
+          $expr: {
+            $eq: ['$currMonth', '$docMonth']
+          }
+        }
+      },
+      {
+        $group: {
+          _id: '$items.skuId',
+          product: {$first: '$items.productName'},
+          color: {$first: '$items.color'},
+          quantity: {$sum: '$items.quantity'}
+        }
+      }
+    ])
+    console.log(products)
+    res.json({products})
+  } catch (error) {
+    console.log(error)
+  }
+}
+
 module.exports = {
   getLogin,
   getHomepage,
@@ -953,5 +1039,8 @@ module.exports = {
   cancelOrder,
   getCouponPage,
   addCoupon,
-  deleteCoupon
+  deleteCoupon,
+  getDashboard,
+  getOrderDetails,
+  getProductDetails
 }

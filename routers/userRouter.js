@@ -73,4 +73,10 @@ router.patch('/orders/cancel', userAuth.authenticate, userController.cancelOrder
 
 router.patch('/checkout/coupons', userAuth.authenticate, userController.addCoupon)
 
+router.post('/checkout/payment', userAuth.authenticate, userController.checkOrder)
+
+router.get('/payment/:id/success', userAuth.authenticate, userController.getSuccessPage)
+
+router.get('/payment/failed/:id', userAuth.authenticate, userController.getFailurePage)
+
 module.exports = router

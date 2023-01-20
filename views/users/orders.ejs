@@ -46,7 +46,7 @@
                 <p><strong>Order Status: </strong><%= item.orderStatus %> </p>
               </div>
               <div>
-                <p>Payment Status: <%= order.paymentMethod == 'COD'? order.paymentMethod : (order.PaymentVerified? 'Completed' : 'Pending') %>  </p>
+                <p>Payment Status: <%= order.paymentMethod == 'COD'? order.paymentMethod : (order.paymentVerified? 'Completed' : 'Pending') %>  </p>
               </div>
             <% } %>   
           </div>

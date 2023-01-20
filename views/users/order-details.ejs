@@ -47,7 +47,7 @@
             <div class="h-100 d-flex flex-column justify-content-between" id="status<%= count %>">
               <div>
                 <p id="order-status<%= count %>">Order status: <%= item.orderStatus %> </p>
-                <p>Payment status: <%= order.paymentMethod == 'COD'? order.paymentMethod : (order.PaymentVerified? 'Completed' : 'Pending') %></p>
+                <p>Payment status: <%= order.paymentMethod == 'COD'? order.paymentMethod : (order.paymentVerified? 'Completed' : 'Pending') %></p>
               </div>
               <div>
                 <button class="sub-button" data-bs-toggle="modal" data-bs-target="#modal<%= count %>">Cancel Order</button>

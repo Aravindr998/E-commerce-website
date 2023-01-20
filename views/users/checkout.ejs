@@ -5,10 +5,10 @@
 <%- include('../partials/user-navbar') %> 
 <section class="container min-vh-100">
   <div class="row">
-    <p class="text-danger"><%= message  %> </p>
     <div class="mb-3 d-flex justify-content-end">
       <button class="sub-button" data-bs-toggle="modal" data-bs-target="#modal">Apply Coupons</button>
     </div>
+    <p id="error" class="text-danger"><%= message  %></p>
     <div class="modal fade" id="modal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
       <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered">
         <div class="modal-content">
@@ -99,7 +99,7 @@
             <p>-₹<%= Math.round(discount.discount) %></p>
           </div>
           <div class="d-none">
-            <input type="text" name="couponId" value="<%= discount.couponId %>">
+            <input type="text" id="coupon" name="couponId" value="<%= discount.couponId %>">
           </div>
           <% } %> 
           <hr>
@@ -114,7 +114,7 @@
           <hr>
           <p class="fw-bold">Choose Payment Method</p>
           <div class="d-flex flex-sm-row flex-column justify-content-between mt-3">
-            <button type="button" onclick="payment()" class="main-button">Pay Via Razorpay</button>
+            <button type="button" id="pay" onclick="checkPayment(this.id)" class="main-button">Pay Via Stripe</button>
             <button type="submit" formaction="/checkout/cod" class="main-button mt-sm-0 mt-3">Cash On Delivery</button>
           </div>
         </div>

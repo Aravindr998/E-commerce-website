@@ -13,7 +13,9 @@ router.post('/login', isLoggedin, validateLogin, adminController.redirectHomepag
 
 //products
 
-router.get('/',authenticate, adminController.getHomepage)
+router.get('/',authenticate, adminController.getDashboard)
+
+router.get('/products', authenticate, adminController.getHomepage)
 
 router.get('/products/new',authenticate, adminController.getAddProducts)
 
@@ -86,5 +88,11 @@ router.get('/coupons', authenticate, adminController.getCouponPage)
 router.post('/coupons', authenticate, adminController.addCoupon)
 
 router.patch('/coupons', authenticate, adminController.deleteCoupon)
+
+//dashboard
+
+router.get('/order-details', authenticate, adminController.getOrderDetails)
+
+router.get('/product-details', authenticate, adminController.getProductDetails)
 
 module.exports = router

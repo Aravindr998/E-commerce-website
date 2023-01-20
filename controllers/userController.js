@@ -1,3 +1,4 @@
+require('dotenv').config()
 const userModel = require('../models/users')
 const bcrypt = require('bcrypt')
 const fast2sms = require('fast-two-sms')
@@ -6,9 +7,10 @@ const productModel = require('../models/products')
 const categoryModel = require('../models/categories')
 const bannerModel = require('../models/banners')
 const couponModel = require('../models/coupons')
+const paymentModel = require('../models/payment')
 const mongoose = require('mongoose')
 const orderModel = require('../models/orders')
-require('dotenv').config()
+const stripe = require('stripe')(process.env.STRIPE_PRIVATE_KEY)
 let otp
 
 const getHomepage = async(req, res) => {
@@ -1080,6 +1082,250 @@ const addCoupon = async(req, res) => {
   }
 }
 
+const checkOrder = async(req, res, next) => {
+  if(!req.body.address){
+    req.session.Errmessage = 'Please add an address'
+    res.redirect('/checkout')
+  }
+  try {
+    const users = await userModel.aggregate([
+      {
+        $match: {
+          _id: mongoose.Types.ObjectId(req.session.user._id)
+        }
+      },
+      {
+        $unwind: '$shippingAddress'
+      },
+      {
+        $match: {
+          'shippingAddress._id': mongoose.Types.ObjectId(req.body.address)
+        }
+      }
+    ])
+    const user = users[0]
+    const order = new orderModel({
+      customerId: req.session.user._id,
+      'address.street1': user.shippingAddress.street1,
+      'address.street2': user.shippingAddress.street2,
+      'address.city': user.shippingAddress.city,
+      'address.state': user.shippingAddress.state,
+      'address.zip': user.shippingAddress.zip,
+      phone: user.phone,
+      totalAmount: Math.round(user.cartTotal * 1.18),
+      paymentMethod: 'Stripe',
+      paymentVerified: false,
+    })
+    if(req.body.couponId){
+      order.couponId = req.body.couponId
+      const coupon = await couponModel.findById(req.body.couponId)
+      if(coupon.users.includes(req.session.user._id)){
+        return res.redirect('/checkout')
+      }
+      let discount;
+      if(coupon.minPurchaseValue){
+        if(user.cartTotal < coupon.minPurchaseValue){
+          req.session.couponApplied = null
+          return res.redirect('/checkout')
+        } 
+        if(coupon.isPercentage){
+          discount = user.cartTotal * coupon.discount/100
+        }else{
+          discount = coupon.discount
+        }
+        req.session.couponApplied = null
+      }
+      order.totalAmount = Math.round(user.cartTotal * 1.18 - discount)
+      await couponModel.findOneAndUpdate({_id: req.body.couponId}, {$push: {users: req.session.user._id}})
+    }
+    let skuId = []
+    user.cart.forEach(item => {
+      skuId.push(item.skuId)
+    })
+    const user1 = await userModel.aggregate([
+      {
+        $match: {
+          _id: mongoose.Types.ObjectId(req.session.user._id)
+        }
+      },
+      {
+        $lookup: {
+          from: 'products',
+          localField: 'cart.skuId',
+          foreignField: 'skus._id',
+          pipeline: [
+            {
+              $unwind: '$skus'
+            },
+            {
+              $match: {
+                'skus._id': {
+                  $in: skuId
+                }
+              }
+            }
+          ],
+          as: 'skus1'
+        }
+      },
+      {
+        $set: {
+          'cart': {
+            $map: {
+              input: '$cart',
+              as: 's',
+              in: {
+                $mergeObjects: [
+                  '$$s',
+                  {
+                    skus: {
+                      $filter: {
+                        input:'$skus1',
+                        as: 's2',
+                        cond: {$eq: ['$$s2._id', '$$s.productId']}
+                      }
+                    } 
+                  }
+                ]
+              }
+            }
+          }
+        }
+      },
+      {
+        $unset: ['skus1']
+      }
+    ])
+    user1[0].cart.forEach(item => {
+      const items = {
+        productId: item.productId,
+        skuId: item.skuId,
+        productName: item.skus[0].title,
+        color: item.skus[0].skus.color,
+        quantity: item.quantity,
+        price: item.skus[0].skus.price,
+        image: item.skus[0].skus.images[0],
+        orderStatus: 'Pending'
+      }
+      order.items.push(items)
+    })
+
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      mode: 'payment',
+      customer_email: user1[0].email,
+      line_items: [
+        {
+          price_data: {
+            currency: 'inr',
+            unit_amount: order.totalAmount * 100,
+            product_data: {
+              name: 'Sub Total'
+            }
+          },
+          quantity: 1
+        }
+      ],
+      success_url: `${process.env.SERVER_URL}/payment/${order._id}/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${process.env.SERVER_URL}/payment/failed/${order._id}?session_id={CHECKOUT_SESSION_ID}`
+    })
+    await order.save()
+    req.session.payment = true
+    return res.json({
+      successStatus: true,
+      url: session.url 
+    })
+  } catch (error) {
+    console.log(error)
+    req.session.Errmessage = 'Some error occured please try again later'
+    res.json({successStatus: false})
+  }
+}
+
+const getSuccessPage = async(req, res) => {
+  try {
+    if(req.session.payment){
+      const session = await stripe.checkout.sessions.retrieve(req.query.session_id)
+      console.log(session)
+      if(session.payment_status == 'paid'){
+        req.session.payment = null
+        const order = await orderModel.findById(req.params.id)
+        console.log(order)
+        for(let item of order.items){
+          await productModel.findOneAndUpdate({
+            skus:{
+              $elemMatch: {
+                _id: mongoose.Types.ObjectId(item.skuId)
+              }
+            }
+          },
+          {
+            $inc: {
+              'skus.$.totalStock': -item.quantity
+            }
+          })
+        }
+        await userModel.findOneAndUpdate({
+          _id: req.session.user._id
+        },
+        {
+          $set:{
+            cart: [],
+            cartTotal: 0
+          }
+        })
+        await orderModel.findOneAndUpdate({_id: req.params.id}, {
+          $set: {
+            paymentVerified: true,
+            'items.$[].orderStatus': 'Placed'
+          }
+        })
+  
+        const payment = new paymentModel({
+          orderId : req.params.id,
+          customerId: req.session.user._id,
+          stripeSessionId: req.query.session_id,
+          status: true
+        })
+        await payment.save()
+        res.render('users/payment-successful')
+      }else{
+        return res.redirect(`/payment/failed/${req.params.id}`)
+      }
+    }else{
+      res.redirect('/')
+    }
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+const getFailurePage = async(req, res) => {
+  try {
+    if(req.session.payment){
+      req.session.payment = null
+      if(req.query?.session_id){
+        const session = await stripe.checkout.sessions.expire(req.query.session_id)
+      }
+      await orderModel.findOneAndUpdate({_id: req.params.id}, {$set: {'items.$[].isCancelled': true}})
+      await userModel.findOneAndUpdate({
+        _id: req.session.user._id
+      },
+      {
+        $set:{
+          cart: [],
+          cartTotal: 0
+        }
+      })
+      res.render('users/payment-failed')
+    }else{
+      res.redirect('/')
+    }
+  } catch (error) {
+    console.log(error)
+  }
+}
+
 module.exports = {
   getHomepage,
   getLogin,
@@ -1115,5 +1361,8 @@ module.exports = {
   getOrdersPage,
   getOrderDetails,
   cancelOrder,
-  addCoupon
+  addCoupon,
+  checkOrder,
+  getSuccessPage,
+  getFailurePage
 }
