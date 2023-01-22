@@ -14,15 +14,15 @@
         <div class="card p-3 my-4">
           <div class="d-flex justify-content-between">
             <p>Name: </p>
-            <p><%= user.fname + " " + user.lname %> </p>
+            <p><%= userDetails.fname + " " + userDetails.lname %> </p>
           </div>
           <div class="d-flex justify-content-between">
             <p>Email: </p>
-            <p><%= user.email %> </p>
+            <p><%= userDetails.email %> </p>
           </div>
           <div class="d-flex justify-content-between">
             <p>Phone: </p>
-            <p><%= user.phone %> </p>
+            <p><%= userDetails.phone %> </p>
           </div>
           <div class="col-12 d-flex justify-content-end">
             <a class="main-button text-decoration-none" href="/dashboard/edit">Edit</a>
@@ -45,9 +45,9 @@
       </div>
     </div>
     <% let count = 0 %> 
-    <% if(user.shippingAddress.length>0){ %> 
+    <% if(userDetails.shippingAddress.length>0){ %> 
       <div class="row">
-      <% user.shippingAddress.forEach(item => { %> 
+      <% userDetails.shippingAddress.forEach(item => { %> 
         <div class="col-md-6">
           <div class="card d-flex flex-row justify-content-between p-5 position-relative">
             <p class="col-6">Address <%= ++count %>:</p>
@@ -71,6 +71,6 @@
   </div>
 </section>
 <%- include('../partials/footer') %> 
-<script src="/script/userScript.js"></script>
+<script defer src="/script/userScript.js"></script>
 </body>
 </html>

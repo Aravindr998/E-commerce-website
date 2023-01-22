@@ -22,10 +22,10 @@
               <% coupons.forEach(coupon => { %>
                 <div class="card p-3 m-2" onclick="addCoupon('<%= coupon._id %>')">
                   <div>
-                    <p class="fw-bold"><%= coupon.code %> </p>
+                    <p class="fw-bold"><%= coupon.code %></p>
                   </div>
                   <div>
-                    <p class="text-muted"><%= coupon.description %> </p>
+                    <p class="text-muted"><%= coupon.description %></p>
                   </div>
                 </div>
               <% }) %>  
@@ -41,10 +41,13 @@
       <div class="col-sm-6">
         <div class="col-12">
           <div class="card p-4">
-            <h5>Select address</h5>
+            <div class="col-12 my-2 d-flex justify-content-between">
+              <h5>Select address</h5>
+              <a class="sub-button text-decoration-none" href="/dashboard/address/add">Add Address</a>
+            </div>
             <% let count = 0 %> 
-            <% if(user.shippingAddress.length>0){ %> 
-            <% user.shippingAddress.forEach((address, index, array) => { %> 
+            <% if(userDetails.shippingAddress.length>0){ %> 
+            <% userDetails.shippingAddress.forEach((address, index, array) => { %> 
               <% count++ %> 
             <div class="form-check">
               <input class="form-check-input" type="radio" value="<%= address._id %>" name="address" id="address<%= count %>" <%= index == 0? 'checked':'' %> >
@@ -63,7 +66,7 @@
         <div class="col-12">
           <div class="card p-4 my-3">
             <h5>Order Summary</h5>
-            <% user.cart.forEach(item => { %> 
+            <% userDetails.cart.forEach(item => { %> 
             <hr>
             <div class="row">
               <div class="col-sm-6 d-flex justify-content-center">
@@ -87,11 +90,11 @@
           <p>PRICE DETAILS</p>
           <div class="d-flex justify-content-between">
             <p>Price</p>
-            <p id="cart-total">₹<%= user.cartTotal %> </p>
+            <p id="cart-total">₹<%= userDetails.cartTotal %> </p>
           </div>
           <div class="d-flex justify-content-between">
             <p>Tax</p>
-            <p id="tax">₹<%= Math.round(user.cartTotal * 0.18) %></p>
+            <p id="tax">₹<%= Math.round(userDetails.cartTotal * 0.18) %></p>
           </div>
           <% if(discount.couponCode) {%> 
           <div class="d-flex justify-content-between text-success fw-bold">
@@ -106,9 +109,9 @@
           <div class="d-flex justify-content-between">
             <p>Total</p>
             <% if(discount.couponCode) {%> 
-                <p id="total">₹<%= Math.round(user.cartTotal * 1.18 - discount.discount) %></p>
+                <p id="total">₹<%= Math.round(userDetails.cartTotal * 1.18 - discount.discount) %></p>
               <% }else{ %>
-                <p id="total">₹<%= Math.round(user.cartTotal * 1.18) %></p>
+                <p id="total">₹<%= Math.round(userDetails.cartTotal * 1.18) %></p>
             <% } %>  
           </div>
           <hr>
@@ -123,8 +126,8 @@
   </div>
 </section>
 <%- include('../partials/footer') %> 
-<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-<script src="/script/userScript.js"></script>
-<script src="/script/payment.js"></script>
+<script defer src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script defer src="/script/userScript.js"></script>
+<script defer src="/script/payment.js"></script>
 </body>
 </html>

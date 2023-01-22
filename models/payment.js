@@ -30,6 +30,13 @@ const paymentSchema = new mongoose.Schema({
   status:{
     type: Boolean,
     required: true
+  },
+  refund: {
+    type: Boolean,
+    default: false
+  },
+  refundId: {
+    type: String
   }
 })
 

@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <%- include('../../partials/admin/admin-head-datatable') %> 
-<body class="p-5">
+<body>
  <%- include('../../partials/admin/admin-navbar') %>
- <section class="container mt-5">
-  <div class="row">
+ <section class="container my-5">
+  <div class="row pt-5">
     <a href="/admin/"></a>
     <div class="col-md-3 mb-2">
       <div class="card d-flex flex-row align-items-center p-4">
@@ -13,7 +13,7 @@
         </div>
         <div class="d-flex flex-row pt-3">
           <p class="fw-bold pe-2">Total Sales:</p>
-          <p>₹1<%= totalSales %> </p>
+          <p>₹<%= totalSales %> </p>
         </div>
       </div>
     </div>
@@ -53,20 +53,38 @@
   </div>
   <div class="row mt-4">
     <div class="col-md-6 mb-3">
-      <h4>Daily Sales</h4>
-      <canvas id="amountSpent"></canvas>
+      <div class="card p-3">
+        <h4>Daily Sales</h4>
+        <canvas id="amountSpent"></canvas>
+      </div>
     </div>
     <div class="col-md-6 mb-3">
-      <h4>Products Sold This Month</h4>
-      <canvas id="products"></canvas>
+      <div class="card p-3">
+        <h4>Products Sold This Month</h4>
+        <canvas id="products"></canvas>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-3">
+      <a href="/admin/sales/download" class="text-decoration-none">
+        <div class="card p-3 d-flex flex-row justify-content-center align-items-center">
+          <div class="me-2">
+            <img class="download-icon" src="/assets/icons/download.png" alt="">
+          </div>
+          <div>
+            <p class="m-0">Download Sales Report</p>
+          </div>
+        </div>
+      </a>
     </div>
   </div>
  </section>  
- <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
+ <script defer src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+ <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
  <%- include('../../partials/admin/datatable-footer') %> 
- <script src="/script/navbarScroll.js"></script> 
- <script src="/script/deleteCategory.js"></script>
- <script src="/script/chart.js"></script>
+ <script defer src="/script/navbarScroll.js"></script> 
+ <script defer src="/script/deleteCategory.js"></script>
+ <script defer src="/script/chart.js"></script>
 </body>
 </html>

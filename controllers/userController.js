@@ -12,6 +12,7 @@ const mongoose = require('mongoose')
 const orderModel = require('../models/orders')
 const Razorpay = require('razorpay')
 const crypto = require('crypto')
+const { findOne } = require('../models/users')
 let otp
 
 const getHomepage = async(req, res) => {
@@ -28,7 +29,7 @@ const getHomepage = async(req, res) => {
       })
     })
       if(req.session.user){
-        return res.render('home-page', {categories, banner})
+        return res.render('home-page', {categories, banner, user: req.session?.user?.fname})
       }else{
         return res.render('landing-page', {categories, banner})
       }
@@ -244,18 +245,62 @@ const resendOtp = (req, res, next) => {
 
 const getProductsPage = async(req, res) => {
   try {
-    const products = await productModel.find()
-    .sort({categoryId: 1})
-    products.forEach(product => {
-      product.skus.forEach((item, index, array) => {
-        if(item.isDeleted || item.totalStock<=0){
-          console.log(item)
-          array.splice(index,1)
+    let searchKey
+    let products
+    if(req.session.searchKey){
+      searchKey = req.session.searchKey
+      req.session.searchKey = null
+      products = await productModel.aggregate([
+        {
+          $lookup: {
+            from: 'categories',
+            localField: 'categoryId',
+            foreignField: '_id',
+            as: 'categoryId'
+          }
+        },
+        {
+          $unwind: '$categoryId'
+        },
+        {
+          $unwind: '$skus'
+        },
+        {
+          $match: {
+            'skus.isDeleted': false,
+            'skus.totalStock': {$gt: 0}
+          }
+        },
+        {
+          $match: {
+            $or: [
+              {title: new RegExp(searchKey, 'i')},
+              {'skus.color': new RegExp(searchKey, 'i')},
+              {'categoryId.categoryName': new RegExp(searchKey, 'i')}
+            ]
+          }
         }
-      })
-    })
+      ])
+    }else{
+      products = await productModel.aggregate([
+        {
+          $unwind: '$skus'
+        },
+        {
+          $match: {
+            'skus.isDeleted': false,
+            'skus.totalStock': {$gt: 0}
+          }
+        },
+        {
+          $sort: {
+            categoryId: 1
+          }
+        }
+      ])
+    }
     const categories = await categoryModel.find()
-    res.render('users/product-page', {products, categories})
+    res.render('users/product-page', {products, categories, user: req.session?.user?.fname})
   } catch (error) {
    console.log(error) 
   }
@@ -269,7 +314,6 @@ const getDetailsPage = async(req, res) => {
     .populate('categoryId')
     product.skus.forEach((item, index, array) => {
       if(item.isDeleted || item.totalStock<=0){
-        console.log(item)
         array.splice(index,1)
       }
     })
@@ -279,7 +323,7 @@ const getDetailsPage = async(req, res) => {
         sku = item
       }
     })
-    res.render('users/product-details', {product, sku})
+    res.render('users/product-details', {product, sku, user: req.session?.user?.fname})
   } catch (error) {
     
   }
@@ -289,14 +333,11 @@ const getCartPage = async(req, res) => {
   try {
     const user = await userModel.findOne({_id: req.session.user._id})
     .populate('cart.productId')
-    console.log(user.cart)
     if(user.cart.length>0){
       user.cart.forEach((item, index, array) => {
         let temp
         item.productId.skus.forEach( sku => {
           if(sku._id.toString() == item.skuId.toString()){
-            console.log('entered')
-            console.log(sku)
             temp = sku
           }
         })
@@ -305,12 +346,11 @@ const getCartPage = async(req, res) => {
       
       const cart = user.cart
       const {cartTotal} = user
-      console.log(cart[0].skus)
-      res.render('users/cart', {cart, cartTotal})
+      res.render('users/cart', {cart, cartTotal, user: req.session?.user?.fname})
     }else{
       const cart = []
       const cartTotal = 0
-      res.render('users/cart', {cart, cartTotal})
+      res.render('users/cart', {cart, cartTotal, user: req.session?.user?.fname})
     }
   } catch (error) {
     console.log(error)
@@ -341,13 +381,10 @@ const addToCart = async(req, res) => {
         flag = 1
       }
     })
-    console.log(total)
     if(flag == 0){
-      console.log()
       await userModel.findOneAndUpdate({_id: req.session.user._id}, {$push: {cart: cartItem}})
       await userModel.findOneAndUpdate({_id: req.session.user._id}, {$inc: {cartTotal: total}})
     }else{
-      console.log(flag)
       await userModel.findOneAndUpdate({_id: req.session.user._id, 'cart.skuId': skuid}, {$inc: {'cart.$.quantity': 1, cartTotal: total}})
     }
     res.json({
@@ -455,7 +492,6 @@ const removeItem = async(req, res) => {
       successStatus: true
     })
   } catch (error) {
-    console.log(error)
     return res.json({
       successStatus: false
     })
@@ -466,22 +502,18 @@ const getWishlishPage = async(req, res) => {
   const user = await userModel.find({_id: req.session.user._id}, {wishlist: 1})
   .populate('wishlist.productId')
   const wishlist = user[0].wishlist
-  console.log(wishlist)
   let wishlistClone = JSON.parse(JSON.stringify(wishlist))
   wishlistClone.forEach((item, index, array) => {
     let temp
     item.productId.skus.forEach( sku => {
       if(sku._id.toString() == item.skuId.toString()){
-        console.log('entered')
-        console.log(sku)
         temp = sku
       }
     })
     array[index].skus = temp
   })
 
-  console.log(wishlistClone[0])
-  res.render('users/wishlist', {wishlist: wishlistClone})
+  res.render('users/wishlist', {wishlist: wishlistClone, user: req.session?.user?.fname})
 }
 
 const addToWishlist = async(req, res, next) => {
@@ -529,7 +561,7 @@ const sendResponse = (req, res) => {
 
 const getDashboard = async(req, res) => {
   const user = await userModel.findById(req.session.user._id)
-  return res.render('users/dashboard', {user})
+  return res.render('users/dashboard', {userDetails: user, user: req.session?.user?.fname})
 }
 
 const getDashboardEdit = async(req, res) => {
@@ -537,10 +569,10 @@ const getDashboardEdit = async(req, res) => {
   if(req.session.Errmessage){
     const message = req.session.Errmessage
     req.session.Errmessage = null
-    return res.render('users/dashboard-edit', {user, message})
+    return res.render('users/dashboard-edit', {userDetails: user, message, user: req.session?.user?.fname})
   }else{
     const message = ''
-    return res.render('users/dashboard-edit', {user, message})
+    return res.render('users/dashboard-edit', {userDetails: user, message, user: req.session?.user?.fname})
   }
 }
 
@@ -606,11 +638,11 @@ const getAddAddress = (req, res) => {
     const address = req.session.address
     req.session.Errmessage = null
     req.session.address = null
-    res.render('users/add-address', {message, address})
+    res.render('users/add-address', {message, address, user: req.session?.user?.fname})
   }else{
     const message = ''
     const address = {}
-    res.render('users/add-address', {message, address})
+    res.render('users/add-address', {message, address, user: req.session?.user?.fname})
   }
 }
 
@@ -662,10 +694,10 @@ const getEditAddressPage = async(req, res) => {
     if(req.session.Errmessage){
       const message = req.session.Errmessage
       req.session.Errmessage = null
-      res.render('users/edit-address', {address: address[0].shippingAddress, message})
+      res.render('users/edit-address', {address: address[0].shippingAddress, message, user: req.session?.user?.fname})
     }else{
       const message = ''
-      res.render('users/edit-address', {address: address[0].shippingAddress, message})
+      res.render('users/edit-address', {address: address[0].shippingAddress, message, user: req.session?.user?.fname})
     }
   } catch (error) {
     console.log(error)
@@ -705,7 +737,6 @@ const getCheckoutPage = async(req, res) => {
   let discount = {}
   if(req.session.couponApplied){
     discount = req.session.couponApplied
-    // req.session.couponApplied = null
   }
   try {
     const user = await userModel.findById(req.session.user._id)
@@ -769,8 +800,7 @@ const getCheckoutPage = async(req, res) => {
         }
       ])
       const coupons = await couponModel.find()
-      console.log(coupons)
-      res.render('users/checkout', {user: user1[0], message, coupons, discount})
+      res.render('users/checkout', {userDetails: user1[0], message, coupons, discount, user: req.session?.user?.fname})
     }else{
       res.redirect('/cart')
     }
@@ -920,7 +950,6 @@ const checkoutCod = async(req, res) => {
       })
     }
     await order.save()
-    console.log(order)
     await userModel.findOneAndUpdate({
       _id: req.session.user._id
     },
@@ -940,7 +969,7 @@ const checkoutCod = async(req, res) => {
 const getOrderPlacedPage = (req, res) => {
   if(req.session.orderplaced){
     req.session.orderplaced = null
-    return res.render('users/order-placed')
+  return res.render('users/order-placed', {user: req.session?.user?.fname})
   }else{
     return res.redirect('/')
   }
@@ -949,8 +978,7 @@ const getOrderPlacedPage = (req, res) => {
 const getOrdersPage = async(req, res) => {
   try {
     const orders = await orderModel.find({customerId: req.session.user._id}).sort({createdAt: -1})
-    console.log(orders[0].items[0]);
-    res.render('users/orders', {orders})
+    res.render('users/orders', {orders, user: req.session?.user?.fname})
   } catch (error) {
     
   }
@@ -960,7 +988,7 @@ const getOrderDetails = async(req, res) => {
   try {
     const orderId = req.params.id
     const order = await orderModel.findById(orderId)
-    res.render('users/order-details', {order})
+    res.render('users/order-details', {order, user: req.session?.user?.fname})
   } catch (error) {
     
   }
@@ -1005,7 +1033,6 @@ const cancelOrder = async(req, res) => {
         }
       }
     ])
-    console.log(quantity)
     await productModel.findOneAndUpdate({
       skus: {
         $elemMatch: {
@@ -1018,6 +1045,37 @@ const cancelOrder = async(req, res) => {
         'skus.$.totalStock': quantity[0].items.quantity
       }
     })
+    const order = await orderModel.findOne({items: {$elemMatch: {_id: req.body.id}}})
+    if(order.paymentMethod == 'Razorpay' && order.paymentVerified == true){
+      const amount = await orderModel.aggregate([
+        {
+          $unwind: '$items'
+        },
+        {
+          $match: {
+            'items._id': mongoose.Types.ObjectId(req.body.id)
+          }
+        }
+      ])
+      console.log(amount)
+      console.log('entered')
+      let refund
+      const payment = await paymentModel.findOne({orderId: order._id})
+      const instance = new Razorpay({ key_id: process.env.RAZORPAY_KEY_ID, key_secret: process.env.RAZORPAY_SECRET_KEY })
+      instance.payments.refund(payment.paymentId,{
+        "amount": amount[0].items.price*100,
+        "speed": "normal",
+        "receipt": payment._id
+      }, async(err, refundDetails) => {
+        if(err){
+          console.log(err)
+        }
+        console.log(refundDetails)
+        refund = refundDetails
+        await paymentModel.findOneAndUpdate({orderId: order._id}, {$set: {refund: true, refundId: refund.id}})
+      })
+    }
+    console.log(true)
     res.json({successStatus: true})
   } catch (error) {
     console.log(error)
@@ -1084,7 +1142,7 @@ const addCoupon = async(req, res) => {
 }
 
 const getFailurePage = async(req, res) => {
-  res.render('users/payment-failed')
+  res.render('users/payment-failed', {user: req.session?.user?.fname})
 }
 
 const createOrder = async(req, res) => {
@@ -1254,6 +1312,9 @@ const verifyPayment = async(req, res) => {
           paymentVerified: true
         }
       })
+      if(order.couponId){
+        await couponModel.findOneAndUpdate({_id: order.couponId}, {$push: {users: req.session.user._id}})
+      }
       for(let item of order.items){
         await productModel.findOneAndUpdate({
           skus:{
@@ -1287,6 +1348,7 @@ const verifyPayment = async(req, res) => {
       })
       await payment.save()
       req.session.orderplaced = true
+      req.session.couponApplied = null
       return res.json({successStatus: true})
     }else{
       const order = await orderModel.findOneAndUpdate({_id: req.body.order.receipt}, {
@@ -1337,6 +1399,75 @@ const paymentFailure = async(req, res) => {
   }
 }
 
+const addItemToCart = async(req, res) => {
+    const prodId = req.body.prodId
+    const skuid = req.body.skuId
+    try {
+      const user = await userModel.findById(req.session.user._id)
+      const product = await productModel.findById(prodId)
+      let sku
+      let total;
+      product.skus.forEach(item => {
+        if(item._id == skuid){
+          total= item.price
+        }
+      })
+      const cartItem = {
+        productId: prodId,
+        skuId: skuid,
+        quantity: 1
+      }
+      let flag = 0
+      user.cart.forEach(item => {
+        if(skuid == item?.skuId){
+          flag = 1
+        }
+      })
+      console.log(total)
+      if(flag == 0){
+        console.log()
+        await userModel.findOneAndUpdate({_id: req.session.user._id}, {$push: {cart:{ $each: [cartItem], $position: 0}}})
+        await userModel.findOneAndUpdate({_id: req.session.user._id}, {$inc: {cartTotal: total}})
+      }else{
+        console.log(flag)
+        await userModel.findOneAndUpdate({_id: req.session.user._id, 'cart.skuId': skuid}, {$inc: {'cart.$.quantity': 1, cartTotal: total}})
+      }
+      res.json({
+        successStatus: true,
+      })
+  } catch (error) {
+    console.log(error)
+    res.json({successStatus: false})
+  }
+}
+
+const searchProducts = async(req, res) => {
+  const noSpecialChars = req.query.search.replace(/[^a-zA-Z0-9 ]/g, '')
+  req.session.searchKey = noSpecialChars
+  res.redirect('/products')
+}
+
+async function initiateRefund(order){
+  return new Promise(async(resolve, reject) => {
+    let refund
+    const payment = await paymentModel.findOne({orderId: order._id})
+    const instance = new Razorpay({ key_id: process.env.RAZORPAY_KEY_ID, key_secret: process.env.RAZORPAY_SECRET_KEY })
+    instance.payments.refund(payment.paymentId,{
+      "amount": order.totalAmount*100,
+      "speed": "normal",
+      "receipt": payment._id
+    }, (err, refundDetails) => {
+      if(err){
+        console.log(err)
+      }
+      console.log(refundDetails)
+      refund = refundDetails
+    })
+    await paymentModel.findOneAndUpdate({orderId: order._id}, {$set: {refund: true, refundId: refund.id}})
+    resolve()
+  })
+}
+
 module.exports = {
   getHomepage,
   getLogin,
@@ -1377,5 +1508,7 @@ module.exports = {
   createOrder,
   verifyPayment,
   cancelPayment,
-  paymentFailure
+  paymentFailure,
+  addItemToCart,
+  searchProducts
 }

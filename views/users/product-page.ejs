@@ -2,7 +2,11 @@
 <html lang="en">
 <%- include('../partials/head') %> 
 <body class="pt-5">
+<% if(user){ %> 
 <%- include('../partials/user-navbar') %> 
+<% }else{ %>
+<%- include('../partials/guest-navbar') %>
+<% } %>  
 <section class="container">
   <div class="row">
     <div class="col-12 pt-4">
@@ -63,26 +67,30 @@
       </div>
     </div>
     <div class="col-md-9 row">
+      <% if(products.length>0){ %> 
       <% products.forEach(product => { %> 
-        <% product.skus.forEach(sku => { %> 
-          <div class="col-md-4">
-              <a class="product-anchor" href="/products/details/<%= product._id %>/<%= sku._id %>  ">
-              <div class="card product-display-card d-flex flex-sm-column flex-row p-2 my-3 justify-content-center">
-                <div class="col-sm-12 col-6 d-flex justify-content-center">
-                  <img class="product-card-image" src="/<%= sku.images[0] %> " alt="">
-                </div>
-                <div class="col-sm-12 col-6">
-                  <div class="m-2">
-                    <h5 class="product-title text-center"><%= product.title %> </h5>
-                    <p class="text-secondary"><%= sku.color %></p>
-                    <p class="text-success">₹<%= sku.price %> </p>
-                  </div>
+        <div class="col-md-4">
+            <a class="product-anchor" href="/products/details/<%= product._id %>/<%= product.skus._id %>  ">
+            <div class="card product-display-card d-flex flex-sm-column flex-row p-2 my-3 justify-content-center">
+              <div class="col-sm-12 col-6 d-flex justify-content-center">
+                <img class="product-card-image" src="/<%= product.skus.images[0] %> " alt="">
+              </div>
+              <div class="col-sm-12 col-6">
+                <div class="m-2">
+                  <h5 class="product-title text-center"><%= product.title %> </h5>
+                  <p class="text-secondary"><%= product.skus.color %></p>
+                  <p class="text-success">₹<%= product.skus.price %> </p>
                 </div>
               </div>
-            </a>
             </div>
-        <% }) %> 
+          </a>
+          </div>
       <% }) %> 
+      <% }else{ %>
+        <div class="col-12 d-flex justify-content-center">
+          <p class="fw-bold">No items matched the search</p>
+        </div>
+      <% } %>  
     </div>
   </div>
 </section>

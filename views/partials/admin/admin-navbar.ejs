@@ -36,10 +36,30 @@
         <li class="nav-item ps-4">
           <a class="nav-link active nav-item" aria-current="page" href="/admin/banner">Banners</a>
         </li>
-        <li class="nav-item ps-4">
-          <a class="nav-link nav-item d-flex align-items-center" href="/admin/logout"><img class="navbar-icon" src="/assets/icons/logout.png" alt=""> <span>Logout</span></a>
+        <li class="nav-item d-flex align-items-center ps-4">
+          <button type="button" class="logout-button" data-bs-toggle="modal" data-bs-target="#modal">
+            <img class="navbar-icon" src="/assets/icons/logout.png" alt="">
+            Logout
+          </button>
         </li>
       </ul>
     </div>
   </div>
 </nav>
+<div class="modal fade" id="modal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="modalLabel">Logout</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Are you sure you want to logout?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="main-button" data-bs-dismiss="modal">Cancel</button>
+        <a href="/admin/logout" class="sub-button text-decoration-none">Logout</a>
+      </div>
+    </div>
+  </div>
+</div>

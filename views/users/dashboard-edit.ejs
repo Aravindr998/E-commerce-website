@@ -9,19 +9,19 @@
       <form class="row g-3" method="POST">
         <div class="col-md-6">
           <label for="fname" class="form-label">First Name</label>
-          <input type="text" class="form-control" name="fname" id="fname" value="<%= user.fname %>">
+          <input type="text" class="form-control" name="fname" id="fname" value="<%= userDetails.fname %>">
         </div>
         <div class="col-md-6">
           <label for="lname" class="form-label">Last Name</label>
-          <input type="text" class="form-control" name="lname" id="lname" value="<%= user.lname %>">
+          <input type="text" class="form-control" name="lname" id="lname" value="<%= userDetails.lname %>">
         </div>
         <div class="col-6">
           <label for="email" class="form-label">Email</label>
-          <input type="email" class="form-control" name="email" id="email" value="<%= user.email %>">
+          <input type="email" class="form-control" name="email" id="email" value="<%= userDetails.email %>">
         </div>
         <div class="col-6">
           <label for="phone" class="form-label">Phone</label>
-          <input type="text" class="form-control" name="phone" id="phone" value="<%= user.phone %>">
+          <input type="text" class="form-control" name="phone" id="phone" value="<%= userDetails.phone %>">
         </div>
         <div class="d-flex justify-content-end">
           <a href="/dashboard" class="sub-button me-3 text-decoration-none">Cancel</a>
@@ -58,8 +58,8 @@
   </div>
 </section>
 <%- include('../partials/footer') %> 
-<script src="/script/userScript.js"></script>
-<script src="/script/editUser.js"></script>
+<script defer src="/script/userScript.js"></script>
+<script defer src="/script/editUser.js"></script>
 </body>
 </html>
 

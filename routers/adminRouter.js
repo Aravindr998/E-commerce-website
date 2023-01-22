@@ -95,4 +95,6 @@ router.get('/order-details', authenticate, adminController.getOrderDetails)
 
 router.get('/product-details', authenticate, adminController.getProductDetails)
 
+router.get('/sales/download', authenticate, adminController.getSalesReport)
+
 module.exports = router

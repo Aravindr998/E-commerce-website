@@ -360,3 +360,13 @@ footer div div div p:first-child{
 .dashboard-icons{
   width: 3rem;
 }
+
+.download-icon{
+  width: 1.5rem;
+}
+
+.logout-button{
+  background-color: transparent;
+  border: none;
+  font-weight: var(--font-weight-subheading);
+}

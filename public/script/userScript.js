@@ -96,6 +96,8 @@ async function addToCart(id){
       console.log(button)
       button.removeAttribute('onclick')
       button.innerHTML = '<a href="/cart" class = "button-link">Go To Cart</a>'
+    }else if(res.redirect){
+      window.location.href = res.redirect
     }else{
       document.querySelector('.added-to-cart').classList.add('alert-danger')
       document.querySelector('.added-to-cart p').innerHTML = res.message
@@ -247,6 +249,8 @@ async function addToWishlist(id, prodId, skuId){
     console.log(button)
     button.removeAttribute('onclick')
     document.querySelector('svg.wishlist').style.fill = 'black'
+  }else if(res.redirect){
+    window.location.href = res.redirect
   }else{
     document.querySelector('.added-to-cart').classList.add('alert-danger')
     document.querySelector('.added-to-cart p').innerHTML = 'Some error occured. Please try again later'
@@ -322,5 +326,25 @@ async function addCoupon(id){
     window.location.href = '/checkout'
   }else{
     error.innerHTML = res.message
+  }
+}
+
+async function buynow(skuId, prodId){
+  const url = '/buy-now'
+  const response = await fetch(url, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      prodId,
+      skuId
+    })
+  })
+  const res = await response.json()
+  if(res.successStatus){
+    window.location.href = '/checkout'
+  }else if(res.redirect){
+    window.location.href = '/login'
   }
 }

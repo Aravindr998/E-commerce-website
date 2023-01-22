@@ -9,6 +9,7 @@ const fs = require('fs')
 const { promisify } = require('util')
 const unlinkAsync = promisify(fs.unlink)
 const path = require('path')
+const { Parser, transforms: { unwind }  } = require('json2csv')
 
 const getLogin = (req, res) => {
   if(req.session.Errmessage){
@@ -921,7 +922,17 @@ const deleteCoupon = async(req, res) => {
 
 const getDashboard = async(req, res) => {
   try {
-    const orders = await orderModel.find({isCancelled: false})
+    const orders = await orderModel.aggregate([
+      {
+        $unwind: '$items' 
+      },
+      {
+        $match: {
+          'items.isCancelled': false,
+          paymentVerified: true
+        }
+      }
+    ])
     const users = await userModel.find()
     const totalSales = orders.reduce((sum, order) => sum+=order.totalAmount, 0)
     const products = await productModel.find()
@@ -1005,6 +1016,105 @@ const getProductDetails = async(req, res) => {
   }
 }
 
+const getSalesReport = async(req, res) => {
+  try {
+    const orders = await orderModel.aggregate([
+      {
+        $unwind: '$items'
+      },
+      {
+        $addFields: {
+          currMonth: {
+            '$month' : new Date()
+          },
+          docMonth: {
+            '$month': '$createdAt'
+          }
+        }
+      },
+      {
+        $match: {
+          'items.isCancelled': false,
+          paymentVerified: true,
+          $expr: {
+            $eq: ['$currMonth', '$docMonth']
+          }
+        }
+      },
+      {
+        $lookup: {
+          from: 'coupons',
+          localField: 'couponId',
+          foreignField: '_id',
+          pipeline: [{
+            $project: {
+              code: 1
+            }
+          }],
+          as: 'couponDetails'
+        }
+      },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'customerId',
+          foreignField: '_id',
+          pipeline: [{
+            $project: {
+              fname: 1,
+              lname: 1,
+              email: 1
+            }
+          }],
+          as: 'customerId'
+        }
+      }
+    ])
+    const fields = [
+      {
+        label: 'Customer Name',
+        value: 'customerId.fname'
+      },
+      {
+        label: 'Email',
+        value: 'customerId.email'
+      },
+      {
+        label: 'Payment Method',
+        value: 'paymentMethod'
+      },
+      {
+        label: 'Product',
+        value: 'items.productName'
+      },
+      {
+        label: 'Color',
+        value: 'items.color'
+      },
+      {
+        label: 'Quantity',
+        value: 'items.quantity'
+      },
+      {
+        label: 'Coupon',
+        value: 'couponDetails.code'
+      },
+      {
+        label: 'Ordered On',
+        value: 'createdAt'
+      }
+    ]
+    const transforms = [unwind({ paths: ['couponDetails', 'customerId'] })]
+    const json2csvParser = new Parser({ fields, transforms })
+    const csv = json2csvParser.parse(orders)
+    fs.writeFileSync('./public/files/data.csv', csv)
+    res.download('./public/files/data.csv', 'Sales Report.csv')
+    console.log(orders)
+  } catch (error) {
+    console.log(error)
+  }
+}
+
 module.exports = {
   getLogin,
   getHomepage,
@@ -1042,5 +1152,6 @@ module.exports = {
   deleteCoupon,
   getDashboard,
   getOrderDetails,
-  getProductDetails
+  getProductDetails,
+  getSalesReport
 }
