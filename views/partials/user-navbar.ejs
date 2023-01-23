@@ -16,16 +16,16 @@
       </form>
       <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
         <li class="nav-item ps-4">
-          <a class="nav-link active nav-item d-flex align-items-center" aria-current="page" href="/wishlist"><img class="navbar-icon" src="/assets/icons/wishlist.png" alt=""> <span>Wishlist</span></a>
+          <a class="nav-link active nav-item d-flex align-items-center" aria-current="page" href="/wishlist"><span class="un d-flex align-items-center"><img class="navbar-icon" src="/assets/icons/wishlist.png" alt=""> <span>Wishlist</span></span></a>
         </li>
         <li class="nav-item ps-4">
-          <a class="nav-link nav-item d-flex align-items-center" href="/cart"><img class="navbar-icon" src="/assets/icons/cart.png" alt=""> <span>Cart</span></a>
+          <a class="nav-link nav-item d-flex align-items-center" href="/cart"><span class="un d-flex align-items-center"><img class="navbar-icon" src="/assets/icons/cart.png" alt=""> <span>Cart</span></span></a>
         </li>
         <li class="nav-item ps-4">
-          <a class="nav-link active nav-item d-flex align-items-center" aria-current="page" href="/dashboard"><img class="navbar-icon" src="/assets/icons/user.png" alt=""> <span>Hi <%= user %></span></a>
+          <a class="nav-link active nav-item d-flex align-items-center" aria-current="page" href="/dashboard"><span class="un d-flex align-items-center"><img class="navbar-icon" src="/assets/icons/user.png" alt=""> <span>Hi <%= user %></span></span></a>
         </li>
         <li class="nav-item ps-4 d-flex align-items-center">
-          <button type="button" class="logout-button" data-bs-toggle="modal" data-bs-target="#modal">
+          <button type="button" class="logout-button un" data-bs-toggle="modal" data-bs-target="#logout-modal">
             <img class="navbar-icon" src="/assets/icons/logout.png" alt="">
             Logout
           </button>
@@ -34,11 +34,11 @@
     </div>
   </div>
 </nav>
-<div class="modal fade" id="modal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+<div class="modal fade" id="logout-modal" tabindex="-1" aria-labelledby="logout-modalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
-        <h1 class="modal-title fs-5" id="modalLabel">Logout</h1>
+        <h1 class="modal-title fs-5" id="logout-modalLabel">Logout</h1>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">

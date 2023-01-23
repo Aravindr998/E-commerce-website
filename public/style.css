@@ -370,3 +370,36 @@ footer div div div p:first-child{
   border: none;
   font-weight: var(--font-weight-subheading);
 }
+
+.dashboard-icon{
+  width: 2rem;
+}
+
+::-webkit-scrollbar{
+  width: 7px;
+}
+::-webkit-scrollbar-track{
+  visibility: hidden;
+}
+::-webkit-scrollbar-thumb{
+  background-color: rgba(0,0,0, 0.5);
+  border-radius: 5rem;
+}
+::-webkit-scrollbar-thumb:hover{
+  background-color: rgba(0,0,0, 0.6);
+}
+.un{
+  padding-bottom:2px;
+  background-image: linear-gradient(rgb(0, 0, 0) 0 0);
+  background-position: 0 100%;
+  background-size: 0% 1px;
+  background-repeat: no-repeat;
+  transition: background-size 0.3s, background-position 0s 0.3s;
+}
+.un:hover{
+  background-position: 100% 100%;
+  background-size: 100% 2px;
+}
+.table-image-orders{
+  max-width: 7rem;
+}

@@ -32,23 +32,19 @@ function updateProduct(){
 }
 
 async function deleteProduct(id) {
-  if(window.confirm('Are you sure?')){
-    const data = document.getElementById(id).dataset.url
-    const url = 'http://localhost:4000/admin/products/delete/' + data
-    const response = await fetch(url, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    })
-    const res = await response.json()
-    console.log(res)
-    if(res.successStatus){
-      window.location.href = res.redirect
-    }else{
-      document.querySelector('#error').innerHTML = res.message
+  const data = document.getElementById(id).dataset.url
+  const url = 'http://localhost:4000/admin/products/delete/' + data
+  const response = await fetch(url, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json'
     }
+  })
+  const res = await response.json()
+  console.log(res)
+  if(res.successStatus){
+    window.location.href = res.redirect
   }else{
-    return
+    document.querySelector('#error').innerHTML = res.message
   }
 }

@@ -17,10 +17,10 @@
         <p>Price Filter</p>
         <form action="/products/filter" method="POST" class="row">
           <div class=" col-6">
-            <input class="form-control range-form" type="text" name="" id="from" placeholder="from">
+            <input class="form-control range-form" type="text" name="" id="from1" placeholder="from">
           </div>
           <div class=" col-6">
-            <input class="form-control range-form" type="text" name="" id="to" placeholder="to">
+            <input class="form-control range-form" type="text" name="" id="to1" placeholder="to">
           </div>
           <div class="d-flex flex-column">
             <p>Categories</p>
@@ -44,18 +44,18 @@
       <h4 class="pt-4">Filters</h4>
       <div class="col-12 pt-1">
         <p>Price Filter</p>
-        <form action="/products/filter" method="POST" class="row">
+        <form action="/products/filter" method="GET" class="row">
           <div class=" col-6">
-            <input class="form-control range-form" type="text" name="" id="from" placeholder="from">
+            <input class="form-control range-form" type="number" name="from" id="from2" placeholder="from">
           </div>
           <div class=" col-6">
-            <input class="form-control range-form" type="text" name="" id="to" placeholder="to">
+            <input class="form-control range-form" type="number" name="to" id="to2" placeholder="to">
           </div>
           <div class="d-flex flex-column pt-3">
             <p>Categories</p>
             <% categories.forEach(item => { %> 
-            <label for="<%= item._id %> ">
-              <input id="<%= item._id %>" class="form-check-input" type="checkbox" name="<%= item._id %> "> 
+            <label for="<%= item._id %>">
+              <input id="<%= item._id %>" class="form-check-input" type="checkbox" name="category[]" value="<%= item._id %>"> 
               <%= item.categoryName %> 
             </label>
             <% }) %> 

@@ -13,6 +13,7 @@
             <tr>
               <th>#</th>
               <th>Order Details</th>
+              <th>Payment Details</th>
               <th>Ordered By</th>
               <th>Ordered On</th>
               <th>Status</th>
@@ -25,7 +26,7 @@
               <% order.items.forEach(item => { %>
                 <tr>
                   <td class="align-middle"><%= ++count %></td>
-                  <td class="align-middle">
+                  <td class="align-middle table-image-orders">
                     <div>
                       <div>
                         <img class="image-table" src="/<%= item.image %> " alt="">
@@ -37,8 +38,14 @@
                       </div>
                     </div>
                   </td>
+                  <td class="align-middle">
+                    <div>
+                      <p>Payment method: <%= order.paymentMethod %></p>
+                      <p>Payment status: <%= order.paymentVerified ? 'Verified' : 'Pending' %></p>
+                    </div>
+                  </td>
                   <td class="align-middle"><%= order.customerId.email %> </td>
-                  <td class="align-middle"><%= order.createdAt.toString().slice(0,16) %></td>
+                  <td class="align-middle"><%= new Date(order.createdAt).toLocaleDateString("en-GB") %></td>
                   <td class="align-middle">
                     <div>
                       <select class="form-select" name="orderStatus" id="status<%= count %>" <%= item.isCancelled ? 'disabled' : '' %> >

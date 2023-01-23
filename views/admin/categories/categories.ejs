@@ -20,8 +20,25 @@
           <% categories.forEach(item => { %>
             <tr>
               <td><%= ++count %> </td>
-              <td><%= item.categoryName %> </td>
-              <td><button class="btn btn-danger" id="<%= item._id %>" onclick="deleteCategory(this.id)">Delete</button></td>
+              <td><%= item.categoryName %></td>
+              <td><button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#categoryModal<%= count %>">Delete</button></td>
+              <div class="modal fade" id="categoryModal<%= count %>" tabindex="-1" aria-labelledby="categoryModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h1 class="modal-title fs-5" id="categoryModalLabel">Delete Category</h1>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                      Are you sure? All products associated with this category will also be deleted
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                      <button type="button" id="<%= item._id %>" onclick="deleteCategory(this.id)" class="btn btn-danger">Delete</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </tr>
           <% }) %> 
         </tbody>

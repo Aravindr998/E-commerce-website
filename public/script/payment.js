@@ -17,7 +17,7 @@ async function checkPayment(buttonid){
     })
     const res = await response.json()
     if(res.successStatus){
-      checkout(res.orderInstance)
+      checkout(res.orderInstance, res.user)
     }else{
       window.location.href = '/checkout'
     }
@@ -27,7 +27,7 @@ async function checkPayment(buttonid){
 
 }
 
-function checkout(order){
+function checkout(order, user){
   const options = {
     "key": "rzp_test_kW0L0zRl03sMQ6",
     "amount": order.amount,
@@ -40,9 +40,9 @@ function checkout(order){
       verifyPayment(response, order)
     },
     "prefill": {
-        "name": "Gaurav Kumar",
-        "email": "gaurav.kumar@example.com",
-        "contact": "9000090000"
+        "name": user.fname+ ' ' +user.lname,
+        "email": user.email,
+        "contact": user.phone
     },
     "notes": {
         "address": "Razorpay Corporate Office"

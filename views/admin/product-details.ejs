@@ -14,7 +14,24 @@
             <a href="/admin/products/edit/<%= product.id %>" class="btn btn-primary">Edit</a>
           </div>
           <div class="m-2">
-            <button id="delete-button" class="btn btn-danger" onclick="deleteProduct(this.id)" data-url="<%= product.id %> ">Delete</button>
+            <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#productModal">Delete</button>
+          </div>
+          <div class="modal fade" id="productModal" tabindex="-1" aria-labelledby="productModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h1 class="modal-title fs-5" id="productModalLabel">Delete Product</h1>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  Are you sure you want to delete the entire product?
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                  <button type="button" class="btn btn-danger"  id="delete-button" onclick="deleteProduct(this.id)" data-url="<%= product.id %> ">Delete</button>
+                </div>
+              </div>
+            </div>
           </div>
           <div class="m-2">
             <a href="/admin/products/skus/add/<%= product.id %>" class="btn btn-outline-success">Add Skus</a>
@@ -48,6 +65,7 @@
             <tbody>
               <% let count = 0 %>
               <% product.skus.forEach(item => { %> 
+              <% count++ %> 
               <tr class="align-middle">
                 <td><%= item.color %></td>
                 <td><%= item.price %></td>
@@ -71,7 +89,24 @@
                 <td>
                   <div class="d-sm-flex">
                     <a href="/admin/products/edit/<%= product.id %>/<%= item.id %>" class="btn btn-primary m-1">Edit</a>
-                    <button class="btn btn-danger m-1" id="delete-sku<%= ++count %> " data-url="<%= item.id %>" data-prodId =<%= product.id %>  onclick="deleteSku(this.id)">Delete</button>
+                    <button class="btn btn-danger m-1" data-bs-toggle="modal" data-bs-target="#skuModal">Delete</button>
+                  </div>
+                  <div class="modal fade" id="skuModal" tabindex="-1" aria-labelledby="skuModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h1 class="modal-title fs-5" id="skuModalLabel">Delete Sku</h1>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                          Are you sure?
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                          <button type="button" class="btn btn-danger" id="delete-sku<%= count %> " data-url="<%= item.id %>" data-prodId =<%= product.id %>  onclick="deleteSku(this.id)">Delete</button>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </td>
               </tr>

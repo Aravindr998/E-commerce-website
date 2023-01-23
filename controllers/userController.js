@@ -12,7 +12,7 @@ const mongoose = require('mongoose')
 const orderModel = require('../models/orders')
 const Razorpay = require('razorpay')
 const crypto = require('crypto')
-const { findOne } = require('../models/users')
+const nodemailer = require('nodemailer')
 let otp
 
 const getHomepage = async(req, res) => {
@@ -300,6 +300,49 @@ const getProductsPage = async(req, res) => {
       ])
     }
     const categories = await categoryModel.find()
+    const categoryArray = []
+    categories.forEach(item => {
+      categoryArray.push(item._id)
+    })
+    let from = req.session.from || 0
+    let to = req.session.to || 1000000
+    let category = []
+    if(req.session.category){
+      req.session.category.forEach(item => {
+        category.push(mongoose.Types.ObjectId(item))
+      })
+    }else{
+      category = categoryArray
+    }
+    console.log(from, to, category)
+    console.log(req.session.from, req.session.to, req.session.category)
+    if(req.session.from || req.session.to || req.session.category){
+      console.log('entered')
+      req.session.from = null
+      req.session.to = null
+      req.session.category = null
+      products = await productModel.aggregate([
+        {
+          $unwind: '$skus'
+        },
+        {
+          $match: {
+            'skus.isDeleted': false,
+            'skus.totalStock': {$gt: 0},
+            $and:[
+              {'skus.price': {$gte: parseInt(from)}},
+              {'skus.price': {$lte: parseInt(to)}},
+            ],
+            categoryId: {$in : category}
+          }
+        },
+        {
+          $sort: {
+            categoryId: 1
+          }
+        }
+      ])
+    }
     res.render('users/product-page', {products, categories, user: req.session?.user?.fname})
   } catch (error) {
    console.log(error) 
@@ -403,6 +446,13 @@ const addToCart = async(req, res) => {
 const changeQuantity = async(req, res) => {
   try {
     const product = await productModel.findById(req.body.prodId)
+    for(let item of product.skus){
+      if(item._id.toString() == req.body.skuId){
+        if(item.totalStock == 0){
+          return res.json({successStatus: false})
+        }
+      }
+    }
     let total
     product.skus.forEach(item => {
       if(item._id == req.body.skuId){
@@ -1070,7 +1120,6 @@ const cancelOrder = async(req, res) => {
         if(err){
           console.log(err)
         }
-        console.log(refundDetails)
         refund = refundDetails
         await paymentModel.findOneAndUpdate({orderId: order._id}, {$set: {refund: true, refundId: refund.id}})
       })
@@ -1289,7 +1338,8 @@ const createOrder = async(req, res) => {
       console.log(orderInstance)
       return res.json({
         successStatus: true,
-        orderInstance
+        orderInstance,
+        user: user1[0]
       })
     })
   } catch (error) {
@@ -1447,26 +1497,150 @@ const searchProducts = async(req, res) => {
   res.redirect('/products')
 }
 
-async function initiateRefund(order){
-  return new Promise(async(resolve, reject) => {
-    let refund
-    const payment = await paymentModel.findOne({orderId: order._id})
-    const instance = new Razorpay({ key_id: process.env.RAZORPAY_KEY_ID, key_secret: process.env.RAZORPAY_SECRET_KEY })
-    instance.payments.refund(payment.paymentId,{
-      "amount": order.totalAmount*100,
-      "speed": "normal",
-      "receipt": payment._id
-    }, (err, refundDetails) => {
-      if(err){
-        console.log(err)
+const filterProducts = (req, res) => {
+  req.session.from = req.query.from
+  req.session.to = req.query.to
+  req.session.category = req.query.category
+  res.redirect('/products')
+}
+
+const getForgotPasswordPage = (req, res) => {
+  let message = ""
+  if(req.session.Errmessage){
+    message = req.session.Errmessage
+    req.session.Errmessage = null
+  }
+  res.render('users/forgot-password-mail', {message})
+}
+
+const checkUser = async(req, res) => {
+  if(!req.body.email){
+    req.session.Errmessage = 'Email cannot be empty'
+    return res.redirect('/forgot-password')
+  }else if(!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(req.body.email)){
+    req.session.Errmessage = 'Invalid email'
+    return res.redirect('/forgot-password')
+  }else{
+    const user = await userModel.find({email: req.body.email})
+    if(user.length == 0){
+      req.session.Errmessage = 'User does not exist. Please sign up'
+      return res.redirect('/forgot-password')
+    }else{
+      const otp = generateMailOtp()
+      req.session.emailOtp = otp
+      console.log(otp)
+      try {
+        const info = await sendMail(user[0].email, otp)
+      } catch (error) {
+        console.log(error)
+        req.session.Errmessage = 'Some error occured. Please try again later'
+        return res.redirect('/forgot-password')
       }
-      console.log(refundDetails)
-      refund = refundDetails
+      return res.redirect(`/forgot-password/${user[0]._id}`)
+    }
+  }
+}
+
+const getEnterOtpPage = async(req, res) => {
+  try {
+    if(req.session.emailOtp){
+      let message = ''
+      if(req.session.Errmessage){
+        message = req.session.Errmessage
+        req.session.Errmessage = null
+      }
+      const user = await userModel.findById(req.params.id)
+      res.render('users/enter-mail-otp', {message, user})
+    }else{
+      res.redirect('/login')
+    }
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+const checkMailOtp = async(req, res) => {
+  try {
+    if(req.session.emailOtp){
+      if(req.body.otp == req.session.emailOtp){
+        res.redirect(`/password/reset/${req.params.id}`)
+      }else{
+        req.session.Errmessage = 'Invalid OTP'
+        res.redirect(`/forgot-password/${req.params.id}`)
+      }
+    }else{
+      res.redirect('/login')
+    }
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+const getResetPasswordPage = async(req, res) => {
+  try {
+    if(req.session.emailOtp){
+      const user = await userModel.findById(req.params.id)
+      let message = ''
+      if(req.session.Errmessage){
+        message = req.session.Errmessage
+        req.session.Errmessage = null
+      }
+      res.render('users/reset-password', {message, user})
+    }else{
+      res.redirect('/login')
+    }
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+const resetPassword = async(req, res) => {
+  try {
+    if(req.body.password != req.body['confirm-password']){
+      req.session.Errmessage = 'Passwords do not match'
+      res.redirect(`/password/reset/${req.params.id}`)
+    }else{
+      const user = await userModel.findById(req.params.id)
+      user.password = req.body.password
+      await user.save()
+      req.session.emailOtp = null
+      res.redirect('/login')
+    }
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+function generateMailOtp(){
+  return Math.floor(100000 + Math.random()*900000)
+}
+
+function sendMail(mail, otp){
+  return new Promise(async(resolve, reject) => {
+    let transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.NODEMAILER_EMAIL,
+        pass: process.env.NODEMAILER_PASSWORD
+      }
     })
-    await paymentModel.findOneAndUpdate({orderId: order._id}, {$set: {refund: true, refundId: refund.id}})
-    resolve()
+    let detail = {
+      from: process.env.NODEMAILER_EMAIL,
+      to: mail,
+      subject: 'KROMA OTP',
+      text: `Your OTP for resetting password is ${otp}`
+    }
+    try {
+      let info = await transporter.sendMail(detail)
+      console.log("Message sent: %s", info.messageId)
+      resolve(info)
+    } catch (error) {
+      reject(error)
+    }
+    
   })
 }
+
 
 module.exports = {
   getHomepage,
@@ -1510,5 +1684,12 @@ module.exports = {
   cancelPayment,
   paymentFailure,
   addItemToCart,
-  searchProducts
+  searchProducts,
+  filterProducts,
+  getForgotPasswordPage,
+  checkUser,
+  getEnterOtpPage,
+  checkMailOtp,
+  getResetPasswordPage,
+  resetPassword
 }

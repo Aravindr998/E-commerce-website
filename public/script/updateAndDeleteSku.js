@@ -33,42 +33,21 @@ async function deleteSku(id){
   const data = document.getElementById(id).dataset.url
   const prodId = document.getElementById(id).dataset.prodid
   const url = 'http://localhost:4000/admin/products/delete/skus/'+ prodId + '/' + data
-  if(window.confirm('Are you sure?')){
-    fetch(url, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    })
-    .then(response => response.json())
-    .then(response => {
-      if(response.successStatus){
-        window.location.href = response.redirect
-      }else{
-        document.querySelector('error-sku').innerHTML = response.message
-      }
-    })
-    .catch(error => {
-      console.log(error)
-    })
-    // try{
-    //   const response = await fetch(url,{
-    //     method: 'DELETE',
-    //     headers: {
-    //       'Content-Type': 'application/json'
-    //     },
-    //     body: {
-    //       id: document.getElementById(id).dataset.prodId
-    //     }
-    //   })
-    //   const res = await response.json()
-    //   if(res.successStatus){
-    //     window.location.href = res.redirect
-    //   }else{
-    //     document.querySelector('error-sku').innerHTML = res.message
-    //   }
-    // }catch(error){
-    //   console.log(error)
-    // }
-  }
+  fetch(url, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  })
+  .then(response => response.json())
+  .then(response => {
+    if(response.successStatus){
+      window.location.href = response.redirect
+    }else{
+      document.querySelector('error-sku').innerHTML = response.message
+    }
+  })
+  .catch(error => {
+    console.log(error)
+  })
 }

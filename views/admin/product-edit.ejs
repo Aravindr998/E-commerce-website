@@ -21,7 +21,7 @@
           <!-- <option selected>Choose...</option> -->
           <% if(categories.length>0){ %> 
             <% categories.forEach(item => { %>               
-              <option value='<%= item._id %>' <%= item._id == product.categoryId? "selected":"" %>  ><%= item.categoryName %> </option>
+              <option value='<%= item._id %>' <%= item._id.toString() == product.categoryId.toString()? "selected":"" %>  ><%= item.categoryName %> </option>
             <% }) %> 
           <% } %> 
         </select>

@@ -87,4 +87,18 @@ router.patch('/buy-now', isUserLoggedin, userController.addItemToCart)
 
 router.get('/search', userController.searchProducts)
 
+router.get('/products/filter', userController.filterProducts)
+
+router.get('/forgot-password', isLoggedin, userController.getForgotPasswordPage)
+
+router.post('/forgot-password/mail', isLoggedin, userController.checkUser)
+
+router.get('/forgot-password/:id', isLoggedin, userController.getEnterOtpPage)
+
+router.post('/forgot-password/otp/:id', isLoggedin, userController.checkMailOtp)
+
+router.get('/password/reset/:id', isLoggedin, userController.getResetPasswordPage)
+
+router.post('/password/reset/:id', isLoggedin, userController.resetPassword)
+
 module.exports = router

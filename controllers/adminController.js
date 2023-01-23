@@ -4,12 +4,14 @@ const categoryModel = require('../models/categories')
 const bannerModel = require('../models/banners')
 const orderModel = require('../models/orders')
 const couponModel = require('../models/coupons')
+const paymentModel = require('../models/payment')
 const mongoose = require('mongoose')
 const fs = require('fs')
 const { promisify } = require('util')
 const unlinkAsync = promisify(fs.unlink)
 const path = require('path')
 const { Parser, transforms: { unwind }  } = require('json2csv')
+const Razorpay = require('razorpay')
 
 const getLogin = (req, res) => {
   if(req.session.Errmessage){
@@ -90,7 +92,7 @@ const addProducts = async(req, res) => {
       }
       try{
         await product.save()
-        return res.redirect('/admin')
+        return res.redirect('/admin/products')
       }catch(error){
         console.log(error)
         if(error.errors.title){
@@ -136,7 +138,7 @@ const newSku = async (req, res) => {
       req.session.update = null
       return res.render('admin/new-sku', {product, skus, categories, message})
     }else{
-      return res.redirect('/admin')
+      return res.redirect('/admin/products')
     }
   } catch (error) {
     console.log(error)
@@ -250,7 +252,7 @@ const saveSku = async(req, res, next) => {
         }
       }, {runValidators: true})
       req.session.update = true
-      return res.redirect('/admin')
+      return res.redirect('/admin/products')
     } catch (error) {
       console.log(error)
       req.session.Errmessage = "Some error occured"
@@ -360,7 +362,7 @@ const getDetailsPage = async(req, res) => {
       const categories = await categoryModel.find()
       return res.render('admin/product-details', {product, categories})
     }else{
-      return res.redirect('/admin')
+      return res.redirect('/admin/products')
     }
   } catch (error) {
     console.log(error)
@@ -501,7 +503,7 @@ const updateProductSku = async (req, res) => {
       }, {runValidators: true})
       return res.json({
         successStatus: true,
-        redirect: '/admin'
+        redirect: '/admin/products'
       })
     } catch (error) {
       console.log(error)
@@ -536,7 +538,7 @@ const deleteProduct = async (req, res) => {
     await productModel.findOneAndUpdate({_id: id}, {$set: {isDeleted: true, "skus.$[].isDeleted": true}})
     return res.json({
       successStatus: true,
-      redirect: '/admin'
+      redirect: '/admin/products'
     })
   } catch (error) {
     console.log(error)
@@ -564,7 +566,7 @@ const deleteSku = async (req, res) => {
       await product.save()
       return res.json({
         successStatus: true,
-        redirect: '/admin'
+        redirect: '/admin/products'
       })
     }else{
       const result = await productModel.findOneAndUpdate({skus: {$elemMatch: {_id: id}}}, {
@@ -574,7 +576,7 @@ const deleteSku = async (req, res) => {
       })
       return res.json({
         successStatus: true,
-        redirect: '/admin'
+        redirect: '/admin/products'
       })
     }
   }catch (error) {
@@ -773,6 +775,7 @@ const getOrdersPage = async(req, res) => {
   try {
     const orders = await orderModel.find()
     .populate('customerId')
+    .sort({createdAt: -1})
     res.render('admin/orders/order', {orders})
   } catch (error) {
     console.log(error)
@@ -850,6 +853,35 @@ const cancelOrder = async(req, res) => {
         'skus.$.totalStock': quantity[0].items.quantity
       }
     })
+    const order = await orderModel.findOne({items: {$elemMatch: {_id: req.body.itemId}}})
+    if(order.paymentMethod == 'Razorpay' && order.paymentVerified == true){
+      const amount = await orderModel.aggregate([
+        {
+          $unwind: '$items'
+        },
+        {
+          $match: {
+            'items._id': mongoose.Types.ObjectId(req.body.itemId)
+          }
+        }
+      ])
+      console.log(amount)
+      console.log('entered')
+      let refund
+      const payment = await paymentModel.findOne({orderId: order._id})
+      const instance = new Razorpay({ key_id: process.env.RAZORPAY_KEY_ID, key_secret: process.env.RAZORPAY_SECRET_KEY })
+      instance.payments.refund(payment.paymentId,{
+        "amount": amount[0].items.price*100,
+        "speed": "normal",
+        "receipt": payment._id
+      }, async(err, refundDetails) => {
+        if(err){
+          console.log(err)
+        }
+        refund = refundDetails
+        await paymentModel.findOneAndUpdate({orderId: order._id}, {$set: {refund: true, refundId: refund.id}})
+      })
+    }
     res.json({successStatus: true})
   } catch (error) {
     console.log(error)
