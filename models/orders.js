@@ -90,5 +90,11 @@ const orderSchema = new mongoose.Schema({
   timestamps: true
 })
 
+orderSchema.virtual('payment', {
+  ref: 'Payments',
+  localField: '_id',
+  foreignField: 'orderId'
+})
+
 const Orders = mongoose.model('Orders', orderSchema)
 module.exports = Orders

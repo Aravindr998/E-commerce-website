@@ -1,6 +1,10 @@
 const userModel = require('../models/users')
 const couponModel = require('../models/coupons')
+const orderModel = require('../models/orders')
 const multer = require('multer')
+const puppeteer = require('puppeteer')
+const ejs = require('ejs')
+const path = require('path')
 
 
 const storage = multer.diskStorage({
@@ -64,7 +68,31 @@ const checkCoupon = async(req, res, next) => {
   }
 }
 
+const createInvoice = async(req, res, next) => {
+  try {
+    const user = await userModel.findById(req.session.user._id)
+    const order = await orderModel.findById(req.params.id)
+    .populate('payment')
+    const file = await ejs.renderFile(path.join(__dirname, '../views/users/', 'tax-invoice.ejs'), {user, order})
+    const browser = await puppeteer.launch()
+    const page = await browser.newPage()
+    await page.setContent(file)
+    await page.emulateMediaType('screen')
+    await page.pdf({
+      path: `./public/invoice/${order._id}.pdf`,
+      format: 'A4',
+      printBackground: true
+    })
+    await browser.close()
+    next()
+  } catch (error) {
+    console.log(error)
+    res.redirect(`/orders/${req.params.id}`)
+  }
+}
+
 module.exports = {
   upload,
-  checkCoupon
+  checkCoupon,
+  createInvoice
 }

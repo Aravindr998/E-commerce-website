@@ -18,6 +18,14 @@
         <div>
           <p><%= order.address.street1 %>, <%= order.address.street2 %>, <%= order.address.city %>, <%= order.address.state %>, <%= order.address.zip %></p>
         </div>
+        <% if(order.payment[0]?.paymentId) {%> 
+        <div>
+          Transaction Id:
+        </div>
+        <div>
+          <%= order.payment[0]?.paymentId %> 
+        </div>
+        <% } %> 
       </div>
     </div>
     <% let count = 0 %> 
@@ -78,6 +86,9 @@
       </div>
     </div>
     <% }) %> 
+    <div class="col-12 d-flex m-3 justify-content-end">
+      <a href="/invoice/download/<%= order._id %>" class="sub-button text-decoration-none">Download Invoice</a>
+    </div>
   </div>
 </section>
 <%- include('../partials/footer') %> 

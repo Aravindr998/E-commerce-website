@@ -13,6 +13,9 @@ const orderModel = require('../models/orders')
 const Razorpay = require('razorpay')
 const crypto = require('crypto')
 const nodemailer = require('nodemailer')
+const fs = require('fs')
+const { promisify } = require('util')
+const unlinkAsync = promisify(fs.unlink)
 let otp
 
 const getHomepage = async(req, res) => {
@@ -22,7 +25,7 @@ const getHomepage = async(req, res) => {
     .populate('products')
     categories.forEach(item => {
       item.products.splice(3, Infinity)
-      item.products[0].skus.forEach((sku, index, array) => {
+      item.products[0]?.skus.forEach((sku, index, array) => {
         if(sku.isDeleted || sku.totalStock<= 0){
           array.splice(index, 1)
         }
@@ -446,13 +449,6 @@ const addToCart = async(req, res) => {
 const changeQuantity = async(req, res) => {
   try {
     const product = await productModel.findById(req.body.prodId)
-    for(let item of product.skus){
-      if(item._id.toString() == req.body.skuId){
-        if(item.totalStock == 0){
-          return res.json({successStatus: false})
-        }
-      }
-    }
     let total
     product.skus.forEach(item => {
       if(item._id == req.body.skuId){
@@ -470,6 +466,14 @@ const changeQuantity = async(req, res) => {
         }
       }
     })
+    for(let item of product.skus){
+      if(item._id.toString() == req.body.skuId){
+        if(item.totalStock-quantity <= 0 && req.body.amount>0){
+          console.log('entered')
+          return res.json({successStatus: false})
+        }
+      }
+    }
     if(flag){
       await userModel.findOneAndUpdate({_id: req.session.user._id, 'cart.skuId': req.body.skuId}, {
         $inc: {'cart.$.quantity': req.body.amount, cartTotal: total}
@@ -1038,6 +1042,7 @@ const getOrderDetails = async(req, res) => {
   try {
     const orderId = req.params.id
     const order = await orderModel.findById(orderId)
+    .populate('payment')
     res.render('users/order-details', {order, user: req.session?.user?.fname})
   } catch (error) {
     
@@ -1611,6 +1616,10 @@ const resetPassword = async(req, res) => {
   }
 }
 
+const downloadInvoice = async(req, res) => {
+  res.download(`./public/invoice/${req.params.id}.pdf`, 'Invoice.pdf')
+}
+
 function generateMailOtp(){
   return Math.floor(100000 + Math.random()*900000)
 }
@@ -1641,6 +1650,10 @@ function sendMail(mail, otp){
   })
 }
 
+const temp = async(req, res) => {
+  
+  res.render('users/tax-invoice', {user, order})
+}
 
 module.exports = {
   getHomepage,
@@ -1691,5 +1704,7 @@ module.exports = {
   getEnterOtpPage,
   checkMailOtp,
   getResetPasswordPage,
-  resetPassword
+  resetPassword,
+  downloadInvoice,
+  temp
 }

@@ -683,6 +683,11 @@ const addNewCategory = async(req, res) => {
     categoryName: req.body.category
   })
   try {
+    const existing = await categoryModel.find({categoryName: new RegExp(req.body.category, 'i')})
+    if(existing.length>0){
+      req.session.Errmessage = 'Category already exists'
+      return res.redirect('/admin/categories')
+    }
     await category.save()
     res.redirect('/admin/categories')
   } catch (error) {

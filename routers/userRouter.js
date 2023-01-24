@@ -101,4 +101,8 @@ router.get('/password/reset/:id', isLoggedin, userController.getResetPasswordPag
 
 router.post('/password/reset/:id', isLoggedin, userController.resetPassword)
 
+router.get('/invoice/download/:id', authenticate, userMiddlewares.createInvoice, userController.downloadInvoice)
+
+router.get('/invoice', userController.temp)
+
 module.exports = router
