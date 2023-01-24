@@ -2,6 +2,12 @@ const express = require('express')
 const userController = require('../controllers/userController')
 const { authenticate, isLoggedin, validateAddress, isUserLoggedin } = require('../middlewares/userAuth')
 const userMiddlewares = require('../middlewares/userMiddlewares')
+const cartController = require('../controllers/usercartController')
+const wishlistController = require('../controllers/userwishlistController')
+const dashboardController = require('../controllers/userDashboardController')
+const checkoutController = require('../controllers/checkoutController')
+const orderController = require('../controllers/userOrderController')
+const productController = require('../controllers/userProductsController')
 
 const router = express.Router()
 
@@ -21,73 +27,73 @@ router.post('/register/otp', userController.generateOtp, userController.checkOtp
 
 router.post('/register/otp/resend', userController.resendOtp)
 
-router.get('/products', userController.getProductsPage)
+router.get('/products', productController.getProductsPage)
 
-router.get('/products/details/:prodid/:skuid', userController.getDetailsPage)
+router.get('/products/details/:prodid/:skuid', productController.getDetailsPage)
 
-router.get('/cart', authenticate, userController.getCartPage)
+router.get('/cart', authenticate, cartController.getCartPage)
 
-router.patch('/cart/add/:prodid/:skuid', isUserLoggedin, userController.addToCart)
+router.patch('/cart/add/:prodid/:skuid', isUserLoggedin, cartController.addToCart)
 
-router.patch('/cart/update/:id', authenticate, userController.changeQuantity)
+router.patch('/cart/update/:id', authenticate, cartController.changeQuantity)
 
-router.patch('/cart/remove/:prodid/:skuid', authenticate, userController.removeItem)
+router.patch('/cart/remove/:prodid/:skuid', authenticate, cartController.removeItem)
 
-router.get('/wishlist', authenticate, userController.getWishlishPage)
+router.get('/wishlist', authenticate, wishlistController.getWishlishPage)
 
-router.patch('/cart/wishlist/add',authenticate, userController.addToWishlist, userController.removeItem)
+router.patch('/cart/wishlist/add',authenticate, wishlistController.addToWishlist, cartController.removeItem)
 
-router.patch('/wishlist/cart/add/:prodid/:skuid', authenticate, userController.deleteFromWishlist, userController.addToCart)
+router.patch('/wishlist/cart/add/:prodid/:skuid', authenticate, wishlistController.deleteFromWishlist, cartController.addToCart)
 
-router.patch('/products/wishlist/add', isUserLoggedin, userController.addToWishlist, userController.sendResponse)
+router.patch('/products/wishlist/add', isUserLoggedin, wishlistController.addToWishlist, wishlistController.sendResponse)
 
-router.patch('/wishlist/remove', authenticate, userController.deleteFromWishlist, userController.sendResponse)
+router.patch('/wishlist/remove', authenticate, wishlistController.deleteFromWishlist, wishlistController.sendResponse)
 
-router.get('/dashboard', authenticate, userController.getDashboard)
+router.get('/dashboard', authenticate, dashboardController.getDashboard)
 
-router.get('/dashboard/edit', authenticate, userController.getDashboardEdit)
+router.get('/dashboard/edit', authenticate, dashboardController.getDashboardEdit)
 
-router.put('/dashboard/edit', authenticate, userController.editUser, userController.generateOtp)
+router.put('/dashboard/edit', authenticate, dashboardController.editUser, userController.generateOtp)
 
-router.put('/dashboard/edit/otp', authenticate, userController.updateUser)
+router.put('/dashboard/edit/otp', authenticate, dashboardController.updateUser)
 
-router.get('/dashboard/address/add', authenticate, userController.getAddAddress)
+router.get('/dashboard/address/add', authenticate, dashboardController.getAddAddress)
 
-router.post('/dashboard/address/add', authenticate, validateAddress, userController.saveAddress)
+router.post('/dashboard/address/add', authenticate, validateAddress, dashboardController.saveAddress)
 
-router.get('/dashboard/address/edit/:id', authenticate, userController.getEditAddressPage)
+router.get('/dashboard/address/edit/:id', authenticate, dashboardController.getEditAddressPage)
 
-router.post('/dashboard/address/update/:id', authenticate, validateAddress, userController.updateAddress)
+router.post('/dashboard/address/update/:id', authenticate, validateAddress, dashboardController.updateAddress)
 
-router.get('/checkout', authenticate, userMiddlewares.checkCoupon, userController.getCheckoutPage)
+router.get('/checkout', authenticate, userMiddlewares.checkCoupon, checkoutController.getCheckoutPage)
 
-router.post('/checkout/cod', authenticate, userController.checkoutCod)
+router.post('/checkout/cod', authenticate, checkoutController.checkoutCod)
 
-router.post('/checkout/razorpay', authenticate, userController.createOrder)
+router.post('/checkout/razorpay', authenticate, orderController.createOrder)
 
-router.get('/orderplaced', authenticate, userController.getOrderPlacedPage)
+router.get('/orderplaced', authenticate, checkoutController.getOrderPlacedPage)
 
-router.get('/orders', authenticate, userController.getOrdersPage)
+router.get('/orders', authenticate, orderController.getOrdersPage)
 
-router.get('/orders/:id', authenticate, userController.getOrderDetails)
+router.get('/orders/:id', authenticate, orderController.getOrderDetails)
 
-router.patch('/orders/cancel', authenticate, userController.cancelOrder)
+router.patch('/orders/cancel', authenticate, orderController.cancelOrder)
 
-router.patch('/checkout/coupons', authenticate, userController.addCoupon)
+router.patch('/checkout/coupons', authenticate, checkoutController.addCoupon)
 
-router.get('/payment/fail', authenticate, userController.getFailurePage)
+router.get('/payment/fail', authenticate, checkoutController.getFailurePage)
 
-router.post('/payment/verify', authenticate, userController.verifyPayment)
+router.post('/payment/verify', authenticate, checkoutController.verifyPayment)
 
-router.post('/payment/cancel', authenticate, userController.cancelPayment)
+router.post('/payment/cancel', authenticate, checkoutController.cancelPayment)
 
-router.post('/payment/fail', authenticate, userController.paymentFailure)
+router.post('/payment/fail', authenticate, checkoutController.paymentFailure)
 
-router.patch('/buy-now', isUserLoggedin, userController.addItemToCart)
+router.patch('/buy-now', isUserLoggedin, cartController.addItemToCart)
 
-router.get('/search', userController.searchProducts)
+router.get('/search', productController.searchProducts)
 
-router.get('/products/filter', userController.filterProducts)
+router.get('/products/filter', productController.filterProducts)
 
 router.get('/forgot-password', isLoggedin, userController.getForgotPasswordPage)
 
@@ -101,8 +107,6 @@ router.get('/password/reset/:id', isLoggedin, userController.getResetPasswordPag
 
 router.post('/password/reset/:id', isLoggedin, userController.resetPassword)
 
-router.get('/invoice/download/:id', authenticate, userMiddlewares.createInvoice, userController.downloadInvoice)
-
-router.get('/invoice', userController.temp)
+router.get('/invoice/download/:id', authenticate, userMiddlewares.createInvoice, orderController.downloadInvoice)
 
 module.exports = router
