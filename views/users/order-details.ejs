@@ -46,6 +46,7 @@
           <% if(item.isCancelled){ %>
             <div>
               <p class="text-danger">Order status: Cancelled</p>
+              <p class="fw-bold">Refund: <%= order.payment[0].refundStatus == 'processed' ? 'Completed' : 'Pending' %> </p>
             </div>
           <% }else if(item.orderStatus == 'Delivered'){ %>
             <div>

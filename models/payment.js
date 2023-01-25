@@ -37,6 +37,9 @@ const paymentSchema = new mongoose.Schema({
   },
   refundId: {
     type: String
+  },
+  refundStatus: {
+    type: String
   }
 })
 

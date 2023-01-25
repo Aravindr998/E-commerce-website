@@ -104,10 +104,10 @@ const saveAddress = async(req, res) => {
         shippingAddress: address
       }
     })
-    res.redirect('/dashboard')
+    res.redirect('/dashboard/address/manage')
   } catch (error) {
     console.log(error)
-    res.redirect('/dashboard')
+    res.redirect('/dashboard/address/manage')
   }
 }
 
@@ -170,6 +170,31 @@ const updateAddress = async(req, res) => {
   }
 }
 
+const getAddresPage = async(req, res) => {
+  try {
+    const userDetails = await userModel.findById(req.session.user._id)
+    res.render('users/manage-address', {userDetails, user: req.session?.user?.fname})
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+const deleteAddress = async(req, res) => {
+  try {
+    await userModel.findOneAndUpdate({_id: req.session.user._id}, {
+      $pull: {
+        shippingAddress: {
+          _id: req.body.id
+        } 
+      }
+    })
+    res.json({successStatus: true})
+  } catch (error) {
+    console.log(error)
+    res.json({successStatus: false})
+  }
+}
+
 module.exports = {
   getDashboard,
   getDashboardEdit,
@@ -178,5 +203,7 @@ module.exports = {
   getAddAddress,
   saveAddress,
   getEditAddressPage,
-  updateAddress
+  updateAddress,
+  getAddresPage,
+  deleteAddress
 }

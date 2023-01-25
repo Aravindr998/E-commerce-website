@@ -9,7 +9,9 @@ const Razorpay = require('razorpay')
 
 const getOrdersPage = async(req, res) => {
   try {
-    const orders = await orderModel.find({customerId: req.session.user._id}).sort({createdAt: -1})
+    const orders = await orderModel.find({customerId: req.session.user._id})
+    .populate('couponId')
+    .sort({createdAt: -1})
     res.render('users/orders', {orders, user: req.session?.user?.fname})
   } catch (error) {
     
@@ -18,8 +20,14 @@ const getOrdersPage = async(req, res) => {
 
 const getOrderDetails = async(req, res) => {
   try {
-    const orderId = req.params.id
-    const order = await orderModel.findById(orderId)
+    const { id } = req.params
+    const payment = await paymentModel.findOne({orderId: id})
+    if(payment.refund && payment.refundStatus != 'processed'){
+      const instance = new Razorpay({key_id: process.env.RAZORPAY_KEY_ID, key_secret: process.env.RAZORPAY_SECRET_KEY})
+      const {status} = await instance.payments.fetchRefund(payment.paymentId, payment.refundId)
+      await paymentModel.findOneAndUpdate({orderId: id}, {$set: {refundStatus: status}})
+    }
+    const order = await orderModel.findById(id)
     .populate('payment')
     res.render('users/order-details', {order, user: req.session?.user?.fname})
   } catch (error) {

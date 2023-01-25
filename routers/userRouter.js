@@ -109,4 +109,8 @@ router.post('/password/reset/:id', isLoggedin, userController.resetPassword)
 
 router.get('/invoice/download/:id', authenticate, userMiddlewares.createInvoice, orderController.downloadInvoice)
 
+router.get('/dashboard/address/manage', authenticate, dashboardController.getAddresPage)
+
+router.patch('/dashboard/address/delete', authenticate, dashboardController.deleteAddress)
+
 module.exports = router

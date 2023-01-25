@@ -3,9 +3,20 @@
 <%- include('../partials/head') %> 
 <body class="pt-5">
 <%- include('../partials/user-navbar') %> 
-<section class="container min-vh-100 pt-5">
+<section class="container min-vh-100">
   <div>
-    <div>
+    <div class="row orders">
+      <div class="col-sm-4 side-bar">
+        <div class="card p-3 m-4">
+          <a class="text-decoration-none" href="/dashboard">Dashboard</a>
+        </div>
+        <div class="card p-3 m-4">
+          <a class="text-decoration-none" href="/orders">Orders</a>
+        </div>
+        <div class="card p-3 m-4 bg-dark">
+          <a class="text-decoration-none text-white" href="/dashboard/address/manage">Manage Address</a>
+        </div>
+      </div>
       <p class="text-danger"><%= message %> </p>
       <form class="row g-3" method="POST" action="/dashboard/address/add">
         <div class="col-12">

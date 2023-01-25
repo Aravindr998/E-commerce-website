@@ -3,75 +3,60 @@
 <%- include('../partials/head') %> 
 <body class="pt-5">
 <%- include('../partials/user-navbar') %> 
-<section class="container min-vh-100 pt-5">
-  <div class="row">
-    <div class="d-flex justify-content-end">
-      <a href="/dashboard/address/add" class="main-button text-decoration-none">Add Address</a>
-    </div>
-    <h1>Dashboard</h1>
-    <div class="row d-flex">
-      <div class="col-md-4">
-        <div class="card p-3 my-4">
-          <div class="d-flex justify-content-between">
-            <p>Name: </p>
-            <p><%= userDetails.fname + " " + userDetails.lname %> </p>
-          </div>
-          <div class="d-flex justify-content-between">
-            <p>Email: </p>
-            <p><%= userDetails.email %> </p>
-          </div>
-          <div class="d-flex justify-content-between">
-            <p>Phone: </p>
-            <p><%= userDetails.phone %> </p>
-          </div>
-          <div class="col-12 d-flex justify-content-end">
-            <a class="main-button text-decoration-none" href="/dashboard/edit">Edit</a>
-          </div>
-        </div> 
-      </div>
-      <div class="col-md-4 my-4 order-card">
-        <a href="/orders" class="text-decoration-none">
-          <div class="card h-100 d-flex flex-row align-items-center justify-content-center">
-            <img class="dashboard-icon me-2 mb-1" src="/assets/icons/box.png" alt="">
-            <h3>Orders</h3>
-          </div>
-        </a>
-      </div>
-      <div class="col-md-4 my-4 order-card">
-        <a href="/wishlist" class="text-decoration-none">
-          <div class="card h-100 d-flex flex-row align-items-center justify-content-center">
-            <img class="dashboard-icon me-2 mb-1" src="/assets/icons/heart.png" alt="">
-            <h3>Wishlist</h3>
-          </div>
-        </a>
-      </div>
-    </div>
-    <% let count = 0 %> 
-    <% if(userDetails.shippingAddress.length>0){ %> 
-      <div class="row">
-      <% userDetails.shippingAddress.forEach(item => { %> 
-        <div class="col-md-6 mb-3">
-          <div class="card d-flex flex-row justify-content-between p-5 position-relative">
-            <p class="col-6">Address <%= ++count %>:</p>
-            <div class="text-end col-6">
-              <p><%= item.street1 %></p>
-              <p><%= item.street2 %></p>
-              <p><%= item.city %></p>
-              <p><%= item.state %></p>
-              <p><%= item.zip %></p>
-            </div>
-            <div class="position-absolute edit-button-address">
-              <a href="/dashboard/address/edit/<%= item._id %> " class="main-button text-decoration-none">Edit</a>
-            </div>
-          </div>
+<div class="orders">
+  <section class="container min-vh-100 pt-5">
+    <div class="row">
+      <div class="col-sm-4 side-bar">
+        <div class="card p-3 m-4 bg-dark">
+          <a class="text-decoration-none text-white" href="/dashboard">Dashboard</a>
         </div>
-      <% }) %> 
+        <div class="card p-3 m-4">
+          <a class="text-decoration-none" href="/orders">Orders</a>
+        </div>
+        <div class="card p-3 m-4">
+          <a class="text-decoration-none" href="/dashboard/address/manage">Manage Address</a>
+        </div>
+      </div>
+      <div class="row d-flex">
+        <div class="col-12">
+          <div class="card p-3">
+            <div class="d-flex">
+              <p class="col-6">Name: </p>
+              <p class="col-6"><%= userDetails.fname + " " + userDetails.lname %> </p>
+            </div>
+            <div class="d-flex">
+              <p class="col-6">Email: </p>
+              <p class="col-6"><%= userDetails.email %> </p>
+            </div>
+            <div class="d-flex">
+              <p class="col-6">Phone: </p>
+              <p class="col-6"><%= userDetails.phone %> </p>
+            </div>
+            <div class="col-12 d-flex justify-content-end">
+              <a class="main-button text-decoration-none" href="/dashboard/edit">Edit</a>
+            </div>
+          </div> 
+        </div>
+        <div class="col-md-6 my-4 order-card">
+          <a href="/cart" class="text-decoration-none">
+            <div class="card h-100 d-flex flex-row align-items-center justify-content-center">
+              <img class="dashboard-icon me-2 mb-1" src="/assets/icons/shoppingcart.png" alt="">
+              <h3>Cart</h3>
+            </div>
+          </a>
+        </div>
+        <div class="col-md-6 my-4 order-card">
+          <a href="/wishlist" class="text-decoration-none">
+            <div class="card h-100 d-flex flex-row align-items-center justify-content-center">
+              <img class="dashboard-icon me-2 mb-1" src="/assets/icons/heart.png" alt="">
+              <h3>Wishlist</h3>
+            </div>
+          </a>
+        </div>
+      </div>
     </div>
-    <% }else{ %>
-      <p>No address added</p>
-      <% } %>  
-  </div>
-</section>
+  </section>
+</div>
 <%- include('../partials/footer') %> 
 <script defer src="/script/userScript.js"></script>
 </body>

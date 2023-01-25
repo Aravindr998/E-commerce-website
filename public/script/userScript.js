@@ -348,3 +348,23 @@ async function buynow(skuId, prodId){
     window.location.href = '/login'
   }
 }
+
+async function deleteAddress(id){
+  try {
+    const response = await fetch('/dashboard/address/delete', {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        id
+      })
+    })
+    const res = await response.json()
+    if(res.successStatus){
+      window.location.href = '/dashboard/address/manage'
+    }
+  } catch (error) {
+    console.log(error)
+  }
+}
