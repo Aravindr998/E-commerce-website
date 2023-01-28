@@ -51,3 +51,53 @@ async function deleteSku(id){
     console.log(error)
   })
 }
+
+const offerForm = document.querySelector('#offer')
+if(offerForm){
+  offerForm.addEventListener('submit', (e) => {
+    e.preventDefault()
+  })
+}
+
+async function applyOffer(id) {
+  const url = '/admin/products/offer/add'
+  const percent = document.querySelector('#offer').value
+  try {
+    const response = await fetch(url, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({id, percent})
+    })
+    const res = await response.json()
+    if(res.successStatus){
+      window.location.reload()
+    }else{
+      document.querySelector('#error-offer p').innerHTML = res.message
+    }
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+async function removeOffer(id) {
+  const url = '/admin/products/offer/remove'
+  try {
+    const response = await fetch(url, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({id})
+    })
+    const res = await response.json()
+    if(res.successStatus){
+      window.location.reload()
+    }else{
+      document.querySelector('#error').innerHTML = 'Some error occured. Please try again later'
+    }
+  } catch (error) {
+    console.log(error)
+  }
+}

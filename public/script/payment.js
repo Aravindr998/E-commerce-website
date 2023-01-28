@@ -90,20 +90,24 @@ async function verifyPayment(payment, order){
 }
 
 async function cancelPayment(order){
-  const response = await fetch('/payment/cancel',{
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      order
+  try {
+    const response = await fetch('/payment/cancel',{
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        order
+      })
     })
-  })
-  const res = await response.json()
-  if(res.successStatus){
-    window.location.href = '/payment/fail'
-  }else{
-    window.location.href = '/payment/fail'
+    const res = await response.json()
+    if(res.successStatus){
+      window.location.href = '/payment/fail'
+    }else{
+      window.location.href = '/'
+    }
+  } catch (error) {
+    console.log(error)
   }
 }
 

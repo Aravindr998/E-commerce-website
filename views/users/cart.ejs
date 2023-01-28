@@ -19,7 +19,7 @@
         <div>
           <p class="product-text-cart m-0"><%= item.productId.title %> </p>
           <p class="text-secondary m-0"><%= item.skus[0].color %></p>
-          <p class="product-text-cart m-0">₹<%= item.skus[0].price %></p>
+          <p class="product-text-cart m-0">₹<%= item.productId?.offerPercent ? Math.round(item.skus[0].price - item.skus[0].price * item.productId?.offerPercent/100) : item.skus[0].price %></p>
         </div>
         <div class="d-flex align-items-center py-4">
           <button class="reduce-button <%= item.productId._id %>" data-subtract="true" data-id="<%= item.skus[0]._id %>" data-prodid="<%= item.productId._id %>" id="dec-button<%= count %>" onclick="changeQty(this.id, -1, '<%= count%>')" <%= item.quantity == 1? 'disabled': '' %> >-</button>
@@ -44,16 +44,17 @@
       <p>PRICE DETAILS</p>
       <div class="d-flex justify-content-between">
         <p>Price <%= cart.length>1?`(${count} items)`:'' %> </p>
-        <p id="cart-total">₹<%= cartTotal %> </p>
+        <% let totalValue = cart.reduce((sum, item) => sum+= (item.productId?.offerPercent ? Math.round(item.skus[0].price - item.skus[0].price * item.productId?.offerPercent/100) : item.skus[0].price) * item.quantity, 0) %> 
+        <p id="cart-total">₹<%= totalValue %> </p>
       </div>
       <div class="d-flex justify-content-between">
         <p>Tax</p>
-        <p id="tax">₹<%= Math.round(cartTotal*0.18) %> </p>
+        <p id="tax">₹<%= Math.round(totalValue*0.18) %> </p>
       </div>
       <hr>
       <div class="d-flex justify-content-between">
         <p>Total</p>
-        <p id="total">₹<%= Math.round(cartTotal + cartTotal*0.18) %> </p>
+        <p id="total">₹<%= Math.round(totalValue + totalValue*0.18) %> </p>
       </div>
       <div class="d-flex justify-content-end mt-5">
         <a class="main-button text-decoration-none" href="/checkout">Place Order</a>

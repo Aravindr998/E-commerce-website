@@ -5,50 +5,68 @@
   <%- include('../partials/admin/admin-navbar') %> 
   <section class="container p-4">
       <div class="row d-flex">
-        <div class="col-md-6 order-sm-1 order-1">
-          <label for="title" class="form-label">Title:</label>
-          <h3><%= product.title %></h3>
-        </div>
-        <div class="col-md-6 d-flex justify-content-end order-md-2 order-4">
-          <div class="m-2">
-            <a href="/admin/products/edit/<%= product.id %>" class="btn btn-primary">Edit</a>
+        <div class="col-12 row">
+          <div class="col-md-6 order-sm-1 order-1">
+            <label for="title" class="form-label">Title:</label>
+            <h3><%= product.title %></h3>
           </div>
-          <div class="m-2">
-            <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#productModal">Delete</button>
-          </div>
-          <div class="modal fade" id="productModal" tabindex="-1" aria-labelledby="productModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h1 class="modal-title fs-5" id="productModalLabel">Delete Product</h1>
-                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                  Are you sure you want to delete the entire product?
-                </div>
-                <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                  <button type="button" class="btn btn-danger"  id="delete-button" onclick="deleteProduct(this.id)" data-url="<%= product.id %> ">Delete</button>
+          <div class="col-md-6 d-flex justify-content-end order-md-2 order-4">
+            <div class="m-2">
+              <a href="/admin/products/edit/<%= product.id %>" class="btn btn-primary">Edit</a>
+            </div>
+            <div class="m-2">
+              <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#productModal">Delete</button>
+            </div>
+            <div class="modal fade" id="productModal" tabindex="-1" aria-labelledby="productModalLabel" aria-hidden="true">
+              <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="productModalLabel">Delete Product</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                    Are you sure you want to delete the entire product?
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-danger"  id="delete-button" onclick="deleteProduct(this.id)" data-url="<%= product.id %> ">Delete</button>
+                  </div>
                 </div>
               </div>
             </div>
+            <div class="m-2">
+              <a href="/admin/products/skus/add/<%= product.id %>" class="btn btn-outline-success">Add Skus</a>
+            </div>
+            <div class="m-2">
+              <button class="btn btn-secondary" <%= product.offerPercent ? '' : 'disabled' %> onclick="removeOffer('<%= product._id %>')">Remove Offers</button>
+            </div>
+            <p id="error" class="text-danger"></p>
           </div>
-          <div class="m-2">
-            <a href="/admin/products/skus/add/<%= product.id %>" class="btn btn-outline-success">Add Skus</a>
+          <div class="col-6 my-4 order-md-3 order-2">
+            <label for="category" class="form-label">Category:</label>
+            <h5><%= product.categoryId.categoryName %> </h5>
           </div>
-          <p id="error" class="text-danger"></p>
+          <div class="col-6 order-md-4 d-flex justify-content-end align-items-end">
+            <form id="offer-form" class="row">
+              <div class="col-7">
+                <label class="form-label" for="offer">Discount in percentage</label>
+                <input id="offer" name="offer" class="form-control" type="number" aria-describedby="error-offer">
+              </div>
+              <div class="col-5 d-flex align-items-end">
+                <button class="btn btn-outline-primary ms-3 mt-1" onclick="applyOffer('<%= product._id %>')">Apply Offer</button>
+              </div>
+              <div id="error-offer" class="form-text text-danger col-12">
+                <p></p>
+              </div>
+            </form>
+          </div>
+          <div class="col-12 order-md-5 order-3">
+            <label for="warranty" class="form-label">Warranty:</label>
+            <p><%= product.warranty %></p>
+          </div>
+          <hr>
         </div>
-        <div class="col-12 my-4 order-md-3 order-2">
-          <label for="category" class="form-label">Category:</label>
-          <h5><%= product.categoryId.categoryName %> </h5>
-        </div>
-        <div class="col-12 order-md-4 order-3">
-          <label for="warranty" class="form-label">Warranty:</label>
-          <p><%= product.warranty %></p>
-        </div>
-        
-        <hr>
-        <div class="table-overflow order-5">
+        <div class="table-overflow order-6">
           <table id="datatable" class="table table-striped">
             <thead>
               <tr>
@@ -68,7 +86,14 @@
               <% count++ %> 
               <tr class="align-middle">
                 <td><%= item.color %></td>
-                <td><%= item.price %></td>
+                <td>
+                  <div>
+                    <% if(product.offerPercent) {%> 
+                    <p class="text-muted m-0"><s class="text-muted">₹<%= item.price %></s></p>
+                    <% } %> 
+                    <p>₹<%= product.offerPercent ? Math.round(item.price - item.price * product.offerPercent/100) : item.price%></p>
+                  </div>
+                </td>
                 <td><%= item.totalStock %></td>
                 <td><%= item.highlights %></td>
                 <td><%= item.dimension %></td>

@@ -24,8 +24,7 @@ const paymentSchema = new mongoose.Schema({
     required: true
   },
   paymentSignature: {
-    type: String,
-    required: true
+    type: String
   },
   status:{
     type: Boolean,

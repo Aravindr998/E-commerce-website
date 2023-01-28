@@ -561,6 +561,51 @@ const deleteSku = async (req, res) => {
   }
 }
 
+const addProductOffer = async(req, res) => {
+  console.log('entered')
+  const {id, percent} = req.body
+  console.log(id)
+  if(!percent){
+    return res.json({
+      successStatus: false,
+      message: 'Field cannot be empty'
+    })
+  }else if(percent>=100){
+    return res.json({
+      successStatus: false,
+      message: 'Offer cannot be greater than or equal to 100%'
+    })
+  }else if(percent <=0){
+    return res.json({
+      successStatus: false,
+      message: 'Offer should be more than 0%'
+    })
+  }
+  try {
+    await productModel.findOneAndUpdate({_id: id}, {$set: {offerPercent: percent}})
+    return res.json({
+      successStatus: true
+    })
+  } catch (error) {
+    console.log(error)
+    return res.json({
+      successStatus: false,
+      message: 'Some error occured, please try again later'
+    })
+  }
+
+}
+
+const removeOffer = async(req, res) => {
+  try {
+    await productModel.findOneAndUpdate({}, {$unset: {offerPercent: ""}})
+    res.json({successStatus: true})
+  } catch (error) {
+    console.log(error)
+    res.json({successStatus: false})
+  }
+}
+
 module.exports = {
   getHomepage,
   getAddProducts,
@@ -576,5 +621,7 @@ module.exports = {
   updateProductSku,
   getAddSkusPage,
   deleteProduct,
-  deleteSku
+  deleteSku,
+  addProductOffer,
+  removeOffer
 }

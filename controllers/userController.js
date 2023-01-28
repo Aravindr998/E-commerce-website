@@ -10,16 +10,55 @@ let otp
 const getHomepage = async(req, res) => {
   try {
     const banner = await bannerModel.findOne({setCurrent: true})
-    const categories = await categoryModel.find()
-    .populate('products')
-    categories.forEach(item => {
-      item.products.splice(3, Infinity)
-      item.products[0]?.skus.forEach((sku, index, array) => {
-        if(sku.isDeleted || sku.totalStock<= 0){
-          array.splice(index, 1)
+    const categories = await categoryModel.aggregate([
+      {
+        $match: {
+          isDeleted: false
         }
-      })
-    })
+      },
+      {
+        $lookup: {
+          from: 'products',
+          localField: '_id',
+          foreignField: 'categoryId',
+          pipeline: [
+            {
+              $unwind: '$skus',
+            },
+            {
+              $match: {
+                'skus.isDeleted': false,
+                'skus.totalStock': {
+                  $gt: 0
+                }
+              }
+            },
+            {
+              $group: {
+                _id: '$_id',
+                title: {$first: '$title'},
+                skus: {$push: '$skus'},
+                categoryId: {$first: '$categoryId'},
+                offerPercent: {$first: '$offerPercent'}
+              }
+            },
+            {
+              $sort: {
+                title: 1
+              }
+            }
+          ],
+          as: 'products'
+        }
+      },
+      {
+        $project: {
+          products: {
+            $slice: ['$products', 0, 3]
+          }
+        }
+      }
+    ])
       if(req.session.user){
         return res.render('home-page', {categories, banner, user: req.session?.user?.fname})
       }else{

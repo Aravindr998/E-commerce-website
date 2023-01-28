@@ -104,4 +104,10 @@ router.get('/product-details', authenticate, adminController.getProductDetails)
 
 router.get('/sales/download', authenticate, adminController.getSalesReport)
 
+//offers
+
+router.patch('/products/offer/add', authenticate, productController.addProductOffer)
+
+router.patch('/products/offer/remove', authenticate, productController.removeOffer)
+
 module.exports = router

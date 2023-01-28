@@ -59,8 +59,14 @@
         <p class="product-details-title pt-4 mb-0"><%= product.title.toUpperCase() %> </p>
         <p class="rating d-inline p-1 rounded-1">Not yet rated</p>
       </div>
-      <div class="pt-5 product-details-price">
-        <p>₹<%= sku.price %> </p>
+      <% if(product.offerPercent) {%>
+        <div class="pt-4 d-flex flex-row">
+          <p class="m-0 fw-bold text-success"><%= product.offerPercent %>% off</p>
+          <p class="ps-3 m-0"><s>₹<%= sku.price %></s></p>
+        </div>
+      <% } %>  
+      <div class="product-details-price">
+        <p>₹<%= product.offerPercent ? Math.round(sku.price - sku.price * product.offerPercent/100) : sku.price %></p>
       </div>
       <div>
         <p><%= product.warranty %> </p>

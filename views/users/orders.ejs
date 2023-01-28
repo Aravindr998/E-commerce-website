@@ -21,46 +21,43 @@
         <div class="col-12 my-2">
           <a href="/orders/<%= order._id %> " class="text-decoration-none">
             <div class="card row d-flex flex-row p-3">
-              <div class="d-flex justify-content-between">
-                <p class="text-muted fw-light">Order id: <%= order._id %> </p>
-                <p>Payment Status: <%= order.paymentMethod == 'COD'? order.paymentMethod : (order.paymentVerified? 'Completed' : 'Pending') %>  </p>
-              </div>
               <% order.items.forEach((item, index, array) => { %> 
               <div class="col-12 row">
-  
-                <div class="col-lg-6">
-                <div>
-                  <p class="fw-bold order-text"><%= item.productName %></p>
+                <div class="col-lg-10 d-flex flex-row">
+                  <div class="col-6">
+                    <p class="fw-bold order-text order-details text-truncate"><%= item.productName %></p>
+                  </div>
+                  <div class="ms-4 col-6">
+                    <p><%= item.color %></p>
+                  </div>
                 </div>
-                <div>
-                  <p><%= item.color %></p>
-                </div>
-              </div>
               <div class="col-lg-2">
                 <div>
                   <p class="">Quantity: <%= item.quantity %> </p>
                 </div>
               </div>
-              <div class="col-lg-4">
-                <% if(item.isCancelled){ %>
-                  <div>
-                    <p class="text-danger"><strong>Order Status: </strong>Cancelled</p>
-                  </div>
-                <% }else if(item.orderStatus == 'Delivered'){ %> 
-                  <div>
-                    <p class="text-success"><strong>Order Status: </strong>Delivered</p>
-                  </div>
-                <% }else{ %>
-                  <div>
-                    <p><strong>Order Status: </strong><%= item.orderStatus %> </p>
-                  </div>
-                <% } %>   
+              
               </div>
-              </div>
-              <% if(index < array.length-1) {%> 
-              <hr> 
-              <% } %> 
+              
             <% }) %>
+            <div class="col-12 d-flex flex-row justify-content-end">
+              <% if(order.isCancelled){ %>
+                <div>
+                  <p class="text-danger"><strong>Order Status: </strong>Cancelled</p>
+                </div>
+              <% }else if(order.orderStatus == 'Delivered'){ %> 
+                <div>
+                  <p class="text-success"><strong>Order Status: </strong>Delivered</p>
+                </div>
+              <% }else{ %>
+                <div>
+                  <p><strong>Order Status: </strong><%= order.orderStatus %> </p>
+                </div>
+                <div class="d-flex justify-content-between ms-3">
+                  <p>Payment Status: <%= order.paymentMethod == 'COD'? order.paymentMethod : (order.paymentVerified? 'Completed' : 'Pending') %>  </p>
+                </div>
+              <% } %>   
+            </div>
           </div>
         </a>
       </div>

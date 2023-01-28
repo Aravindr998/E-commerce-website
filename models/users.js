@@ -73,6 +73,9 @@ const userSchema = new mongoose.Schema({
       },
       skus: {
         type: Array 
+      },
+      price: {
+        type: Number
       }
     }]
   },

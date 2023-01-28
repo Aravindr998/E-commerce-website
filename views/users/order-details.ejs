@@ -4,72 +4,82 @@
 <body class="pt-5">
 <%- include('../partials/user-navbar') %> 
 <section class="container min-vh-100 pt-5">
-  <div class="row">
-    <div class="col-12 d-flex justify-content-between">
-      <div>
-        <p class="text-muted"><strong>Order Id: </strong><%= order._id %> </p>
-        <p class="fs-3 fw-bold">Total amount: ₹<%= order.totalAmount %> </p>
-        <p class="fs-5">Ordered on: <%= order.createdAt.toString().slice(0,16) %> </p>
-      </div>
-      <div class="px-4">
+  <div class="row d-flex justify-content-between">
+    <div class="col-6">
+      <p class="text-muted">Order Id: <%= order._id %></p>
+      <h5>Ordered on: <%= order.createdAt.toString().slice(0,16) %></h5>
+    </div>
+    <div class="col-6">
+      <% if(order.isCancelled){ %>
         <div>
-          <p class="fw-bold">Address:</p>
+          <h3 class="fw-bold text-danger d-flex flex-column justify-content-between text-end">Order status: Cancelled</h3>
         </div>
+        <% if(order.payment && order?.payment[0]?.refund) {%> 
+          <div>
+            <p class="fw-bold text-end"><%= (order?.payment[0]?.refundStatus == 'processed' ? 'Refund Completed' : 'Refund Pending') %> </p>
+          </div>
+        <% } %>  
+      <% }else if(order.orderStatus == 'Delivered'){ %>
         <div>
-          <p><%= order.address.street1 %>, <%= order.address.street2 %>, <%= order.address.city %>, <%= order.address.state %>, <%= order.address.zip %></p>
-        </div>
-        <% if(order.payment[0]?.paymentId) {%> 
-        <div>
-          Transaction Id:
-        </div>
-        <div>
-          <%= order.payment[0]?.paymentId %> 
+          <h3 class="fw-bold text-success d-flex flex-column justify-content-between text-end">Order status: Delivered</h3>
+        </div> 
+      <% }else{ %>
+        <div class="d-flex flex-column justify-content-between text-end">
+          <div>
+            <p class="fw-bold">Order status: <%= order.orderStatus %> </p>
+            <p>Payment status: <%= order.paymentMethod == 'COD'? order.paymentMethod : (order.paymentVerified? 'Completed' : 'Pending') %></p>
+          </div>
         </div>
         <% } %> 
-      </div>
     </div>
-    <% let count = 0 %> 
-    <% order.items.forEach(item => { %> 
-      <% count++ %> 
-    <div class="col-12">
-      <div class="card row d-flex flex-row p-3 my-2">
-        <div class="col-md-4 d-flex justify-content-center">
-          <img class="checkout-images" src="/<%= item.image %> " alt="">
+    <div class="col-sm-6">
+      <% order.items.forEach(item => { %>
+        <div class="card d-flex flex-row p-4 m-2">
+          <div class="col-6">
+            <img class="checkout-images" src="/<%= item.image %>" alt="">
+          </div>
+          <div class="col-6">
+            <h6><%= item.productName %></h6>
+            <p class="text-muted"><%= item.color %></p>
+            <p class="fw-bold">₹<%= item.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") %></p>
+            <p>Quantity: <%= item.quantity %> </p>
+          </div>
         </div>
-        <div class="col-md-4">
-          <p><%= item.productName %></p>
-          <p class="text-muted"><%= item.color %></p>
-          <p>₹<%= Math.round(item.price*1.18) %> </p>
-          <p class="">Quantity: <%= item.quantity %> </p>
+      <% }) %>
+    </div>
+    <div class="col-sm-4">
+      <div class=" my-5">
+        <h3>Address</h3>
+        <p><%= order.address.street1 + ', '+ order.address.street2 + ', ' + order.address.city + ', ' + order.address.state + ', ' + order.address.zip%></p>
+      </div>
+      <div class="d-flex flex-row mb-5">
+        <div class="col-6">
+          <p>Total:</p>
+          <p>Tax:</p>
+          <% if(order.couponId) {%> 
+          <p><%= order.couponId?.code %>:</p>
+          <% } %> 
+          <p class="fw-bold">Grand Total:</p>
         </div>
-        <div class="col-md-4">
-          <% if(item.isCancelled){ %>
-            <div>
-              <p class="text-danger">Order status: Cancelled</p>
-              <p class="fw-bold">Refund: <%= order.payment[0].refundStatus == 'processed' ? 'Completed' : 'Pending' %> </p>
-            </div>
-          <% }else if(item.orderStatus == 'Delivered'){ %>
-            <div>
-              <p class="fw-bold text-success">Order status: Delivered</p>
-            </div> 
-          <% }else{ %>
-            <div class="h-100 d-flex flex-column justify-content-between" id="status<%= count %>">
-              <div>
-                <p id="order-status<%= count %>">Order status: <%= item.orderStatus %> </p>
-                <p>Payment status: <%= order.paymentMethod == 'COD'? order.paymentMethod : (order.paymentVerified? 'Completed' : 'Pending') %></p>
-              </div>
-              <div>
-                <button class="sub-button" data-bs-toggle="modal" data-bs-target="#modal<%= count %>">Cancel Order</button>
-              </div>
-            </div>
-            <div id="cancel<%= count %>" class="d-none">
-              <p class="text-danger">Order status: Cancelled</p>
-            </div>
-          <% } %>   
+        <div class="col-6">
+          <p>₹<%= total %> </p>
+          <p>₹<%= Math.round(total*0.18) %> </p>
+          <% if(order.couponId) {%> 
+          <p>-₹<%= Math.round(discount) %>:</p>
+          <% } %> 
+          <p class="fw-bold">₹<%= order.totalAmount %> </p>
         </div>
       </div>
+      <% if(!order.isCancelled){ %> 
+      <div class="col-12 d-flex m-3 justify-content-between">
+        <a href="/invoice/download/<%= order._id %>" class="main-button text-decoration-none">Download Invoice</a>
+        <% if(order.orderStatus != 'Delivered') {%> 
+        <button class="sub-button ms-3" data-bs-toggle="modal" data-bs-target="#modal">Cancel Order</button>
+        <% } %> 
+      </div>
+      <% } %> 
     </div>
-    <div class="modal fade" id="modal<%= count %>" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal fade" id="modal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header">
@@ -81,14 +91,10 @@
           </div>
           <div class="modal-footer">
             <button type="button" class="sub-button" data-bs-dismiss="modal">Close</button>
-            <button type="button" class="main-button" data-bs-dismiss="modal" onclick="cancelOrder('<%= item._id %>', 'status<%= count %>', 'cancel<%= count %>')">Confirm</button>
+            <button type="button" class="main-button" data-bs-dismiss="modal" onclick="cancelOrder('<%= order._id %>')">Confirm</button>
           </div>
         </div>
       </div>
-    </div>
-    <% }) %> 
-    <div class="col-12 d-flex m-3 justify-content-end">
-      <a href="/invoice/download/<%= order._id %>" class="sub-button text-decoration-none">Download Invoice</a>
     </div>
   </div>
 </section>

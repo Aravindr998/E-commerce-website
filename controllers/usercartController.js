@@ -16,7 +16,7 @@ const getCartPage = async(req, res) => {
         })
         array[index].skus = temp
       })
-      
+      console.log(user.cart)
       const cart = user.cart
       const {cartTotal} = user
       res.render('users/cart', {cart, cartTotal, user: req.session?.user?.fname})
@@ -35,14 +35,6 @@ const addToCart = async(req, res) => {
   const skuid = req.params.skuid
   try {
     const user = await userModel.findById(req.session.user._id)
-    const product = await productModel.findById(prodId)
-    let sku
-    let total;
-    product.skus.forEach(item => {
-      if(item._id == skuid){
-        total= item.price
-      }
-    })
     const cartItem = {
       productId: prodId,
       skuId: skuid,
@@ -56,9 +48,8 @@ const addToCart = async(req, res) => {
     })
     if(flag == 0){
       await userModel.findOneAndUpdate({_id: req.session.user._id}, {$push: {cart: cartItem}})
-      await userModel.findOneAndUpdate({_id: req.session.user._id}, {$inc: {cartTotal: total}})
     }else{
-      await userModel.findOneAndUpdate({_id: req.session.user._id, 'cart.skuId': skuid}, {$inc: {'cart.$.quantity': 1, cartTotal: total}})
+      await userModel.findOneAndUpdate({_id: req.session.user._id, 'cart.skuId': skuid}, {$inc: {'cart.$.quantity': 1}})
     }
     res.json({
       successStatus: true,
@@ -77,11 +68,6 @@ const changeQuantity = async(req, res) => {
   try {
     const product = await productModel.findById(req.body.prodId)
     let total
-    product.skus.forEach(item => {
-      if(item._id == req.body.skuId){
-        total= item.price*req.body.amount
-      }
-    })
     const user = await userModel.findById(req.session.user._id)
     let flag = true
     let quantity
@@ -103,12 +89,25 @@ const changeQuantity = async(req, res) => {
     }
     if(flag){
       await userModel.findOneAndUpdate({_id: req.session.user._id, 'cart.skuId': req.body.skuId}, {
-        $inc: {'cart.$.quantity': req.body.amount, cartTotal: total}
+        $inc: {'cart.$.quantity': req.body.amount}
       })
+      const cart = await userModel.findById(req.session.user._id)
+      .populate('cart.productId')
+      cart.cart.forEach((item, index, array) => {
+        let temp
+        item.productId.skus.forEach( sku => {
+          if(sku._id.toString() == item.skuId.toString()){
+            temp = sku
+          }
+        })
+        array[index].skus = temp
+      })
+      const total = cart.cart.reduce((sum, item) => sum += (item.productId.offerPercent ? item.skus[0].price * (1 - item.productId.offerPercent/100) : item.skus[0].price) * item.quantity, 0)
+      console.log(total)
       return res.json({
         successStatus: true,
         quantity: quantity + req.body.amount,
-        cartTotal: user.cartTotal + total
+        cartTotal: total
       })
     }else{
       return res.json({
@@ -168,7 +167,6 @@ const removeItem = async(req, res) => {
     const quantity = userCart[0].cart.quantity
     const totalPrice = -sku[0].skus.price*quantity
     await userModel.findOneAndUpdate({_id: req.session.user._id}, {$pull: {cart: {skuId: req.body.skuId}}})
-    await userModel.findOneAndUpdate({_id: req.session.user._id}, {$inc: {cartTotal: totalPrice}})
     return res.json({
       successStatus: true
     })
@@ -184,7 +182,6 @@ const addItemToCart = async(req, res) => {
   try {
     const user = await userModel.findById(req.session.user._id)
     const product = await productModel.findById(prodId)
-    let sku
     let total;
     product.skus.forEach(item => {
       if(item._id == skuid){
@@ -206,10 +203,8 @@ const addItemToCart = async(req, res) => {
     if(flag == 0){
       console.log()
       await userModel.findOneAndUpdate({_id: req.session.user._id}, {$push: {cart:{ $each: [cartItem], $position: 0}}})
-      await userModel.findOneAndUpdate({_id: req.session.user._id}, {$inc: {cartTotal: total}})
     }else{
-      console.log(flag)
-      await userModel.findOneAndUpdate({_id: req.session.user._id, 'cart.skuId': skuid}, {$inc: {'cart.$.quantity': 1, cartTotal: total}})
+      await userModel.findOneAndUpdate({_id: req.session.user._id, 'cart.skuId': skuid}, {$inc: {'cart.$.quantity': 1}})
     }
     res.json({
       successStatus: true,

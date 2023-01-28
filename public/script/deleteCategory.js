@@ -69,11 +69,10 @@ async function deleteBanner(id, bannerId){
   }
 }
 
-async function changeStatus(id, selectId, orderId, itemId){
+async function changeStatus(id, selectId, orderId){
   const url = 'http://localhost:4000/admin/orders'
   const body = {
     orderId,
-    itemId,
     orderStatus: document.getElementById(selectId).value
   } 
   try {
@@ -95,10 +94,10 @@ async function changeStatus(id, selectId, orderId, itemId){
   }
 }
 
-async function cancelOrder(div1, div2, itemId, selectId){
+async function cancelOrder(div1, div2, orderId, selectId){
   const url = 'http://localhost:4000/admin/orders/cancel'
   const body = {
-    itemId
+    orderId
   } 
   try {
     const response = await fetch(url, {
@@ -112,7 +111,7 @@ async function cancelOrder(div1, div2, itemId, selectId){
     if(res.successStatus){
       const buttonDiv = document.getElementById(div1)
       const cancelledDiv = document.getElementById(div2)
-      buttonDiv.style.display = 'none'
+      buttonDiv.classList.add('d-none')
       cancelledDiv.classList.remove('d-none')
       document.getElementById(selectId).disabled = true
     }else{

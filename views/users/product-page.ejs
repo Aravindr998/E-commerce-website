@@ -79,7 +79,10 @@
                 <div class="m-2">
                   <h5 class="product-title text-center"><%= product.title %> </h5>
                   <p class="text-secondary"><%= product.skus.color %></p>
-                  <p class="text-success">₹<%= product.skus.price %> </p>
+                  <p class="text-success">₹<%= product.offerPercent ? Math.round(product.skus.price - product.skus.price * product.offerPercent/100) : product.skus.price %> </p>
+                  <% if(product.offerPercent) {%>
+                    <p class="m-0"><span class="fw-bold text-success"><%= product.offerPercent %>% off</span> <span class="text-muted"><s>₹<%= product.skus.price %> </s></span></p>
+                  <% } %>  
                 </div>
               </div>
             </div>

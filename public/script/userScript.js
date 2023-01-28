@@ -284,7 +284,7 @@ async function removeFromCart(id, prodId, skuId){
   }
 }
 
-async function cancelOrder(id, divStatus, divCancel){
+async function cancelOrder(id){
   const url = 'http://localhost:4000/orders/cancel'
   const body = {
     id
@@ -299,10 +299,7 @@ async function cancelOrder(id, divStatus, divCancel){
     })
     const res = await response.json()
     if(res.successStatus){
-      const div = document.getElementById(divStatus)
-      div.classList.remove('d-flex')
-      div.classList.add('d-none')
-      document.getElementById(divCancel).classList.remove('d-none')
+      location.reload()
     }else{
       document.querySelector('#error').innerHTML = 'Some Error occured. Please try again later'
     }

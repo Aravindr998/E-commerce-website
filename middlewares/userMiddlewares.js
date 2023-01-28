@@ -36,6 +36,18 @@ const checkCoupon = async(req, res, next) => {
     if(req.session.couponApplied){
       const coupon = await couponModel.findById(req.session.couponApplied.couponId)
       const user = await userModel.findById(req.session.user._id)
+      .populate('cart.productId')
+      if(user.cart.length>0){
+        user.cart.forEach((item, index, array) => {
+          let temp
+          item.productId.skus.forEach( sku => {
+            if(sku._id.toString() == item.skuId.toString()){
+              temp = sku
+            }
+          })
+          array[index].skus = temp
+        })
+      }
       if(coupon.users.includes(req.session.user._id)){
         return res.json({
           successStatus: false,
@@ -43,13 +55,14 @@ const checkCoupon = async(req, res, next) => {
         })
       }
       let discount;
+      const total = user.cart.reduce((sum, item) => sum+=(item.productId.offerPercent ? Math.round(item.skus[0].price * (1 - item.productId.offerPercent/100)) : item.skus[0].price) * item.quantity, 0)
       if(coupon.minPurchaseValue){
-        if(user.cartTotal < coupon.minPurchaseValue){
+        if(total < coupon.minPurchaseValue){
           req.session.couponApplied = null
           return next()
         } 
         if(coupon.isPercentage){
-          discount = user.cartTotal * coupon.discount/100
+          discount = total * coupon.discount/100
         }else{
           discount = coupon.discount
         }

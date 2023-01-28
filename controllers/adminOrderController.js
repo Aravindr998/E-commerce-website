@@ -16,16 +16,15 @@ const getOrdersPage = async(req, res) => {
 }
 
 const changeOrderStatus = async(req, res) => {
+  const {orderId , orderStatus} = req.body
   try {
     const order = await orderModel.findOneAndUpdate({
-      items: {
-        $elemMatch: {
-          _id: req.body.itemId
-        }
-      }
+      _id: orderId
     },
     {
-      'items.$.orderStatus': req.body.orderStatus
+      $set: {
+        orderStatus: orderStatus
+      }
     })
     res.json({successStatus: true})
   } catch (error) {
@@ -35,76 +34,36 @@ const changeOrderStatus = async(req, res) => {
 }
 
 const cancelOrder = async(req, res) => {
+  const {orderId} = req.body
   try {
-    await orderModel.updateMany({
-      items: {
-        $elemMatch: {
-          _id: req.body.itemId
-        }
-      }
+    const order = await orderModel.findOneAndUpdate({
+      _id: orderId
     }, 
     {
       $set: {
-        'items.$.isCancelled': true
+        isCancelled: true
       }
     })
-    const quantity = await orderModel.aggregate([
-      {
-        $match: {
-          items: {
-            $elemMatch: {
-              _id: mongoose.Types.ObjectId(req.body.itemId)
-            }
+    for(let item of order.items){
+      await productModel.findOneAndUpdate({
+        skus: {
+          $elemMatch: {
+            _id: mongoose.Types.ObjectId(item.skuId)
           }
         }
       },
       {
-        $unwind: '$items'
-      },
-      {
-        $match: {
-          'items._id': mongoose.Types.ObjectId(req.body.itemId)
+        $set: {
+          'skus.$.totalStock': item.quantity
         }
-      },
-      {
-        $project: {
-          'items.skuId': 1,
-          'items.quantity': 1
-        }
-      }
-    ])
-    console.log(quantity)
-    await productModel.findOneAndUpdate({
-      skus: {
-        $elemMatch: {
-          _id: quantity[0].items.skuId
-        }
-      }
-    },
-    {
-      $inc: {
-        'skus.$.totalStock': quantity[0].items.quantity
-      }
-    })
-    const order = await orderModel.findOne({items: {$elemMatch: {_id: req.body.itemId}}})
+      })
+    }
     if(order.paymentMethod == 'Razorpay' && order.paymentVerified == true){
-      const amount = await orderModel.aggregate([
-        {
-          $unwind: '$items'
-        },
-        {
-          $match: {
-            'items._id': mongoose.Types.ObjectId(req.body.itemId)
-          }
-        }
-      ])
-      console.log(amount)
-      console.log('entered')
       let refund
       const payment = await paymentModel.findOne({orderId: order._id})
       const instance = new Razorpay({ key_id: process.env.RAZORPAY_KEY_ID, key_secret: process.env.RAZORPAY_SECRET_KEY })
       instance.payments.refund(payment.paymentId,{
-        "amount": amount[0].items.price*100,
+        "amount": order.totalAmount*100,
         "speed": "normal",
         "receipt": payment._id
       }, async(err, refundDetails) => {

@@ -82,7 +82,7 @@ const getOrderDetails = async(req, res) => {
       },
       {
         $match: {
-          'items.isCancelled': false,
+          isCancelled: false,
           paymentVerified: true
         }
       },
@@ -125,7 +125,7 @@ const getProductDetails = async(req, res) => {
       },
       {
         $match: {
-          'items.isCancelled': false,
+          isCancelled: false,
           paymentVerified: true,
           $expr: {
             $eq: ['$currMonth', '$docMonth']
@@ -166,7 +166,7 @@ const getSalesReport = async(req, res) => {
       },
       {
         $match: {
-          'items.isCancelled': false,
+          isCancelled: false,
           paymentVerified: true,
           $expr: {
             $eq: ['$currMonth', '$docMonth']

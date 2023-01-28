@@ -14,7 +14,7 @@
       <% if(item.products.length>0) {%>
         <% item.products.forEach((product, index) => { %>
           <div class="col-md-3">
-            <a class="product-anchor" href="/products/details/<%= product._id %>/<%= product.skus[0]._id %>">
+            <a class="product-anchor" href="/products/details/<%= product?._id %>/<%= product?.skus[0]?._id %>">
               <div class="card product-card d-flex flex-column p-4 m-4 justify-content-center">
                 <div class="d-flex justify-content-center pb-4">
                   <img class="product-card-image" src="/<%= product.skus[0].images[0] %> " alt="">
@@ -23,7 +23,7 @@
                   <p class="text-center product-card-title"><%= product.title %></p>
                 </div>
                 <div class="d-flex justify-content-center">
-                  <p class="text-success">From ₹<%= product.skus[0].price %> </p>
+                  <p class="text-success">From ₹<%= product.offerPercent ? Math.round(product.skus[0].price - product.skus[0].price * product.offerPercent/100) : product.skus[0].price%></p>
                 </div>
               </div>
             </a>

@@ -23,19 +23,19 @@
           <tbody>
             <% let count = 0 %> 
             <% orders.forEach(order => { %>
-              <% order.items.forEach(item => { %>
-                <tr>
-                  <td class="align-middle"><%= ++count %></td>
-                  <td class="align-middle table-image-orders">
-                    <div>
-                      <div>
-                        <img class="image-table" src="/<%= item.image %> " alt="">
-                      </div>
+              <tr>
+                <td class="align-middle"><%= ++count %></td>
+                <td class="align-middle">
+                  <div>
+                    <% order.items.forEach(item => { %>
                       <div>
                         <p class="fw-bold"><%= item.productName %></p>
-                        <p class="text-muted"><%= item.color %></p>
-                        <p>Quantity: <%= item.quantity %></p>
+                        <div class="d-flex flex-row">
+                          <p class="text-muted me-3"><%= item.color %></p>
+                          <p>Quantity: <%= item.quantity %></p>
+                        </div>
                       </div>
+                      <% }) %>  
                     </div>
                   </td>
                   <td class="align-middle">
@@ -48,22 +48,22 @@
                   <td class="align-middle"><%= new Date(order.createdAt).toLocaleDateString("en-GB") %></td>
                   <td class="align-middle">
                     <div>
-                      <select class="form-select" name="orderStatus" id="status<%= count %>" <%= item.isCancelled ? 'disabled' : '' %> >
-                        <option value="Placed" <%= item.orderStatus == 'Placed' ? 'selected' : '' %> >Placed</option>
-                        <option value="Confirmed" <%= item.orderStatus == 'Confirmed' ? 'selected' : '' %>>Confirmed</option>
-                        <option value="Shipped" <%= item.orderStatus == 'Shipped' ? 'selected' : '' %>>Shipped</option>
-                        <option value="Delivered" <%= item.orderStatus == 'Delivered' ? 'selected' : '' %>>Delivered</option>
+                      <select class="form-select" name="orderStatus" id="status<%= count %>" <%= order.isCancelled ? 'disabled' : '' %> >
+                        <option value="Placed" <%= order.orderStatus == 'Placed' ? 'selected' : '' %> >Placed</option>
+                        <option value="Confirmed" <%= order.orderStatus == 'Confirmed' ? 'selected' : '' %>>Confirmed</option>
+                        <option value="Shipped" <%= order.orderStatus == 'Shipped' ? 'selected' : '' %>>Shipped</option>
+                        <option value="Delivered" <%= order.orderStatus == 'Delivered' ? 'selected' : '' %>>Delivered</option>
                       </select>
                     </div>
                   </td>
                   <td class="align-middle">
                     <div>
-                      <% if(item.isCancelled){ %>
+                      <% if(order.isCancelled){ %>
                         <button class="btn btn-danger" disabled>Cancelled</button>
                         <% }else{ %>  
-                          <div id="button-div<%= count %>">
-                            <button class="btn btn-primary" id="change-status-button<%= count  %> " onclick="changeStatus(this.id, 'status<%= count %>', '<%= order._id %>', '<%= item._id %>')">Save Changes</button>
-                            <button class="btn btn-danger" id="cancel-button<%= count %>" data-bs-toggle="modal" data-bs-target="#modal<%= count %>">Cancel Order</button>
+                          <div id="button-div<%= count %>" class="d-flex flex-column">
+                            <button class="btn btn-primary" id="change-status-button<%= count  %> " onclick="changeStatus(this.id, 'status<%= count %>', '<%= order._id %>')">Save Changes</button>
+                            <button class="btn btn-danger mt-3" id="cancel-button<%= count %>" data-bs-toggle="modal" data-bs-target="#modal<%= count %>">Cancel Order</button>
                           </div>
                           <div class="d-none" id="cancelled-div<%= count %>">
                             <button class="btn btn-danger" disabled>Cancelled</button>
@@ -84,12 +84,11 @@
                       </div>
                       <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="cancelOrder('button-div<%= count %>', 'cancelled-div<%= count %>', '<%= item._id %>', 'status<%= count %>')">Confirm</button>
+                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="cancelOrder('button-div<%= count %>', 'cancelled-div<%= count %>', '<%= order._id %>', 'status<%= count %>')">Confirm</button>
                       </div>
                     </div>
                   </div>
                 </div>
-              <% }) %>  
             <% }) %>  
           </tbody>
         </table>

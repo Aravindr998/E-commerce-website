@@ -16,6 +16,7 @@ const getCheckoutPage = async(req, res) => {
   if(req.session.couponApplied){
     discount = req.session.couponApplied
   }
+  console.log(discount)
   try {
     const user = await userModel.findById(req.session.user._id)
     let skuId = []
@@ -108,6 +109,21 @@ const checkoutCod = async(req, res) => {
         }
       }
     ])
+    const cart = await userModel.findById(req.session.user._id)
+      .populate('cart.productId')
+      if(cart.cart.length>0){
+        cart.cart.forEach((item, index, array) => {
+          let temp
+          item.productId.skus.forEach( sku => {
+            if(sku._id.toString() == item.skuId.toString()){
+              temp = sku
+            }
+          })
+          array[index].skus = temp
+        })
+      }
+    const total = cart.cart.reduce((sum, item) => sum+=(item.productId.offerPercent ? Math.round(item.skus[0].price * (1 - item.productId.offerPercent/100)) : item.skus[0].price) * item.quantity, 0)
+    console.log(total)
     const user = users[0]
     const order = new orderModel({
       customerId: req.session.user._id,
@@ -117,7 +133,7 @@ const checkoutCod = async(req, res) => {
       'address.state': user.shippingAddress.state,
       'address.zip': user.shippingAddress.zip,
       phone: user.phone,
-      totalAmount: Math.round(user.cartTotal * 1.18),
+      totalAmount: Math.round(total * 1.18),
       paymentMethod: 'COD',
       paymentVerified: true,
     })
@@ -129,18 +145,18 @@ const checkoutCod = async(req, res) => {
       }
       let discount;
       if(coupon.minPurchaseValue){
-        if(user.cartTotal < coupon.minPurchaseValue){
+        if(total < coupon.minPurchaseValue){
           req.session.couponApplied = null
           return res.redirect('/checkout')
         } 
         if(coupon.isPercentage){
-          discount = user.cartTotal * coupon.discount/100
+          discount = total * coupon.discount/100
         }else{
           discount = coupon.discount
         }
         req.session.couponApplied = null
       }
-      order.totalAmount = Math.round(user.cartTotal * 1.18 - discount)
+      order.totalAmount = Math.round(total * 1.18 - discount)
       await couponModel.findOneAndUpdate({_id: req.body.couponId}, {$push: {users: req.session.user._id}})
     }
     let skuId = []
@@ -208,7 +224,7 @@ const checkoutCod = async(req, res) => {
         productName: item.skus[0].title,
         color: item.skus[0].skus.color,
         quantity: item.quantity,
-        price: item.skus[0].skus.price,
+        price: item.skus[0].offerPercent ? Math.round(item.skus[0].skus.price * (1 - item.skus[0].offerPercent/100)) : item.skus[0].skus.price,
         image: item.skus[0].skus.images[0]
       }
       order.items.push(items)
@@ -233,8 +249,7 @@ const checkoutCod = async(req, res) => {
     },
     {
       $set:{
-        cart: [],
-        cartTotal: 0
+        cart: []
       }
     })
     req.session.orderplaced = true
@@ -255,8 +270,19 @@ const getOrderPlacedPage = (req, res) => {
 const addCoupon = async(req, res) => {
   try {
     const coupon = await couponModel.findById(req.body.id)
-    console.log(coupon)
     const user = await userModel.findById(req.session.user._id)
+    .populate('cart.productId')
+    if(user.cart.length>0){
+      user.cart.forEach((item, index, array) => {
+        let temp
+        item.productId.skus.forEach( sku => {
+          if(sku._id.toString() == item.skuId.toString()){
+            temp = sku
+          }
+        })
+        array[index].skus = temp
+      })
+    }
     let discount;
     if(coupon.users.includes(req.session.user._id)){
       return res.json({
@@ -264,15 +290,18 @@ const addCoupon = async(req, res) => {
         message: 'You have already availed this offer'
       })
     }
+    console.log(user.cart[0].skus)
+    const total = user.cart.reduce((sum, item) => sum+=(item.productId.offerPercent ? Math.round(item.skus[0].price * (1 - item.productId.offerPercent/100)) : item.skus[0].price) * item.quantity, 0)
+    console.log(total)
     if(coupon.minPurchaseValue){
-      if(user.cartTotal < coupon.minPurchaseValue){
+      if(total < coupon.minPurchaseValue){
         return res.json({
           successStatus: false,
-          message: `Please add items worth Rs. ${coupon.minPurchaseValue - user.cartTotal} more to avail this offer`
+          message: `Please add items worth Rs. ${coupon.minPurchaseValue - total} more to avail this offer`
         })
       } 
       if(coupon.isPercentage){
-        discount = user.cartTotal * coupon.discount/100
+        discount = total * coupon.discount/100
       }else{
         discount = coupon.discount
       }
@@ -281,6 +310,7 @@ const addCoupon = async(req, res) => {
         couponId: coupon._id,
         couponCode: coupon.code
       }
+      console.log(req.session.couponApplied)
       return res.json({
         successStatus: true
       })
@@ -335,7 +365,6 @@ const verifyPayment = async(req, res) => {
       {
         $set:{
           cart: [],
-          cartTotal: 0
         }
       })
       const payment = new paymentModel({
@@ -353,7 +382,7 @@ const verifyPayment = async(req, res) => {
     }else{
       const order = await orderModel.findOneAndUpdate({_id: req.body.order.receipt}, {
         $set: {
-          'items.$[].isCancelled': true
+          isCancelled: true
         }
       })
       return res.json({successStatus:false})
@@ -367,7 +396,7 @@ const cancelPayment = async(req, res) => {
   try {
     const order = await orderModel.findOneAndUpdate({_id: req.body.order.receipt}, {
       $set: {
-        'items.$[].isCancelled': true,
+        isCancelled: true,
       }
     })
     res.json({successStatus: true})
@@ -378,21 +407,23 @@ const cancelPayment = async(req, res) => {
 }
 
 const paymentFailure = async(req, res) => {
+  console.log('on payment cancelled page')
+  console.log(req.body.order)
   try {
     const payment = new paymentModel({
       orderId: req.body.order.receipt,
       customerId: req.session.user._id,
-      paymentId: req.body.payment['razorpay_payment_id'],
-      razorpayOrderId: req.body.payment['razorpay_order_id'],
-      paymentSignature: req.body.payment['razorpay_signature'],
+      paymentId: req.body.payment.error.metadata['payment_id'],
+      razorpayOrderId: req.body.payment.error.metadata['order_id'],
       status: false
     })
     await payment.save()
     const order = await orderModel.findOneAndUpdate({_id: req.body.order.receipt}, {
       $set: {
-        'items.$[].isCancelled': true,
+        isCancelled: true,
       }
     })
+    console.log(order)
     res.json({successStatus: true})
   } catch (error) {
     console.log(error)

@@ -76,7 +76,7 @@
                 <div>
                   <p class="product-text-cart m-0"><%= item.skus[0].title %> </p>
                   <p class="text-secondary"><%= item.skus[0].skus.color %></p>
-                  <p class="product-text-cart m-0">₹<%= item.skus[0].skus.price %></p>
+                  <p class="product-text-cart m-0">₹<%= item.skus[0].offerPercent ? Math.round(item.skus[0].skus.price * (1 - item.skus[0].offerPercent/100)) : item.skus[0].skus.price %></p>
                   <p>Quantity: <%= item.quantity %></p>
                 </div>
               </div>
@@ -90,11 +90,12 @@
           <p>PRICE DETAILS</p>
           <div class="d-flex justify-content-between">
             <p>Price</p>
-            <p id="cart-total">₹<%= userDetails.cartTotal %> </p>
+            <% let total = userDetails.cart.reduce((sum, item) => sum+= (item.skus[0]?.offerPercent ? Math.round(item.skus[0].skus.price * (1 - item.skus[0].offerPercent/100)) : item.skus[0].skus.price) * item.quantity, 0) %> 
+            <p id="cart-total">₹<%= total %> </p>
           </div>
           <div class="d-flex justify-content-between">
             <p>Tax</p>
-            <p id="tax">₹<%= Math.round(userDetails.cartTotal * 0.18) %></p>
+            <p id="tax">₹<%= Math.round(total * 0.18) %></p>
           </div>
           <% if(discount.couponCode) {%> 
           <div class="d-flex justify-content-between text-success fw-bold">
@@ -109,9 +110,9 @@
           <div class="d-flex justify-content-between">
             <p>Total</p>
             <% if(discount.couponCode) {%> 
-                <p id="total">₹<%= Math.round(userDetails.cartTotal * 1.18 - discount.discount) %></p>
+                <p id="total">₹<%= Math.round(total * 1.18 - discount.discount) %></p>
               <% }else{ %>
-                <p id="total">₹<%= Math.round(userDetails.cartTotal * 1.18) %></p>
+                <p id="total">₹<%= Math.round(total * 1.18) %></p>
             <% } %>  
           </div>
           <hr>
