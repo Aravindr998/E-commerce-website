@@ -140,3 +140,96 @@ async function deleteCoupon(id){
     document.querySelector('#error').innerHTML = 'Some error occured. Please try again later'
   }
 }
+
+async function addCategoryOffer(inputId, categoryId){
+  try {
+    const url = '/admin/categories/offer/add'
+    const input = document.getElementById(inputId)
+    const percent = input.value
+    const response = await fetch(url, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        categoryId,
+        percent
+      })
+    })
+    const res = await response.json()
+    if(res.successStatus){
+      window.location.reload()
+    }else{
+      document.querySelector('#error').innerHTML = res.message
+      input.classList.add('is-invalid')
+    }
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+async function removeCategoryOffer(id){
+  const url = '/admin/categories/offer/remove'
+  const response = await fetch(url, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({id}) 
+  })
+  const res = await response.json()
+  if(res.successStatus){
+    window.location.reload()
+  }else{
+    document.querySelector('#error').innerHTML = 'Some error occured. Please try again later'
+  }
+}
+
+async function acceptReturn(id, status){
+  try {
+    const url = '/admin/returns'
+    const response = await fetch(url, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        id,
+        status
+      })
+    })
+    const res = await response.json()
+    if(res.successStatus){
+      window.location.reload()
+    }else{
+      document.querySelector('#error').innerHTML = 'Some error occured. Please try again later.'
+    } 
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+async function changeReturnStatus(buttonId, statusId, orderId){
+  try {
+    const url = '/admin/returns/status'
+    const status = document.getElementById(statusId)
+    const response = await fetch(url, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        orderId,
+        value: status.value
+      })
+    })
+    const res = await response.json()
+    if(res.successStatus){
+      window.location.reload()
+    }else{
+      document.querySelector('#error').innerHTML = 'Some error occured. Please try again later'
+    }
+  } catch (error) {
+    console.log(error)
+  }
+}

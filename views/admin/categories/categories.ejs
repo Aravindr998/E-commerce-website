@@ -12,6 +12,9 @@
           <tr>
             <th>#</th>
             <th>Category</th>
+            <th>Apply Offer</th>
+            <th>Remove Offer</th>
+            <th>Offer</th>
             <th>Action</th>
           </tr>
         </thead>
@@ -21,6 +24,38 @@
             <tr>
               <td><%= ++count %> </td>
               <td><%= item.categoryName %></td>
+              <td>
+                <div>
+                  <form action="" class="d-flex flex-row align-items-center">
+                    <div class="form-floating me-3">
+                      <input type="number" class="form-control" id="offer<%= count %>" name="offer" placeholder="Offer in percentage">
+                      <label for="offer<%= count %>" >Offer in percentage</label>
+                    </div>
+                    <div>
+                      <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modal<%= count %>">Apply Offer</button>
+                    </div>
+                    <div class="modal fade" id="modal<%= count %>" tabindex="-1" aria-labelledby="modalLabel<%= count %>" aria-hidden="true">
+                      <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="modalLabel<%= count %>">Apply offer for category</h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                          </div>
+                          <div class="modal-body">
+                            Are you sure? This will remove all existing product offers and apply category offer.
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn btn-success" data-bs-dismiss="modal" onclick="addCategoryOffer('offer<%= count %>', '<%= item._id %>')">Apply</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </td>
+              <td><button type="button" class="btn btn-secondary" id="remove-offer<%= count %>" onclick="removeCategoryOffer('<%= item._id %>')">Remove Offer</button></td>
+              <td id="percent<%= count %>"><%= item.offerPercent ? `${item.offerPercent}%` : 'None' %> </td>
               <td><button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#categoryModal<%= count %>">Delete</button></td>
               <div class="modal fade" id="categoryModal<%= count %>" tabindex="-1" aria-labelledby="categoryModalLabel" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered">

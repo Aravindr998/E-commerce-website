@@ -48,7 +48,7 @@
                   <td class="align-middle"><%= new Date(order.createdAt).toLocaleDateString("en-GB") %></td>
                   <td class="align-middle">
                     <div>
-                      <select class="form-select" name="orderStatus" id="status<%= count %>" <%= order.isCancelled ? 'disabled' : '' %> >
+                      <select class="form-select" name="orderStatus" id="status<%= count %>" <%= order.isCancelled || order.return ? 'disabled' : '' %> >
                         <option value="Placed" <%= order.orderStatus == 'Placed' ? 'selected' : '' %> >Placed</option>
                         <option value="Confirmed" <%= order.orderStatus == 'Confirmed' ? 'selected' : '' %>>Confirmed</option>
                         <option value="Shipped" <%= order.orderStatus == 'Shipped' ? 'selected' : '' %>>Shipped</option>
@@ -60,6 +60,8 @@
                     <div>
                       <% if(order.isCancelled){ %>
                         <button class="btn btn-danger" disabled>Cancelled</button>
+                        <% }else if(order.return){ %>
+                          <button class="btn btn-danger" disabled>Return Requested</button>
                         <% }else{ %>  
                           <div id="button-div<%= count %>" class="d-flex flex-column">
                             <button class="btn btn-primary" id="change-status-button<%= count  %> " onclick="changeStatus(this.id, 'status<%= count %>', '<%= order._id %>')">Save Changes</button>

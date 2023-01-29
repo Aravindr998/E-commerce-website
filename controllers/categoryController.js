@@ -54,8 +54,55 @@ const deleteCategory = async(req, res) => {
   }
 }
 
+const addCategoryOffer = async(req, res) => {
+  const {categoryId, percent} = req.body
+  if(!percent){
+    return res.json({
+      successStatus: false,
+      message: 'Value cannot be empty'
+    })
+  }else if(percent >= 100){
+    return res.json({
+      successStatus: false,
+      message: 'Offer cannot be greater than or equal to 100%'
+    })
+  }else if(percent <= 0){
+    return res.json({
+      successStatus: false,
+      message: 'Offer cannot be less than zero'
+    })
+  }
+  try {
+    await productModel.updateMany({categoryId: mongoose.Types.ObjectId(categoryId)}, {$set: {offerPercent: percent}})
+    await categoryModel.findOneAndUpdate({_id: categoryId}, {$set: {offerPercent: percent}})
+    return res.json({
+      successStatus: true
+    })
+  } catch (error) {
+    console.log(error)
+    return res.json({
+      successStatus: false,
+      message: 'Some error occured. Please try again later'
+    })
+  }
+}
+
+const removeCategoryOffer = async(req, res) => {
+  try {
+    const {id} = req.body
+    await productModel.updateMany({categoryId: id}, {$unset: {offerPercent: ""}})
+    await categoryModel.findOneAndUpdate({_id: id}, {$unset: {offerPercent: ""}})
+    res.json({successStatus: true})
+  } catch (error) {
+    console.log(error)
+    res.json({successStatus: false})
+  }
+}
+
 module.exports = {
   getCategoriesPage,
   addNewCategory,
   deleteCategory,
+  addCategoryOffer,
+  removeCategoryOffer
 }

@@ -5,6 +5,7 @@ const paymentModel = require('../models/payment')
 const mongoose = require('mongoose')
 const orderModel = require('../models/orders')
 const Razorpay = require('razorpay')
+const Orders = require('../models/orders')
 
 
 const getOrdersPage = async(req, res) => {
@@ -268,11 +269,25 @@ const downloadInvoice = async(req, res) => {
   res.download(`./public/invoice/${req.params.id}.pdf`, 'Invoice.pdf')
 }
 
+const returnOrder = async(req, res) => {
+  const {id} = req.body
+  console.log(id)
+  try {
+    const order = await orderModel.findOneAndUpdate({_id: id}, {$set: {return: true, returnStatus: 'Requested'}})
+    console.log(order)
+    res.json({successStatus: true})
+  } catch (error) {
+    console.log(error)
+    res.json({successStatus: false})
+  }
+}
+
 
 module.exports = {
   getOrdersPage,
   getOrderDetails,
   cancelOrder,
   createOrder,
-  downloadInvoice
+  downloadInvoice,
+  returnOrder
 }

@@ -60,7 +60,7 @@ const getDashboard = async(req, res) => {
       },
       {
         $match: {
-          'items.isCancelled': false,
+          isCancelled: false,
           paymentVerified: true
         }
       }

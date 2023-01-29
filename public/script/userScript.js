@@ -12,8 +12,9 @@ function changeImage(id) {
 }
 
 //code to zoom on hover
-
-container.addEventListener('mousemove', zoomImage)
+if(container){
+  container.addEventListener('mousemove', zoomImage)
+}
 
 
 function zoomImage(e) {
@@ -54,15 +55,17 @@ function zoomImage(e) {
   result.style.backgroundSize = `${imageRect.width * fx}px ${imageRect.height*fy}px`
   result.style.backgroundPosition = `-${x*fx}px -${y*fy}px`
 }
-
-container.addEventListener('mouseenter', showZoom)
+if(container){
+  container.addEventListener('mouseenter', showZoom)
+}
 
 function showZoom() {
   lens.style.visibility = 'visible'
   result.style.visibility = 'visible'
 }
-
-container.addEventListener('mouseleave', hideZoom)
+if(container){
+  container.addEventListener('mouseleave', hideZoom)
+}
 
 function hideZoom() {
   lens.style.visibility = 'hidden'
@@ -360,6 +363,27 @@ async function deleteAddress(id){
     const res = await response.json()
     if(res.successStatus){
       window.location.href = '/dashboard/address/manage'
+    }
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+async function returnOrder(id){
+  try {
+    const url = '/orders/return'
+    const response =  await fetch(url, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        id
+      })
+    })
+    const res = await response.json()
+    if(res.successStatus){
+      window.location.reload()
     }
   } catch (error) {
     console.log(error)

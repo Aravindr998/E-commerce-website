@@ -8,6 +8,9 @@ const categorySchema = new mongoose.Schema({
   isDeleted: {
     type: Boolean,
     default: false
+  },
+  offerPercent: {
+    type: Number
   }
 }, {
   toJSON: {virtuals: true},

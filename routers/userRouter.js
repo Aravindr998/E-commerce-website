@@ -113,4 +113,6 @@ router.get('/dashboard/address/manage', authenticate, dashboardController.getAdd
 
 router.patch('/dashboard/address/delete', authenticate, dashboardController.deleteAddress)
 
+router.patch('/orders/return', authenticate, orderController.returnOrder)
+
 module.exports = router

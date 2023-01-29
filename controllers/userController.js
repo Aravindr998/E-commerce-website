@@ -55,7 +55,8 @@ const getHomepage = async(req, res) => {
         $project: {
           products: {
             $slice: ['$products', 0, 3]
-          }
+          },
+          categoryName: 1
         }
       }
     ])

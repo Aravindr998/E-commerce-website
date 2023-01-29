@@ -8,6 +8,7 @@ const bannerController = require('../controllers/adminBannerController')
 const categoryController = require('../controllers/categoryController')
 const orderController = require('../controllers/adminOrderController')
 const couponController = require('../controllers/adminCouponController')
+const returnController = require('../controllers/returnController')
 const router = express.Router()
 
 
@@ -109,5 +110,17 @@ router.get('/sales/download', authenticate, adminController.getSalesReport)
 router.patch('/products/offer/add', authenticate, productController.addProductOffer)
 
 router.patch('/products/offer/remove', authenticate, productController.removeOffer)
+
+router.patch('/categories/offer/add', authenticate, categoryController.addCategoryOffer)
+
+router.patch('/categories/offer/remove', authenticate, categoryController.removeCategoryOffer)
+
+//returns
+
+router.get('/returns', authenticate, returnController.getReturnPage)
+
+router.patch('/returns', authenticate, returnController.acceptReturn)
+
+router.patch('/returns/status', authenticate, returnController.changeReturnStatus)
 
 module.exports = router

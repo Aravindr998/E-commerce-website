@@ -84,6 +84,13 @@ const orderSchema = new mongoose.Schema({
   isCancelled: {
     type: Boolean,
     default: false
+  },
+  return: {
+    type: Boolean,
+    default: false
+  },
+  returnStatus: {
+    type: String
   }
 },
 {

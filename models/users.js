@@ -79,10 +79,6 @@ const userSchema = new mongoose.Schema({
       }
     }]
   },
-  cartTotal: {
-    type: Number,
-    default: 0
-  },
   wishlist: [{
     type: {
       productId: {

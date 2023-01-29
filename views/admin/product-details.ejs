@@ -72,7 +72,6 @@
               <tr>
                 <th>Color</th>
                 <th>Price</th>
-                <th>Stock</th>
                 <th>Highlights</th>
                 <th>Dimension</th>
                 <th class="text-center">Images</th>
@@ -94,7 +93,6 @@
                     <p>₹<%= product.offerPercent ? Math.round(item.price - item.price * product.offerPercent/100) : item.price%></p>
                   </div>
                 </td>
-                <td><%= item.totalStock %></td>
                 <td><%= item.highlights %></td>
                 <td><%= item.dimension %></td>
                 <td>
