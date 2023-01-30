@@ -246,6 +246,9 @@ const getSalesReport = async(req, res) => {
     console.log(error)
   }
 }
+const getPdfSalesReport = (req, res) => {
+  res.download('./public/files/sales-report.pdf', 'Sale Report.pdf')
+}
 
 module.exports = {
   getLogin,
@@ -254,5 +257,6 @@ module.exports = {
   getDashboard,
   getOrderDetails,
   getProductDetails,
-  getSalesReport
+  getSalesReport,
+  getPdfSalesReport
 }

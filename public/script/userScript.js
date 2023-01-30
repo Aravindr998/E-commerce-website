@@ -139,15 +139,14 @@ async function changeQty(id, amount, count){
       document.getElementById('tax').innerHTML = '₹'+Math.round(res.cartTotal*0.18)
       document.getElementById('total').innerHTML = '₹'+Math.round(res.cartTotal*1.18)
       if(res.quantity == 1){
-        console.log('entered')
          reduceButton.disabled = true
       }else{
-        console.log('entered2')
-        console.log(reduceButton)
         reduceButton.disabled = false
       }
     }else{
-      location.reload()
+      const toastLiveExample = document.getElementById('liveToast')
+      const toast = new bootstrap.Toast(toastLiveExample)
+      toast.show()
     }
   } catch (error) {
     console.log(error)
@@ -346,6 +345,11 @@ async function buynow(skuId, prodId){
     window.location.href = '/checkout'
   }else if(res.redirect){
     window.location.href = '/login'
+  }else if(res.message){
+    document.querySelector('.added-to-cart').classList.add('alert-danger')
+    document.querySelector('.added-to-cart p').innerHTML = res.message
+    document.querySelector('.added-to-cart').style.transform = 'translateY(0rem)'
+    document.querySelector('.added-to-cart').style.visibility = 'visible'
   }
 }
 

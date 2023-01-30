@@ -34,7 +34,7 @@ function checkout(order, user){
     "currency": "INR",
     "name": "KROMA",
     "description": "Test Transaction",
-    "image": "https://example.com/your_logo",
+    "image": "/assets/logo/kroma-logo.png",
     "order_id": order.id, 
     "handler": function (response){
       verifyPayment(response, order)
@@ -48,7 +48,7 @@ function checkout(order, user){
         "address": "Razorpay Corporate Office"
     },
     "theme": {
-        "color": "#3399cc"
+        "color": "#000000"
     },
     "modal": {
       "ondismiss": function(){

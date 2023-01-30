@@ -1,5 +1,6 @@
 const productModel = require('../models/products')
 const categoryModel = require('../models/categories')
+const userModel = require('../models/users')
 const mongoose = require('mongoose')
 
 const getProductsPage = async(req, res) => {
@@ -26,8 +27,7 @@ const getProductsPage = async(req, res) => {
         },
         {
           $match: {
-            'skus.isDeleted': false,
-            'skus.totalStock': {$gt: 0}
+            'skus.isDeleted': false
           }
         },
         {
@@ -48,7 +48,6 @@ const getProductsPage = async(req, res) => {
         {
           $match: {
             'skus.isDeleted': false,
-            'skus.totalStock': {$gt: 0}
           }
         },
         {
@@ -87,7 +86,6 @@ const getProductsPage = async(req, res) => {
         {
           $match: {
             'skus.isDeleted': false,
-            'skus.totalStock': {$gt: 0},
             $and:[
               {'skus.price': {$gte: parseInt(from)}},
               {'skus.price': {$lte: parseInt(to)}},
@@ -114,8 +112,24 @@ const getDetailsPage = async(req, res) => {
     const skuId = req.params.skuid
     const product = await productModel.findById(prodId)
     .populate('categoryId')
+    const cart = await userModel.aggregate([
+      {
+        $match: {
+          _id: mongoose.Types.ObjectId(req.session.user._id)
+        }
+      },
+      {
+        $unwind: '$cart'
+      },
+      {
+        $match: {
+          'cart.skuId': mongoose.Types.ObjectId(skuId)
+        }
+      }
+    ])
+    console.log(cart)
     product.skus.forEach((item, index, array) => {
-      if(item.isDeleted || item.totalStock<=0){
+      if(item.isDeleted){
         array.splice(index,1)
       }
     })
@@ -125,9 +139,9 @@ const getDetailsPage = async(req, res) => {
         sku = item
       }
     })
-    res.render('users/product-details', {product, sku, user: req.session?.user?.fname})
+    res.render('users/product-details', {product, cart, sku, user: req.session?.user?.fname})
   } catch (error) {
-    
+    console.log(error)
   }
 }
 const searchProducts = async(req, res) => {

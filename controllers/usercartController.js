@@ -181,13 +181,41 @@ const addItemToCart = async(req, res) => {
   const skuid = req.body.skuId
   try {
     const user = await userModel.findById(req.session.user._id)
-    const product = await productModel.findById(prodId)
-    let total;
-    product.skus.forEach(item => {
-      if(item._id == skuid){
-        total= item.price
+    const cart = await userModel.aggregate([
+      {
+        $match: {
+          _id: mongoose.Types.ObjectId(req.session.user._id)
+        }
+      },
+      {
+        $unwind: '$cart'
+      },
+      {
+        $match: {
+          'cart.skuId': mongoose.Types.ObjectId(skuid)
+        }
       }
-    })
+    ])
+    const product = await productModel.aggregate([
+      {
+        $match: {
+          _id: mongoose.Types.ObjectId(prodId)
+        }
+      },
+      {
+        $unwind: '$skus'
+      },
+      {
+        $match: {
+          'skus._id': mongoose.Types.ObjectId(skuid)
+        }
+      }
+    ])
+    if(cart.length > 0){
+      if(product[0].skus.totalStock - cart[0].cart.quantity <= 0){
+        return res.json({successStatus: false, message: 'Item out of stock'})
+      }
+    }
     const cartItem = {
       productId: prodId,
       skuId: skuid,
@@ -199,9 +227,7 @@ const addItemToCart = async(req, res) => {
         flag = 1
       }
     })
-    console.log(total)
     if(flag == 0){
-      console.log()
       await userModel.findOneAndUpdate({_id: req.session.user._id}, {$push: {cart:{ $each: [cartItem], $position: 0}}})
     }else{
       await userModel.findOneAndUpdate({_id: req.session.user._id, 'cart.skuId': skuid}, {$inc: {'cart.$.quantity': 1}})

@@ -105,6 +105,8 @@ router.get('/product-details', authenticate, adminController.getProductDetails)
 
 router.get('/sales/download', authenticate, adminController.getSalesReport)
 
+router.get('/sales/download/pdf', authenticate, adminMiddlewares.generatePdf, adminController.getPdfSalesReport)
+
 //offers
 
 router.patch('/products/offer/add', authenticate, productController.addProductOffer)

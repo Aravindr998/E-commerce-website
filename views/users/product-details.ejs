@@ -34,7 +34,8 @@
           </div>
         </div>
       </div>
-      <% if(sku.totalStock>0){ %> 
+      <% let stock = cart[0]?.cart.quantity || 0 %> 
+      <% if(sku.totalStock - stock > 0){ %> 
       <div class="d-flex my-sm-5 my-1 justify-content-center">
         <div class="col-3 d-flex justify-content-center align-items-center">
           <button onclick="buynow('<%= sku._id %>', '<%= product._id %>')" class="main-button w-100">Buy Now</button>
@@ -44,8 +45,8 @@
         </div>
       </div>
       <% }else{ %>
-        <div>
-          <p class="text-center text-danger">Out of stock</p>
+        <div class="mt-3">
+          <h3 class="text-center text-danger">Out of stock</h3>
         </div>
       <% } %>  
       <div class="position-absolute wishlist-parent">
