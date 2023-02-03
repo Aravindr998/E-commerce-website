@@ -18,15 +18,12 @@ const categorySchema = new mongoose.Schema({
 })
 
 categorySchema.pre('find', function(){
-  console.log('pre find')
   this.where({isDeleted: false})
 })
 categorySchema.pre('findOne', function(){
-  console.log('pre findOne')
   this.where({isDeleted: false})
 })
 categorySchema.pre('findById', function(){
-  console.log('pre findById')
   this.where({isDeleted: false})
 })
 categorySchema.virtual('products',{

@@ -3,8 +3,10 @@
 <%- include('./partials/head') %> 
 <body>
 <%- include('./partials/guest-navbar') %> 
-<header class="banner d-flex justify-content-center align-items-center" style="background-image: url('/<%= banner.image %>')">
-  <h1 class="banner-text text-white"><%= banner.caption %></h1>
+<% let image = '/assets/banner/One stop shop.png' %> 
+<% let caption = 'One stop shop for all your smartphone needs' %> 
+<header class="banner d-flex justify-content-center align-items-center" style="background-image: url('/<%= banner?.image || image %>')">
+  <h1 class="banner-text text-white"><%= banner?.caption || caption %></h1>
 </header>
 <%- include('./partials/users/landing-body') %> 
 <%- include('./partials/footer') %> 

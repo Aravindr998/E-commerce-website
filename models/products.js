@@ -63,19 +63,15 @@ const productSchema = new mongoose.Schema({
 })
 
 productSchema.pre('find', function(){
-  console.log('pre find product')
   this.where({isDeleted: false})
 })
 productSchema.pre('findOne', function(){
-  console.log('pre findOne product')
   this.where({isDeleted: false})
 })
 productSchema.pre('findById', function(){
-  console.log('pre findById product')
   this.where({isDeleted: false})
 })
 productSchema.pre('findOneAndUpdate', function(){
-  console.log('pre findOneAndUpdate product')
   this.where({isDeleted: false})
 })
 

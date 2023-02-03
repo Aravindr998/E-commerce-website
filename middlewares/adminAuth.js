@@ -22,6 +22,7 @@ const validateLogin = async (req, res, next) => {
   }
   try{
     const admin = await adminModel.find({email: req.body.email})
+    console.log(admin)
     if(admin.length == 0){
       req.session.Errmessage = "Invalid Email"
       return res.redirect('/admin/login')
