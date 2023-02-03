@@ -8,7 +8,7 @@ document.addEventListener('submit', (e) =>{
   if(window.getComputedStyle(otpCard).display == 'none'){
     e.preventDefault()
     console.log('inside queryselector')
-    const url = 'http://localhost:4000/dashboard/edit'
+    const url = '/dashboard/edit'
     fetch(url, {
       method: 'PUT',
       headers: {
@@ -35,7 +35,7 @@ document.addEventListener('submit', (e) =>{
     console.log('inside else case')
     e.preventDefault()
     const otp = document.querySelector('#otp').value
-    const url = 'http://localhost:4000/dashboard/edit/otp'
+    const url = '/dashboard/edit/otp'
     fetch(url, {
       method: 'PUT',
       headers: {
@@ -66,7 +66,7 @@ document.addEventListener('submit', (e) =>{
 function resendOtp(){
   const otp = document.querySelector('#otp').value
   const phone = document.querySelector('#phone').value
-  const url = 'http://localhost:4000/register/otp/resend'
+  const url = '/register/otp/resend'
   fetch(url, {
     method: 'POST',
     headers: {

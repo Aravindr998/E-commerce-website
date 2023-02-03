@@ -1,5 +1,5 @@
 function deleteCategory(id){
-  const url = 'http://localhost:4000/admin/categories/' + id
+  const url = '/admin/categories/' + id
   const body = {
     id
   }
@@ -26,7 +26,7 @@ function deleteCategory(id){
 }
 
 async function setCurrent(id, bannerId){
-  const url = 'http://localhost:4000/admin/banner/' + bannerId
+  const url = '/admin/banner/' + bannerId
   const body = {
     bannerId
   }
@@ -40,7 +40,7 @@ async function setCurrent(id, bannerId){
     })
     const res = await response.json()
     if(res.successStatus){
-      window.location.href = 'http://localhost:4000/admin/banner'
+      window.location.href = '/admin/banner'
     }else{
       document.querySelector('.text-danger').innerHTML = 'Some Error occured'
     }
@@ -50,7 +50,7 @@ async function setCurrent(id, bannerId){
 }
 
 async function deleteBanner(id, bannerId){
-  const url = 'http://localhost:4000/admin/banner/' + bannerId
+  const url = '/admin/banner/' + bannerId
   try {
     const response = await fetch(url, {
       method: 'DELETE',
@@ -60,7 +60,7 @@ async function deleteBanner(id, bannerId){
     })
     const res = await response.json()
     if(res.successStatus){
-      window.location.href = 'http://localhost:4000/admin/banner'
+      window.location.href = '/admin/banner'
     }else{
       document.querySelector('.text-danger').innerHTML = 'Some Error occured'
     }
@@ -70,7 +70,7 @@ async function deleteBanner(id, bannerId){
 }
 
 async function changeStatus(id, selectId, orderId){
-  const url = 'http://localhost:4000/admin/orders'
+  const url = '/admin/orders'
   const body = {
     orderId,
     orderStatus: document.getElementById(selectId).value
@@ -85,7 +85,7 @@ async function changeStatus(id, selectId, orderId){
     })
     const res = await response.json()
     if(res.successStatus){
-      window.location.href = 'http://localhost:4000/admin/orders'
+      window.location.href = '/admin/orders'
     }else{
       document.querySelector('#error').innerHTML = 'Some Error occured. Please try again later'
     }
@@ -95,7 +95,7 @@ async function changeStatus(id, selectId, orderId){
 }
 
 async function cancelOrder(div1, div2, orderId, selectId){
-  const url = 'http://localhost:4000/admin/orders/cancel'
+  const url = '/admin/orders/cancel'
   const body = {
     orderId
   } 
@@ -123,7 +123,7 @@ async function cancelOrder(div1, div2, orderId, selectId){
 }
 
 async function deleteCoupon(id){
-  const url = 'http://localhost:4000/admin/coupons'
+  const url = '/admin/coupons'
   const response = await fetch(url, {
     method: 'PATCH',
     headers: {

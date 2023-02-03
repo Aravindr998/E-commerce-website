@@ -16,7 +16,6 @@ const getCartPage = async(req, res) => {
         })
         array[index].skus = temp
       })
-      console.log(user.cart)
       const cart = user.cart
       const {cartTotal} = user
       res.render('users/cart', {cart, cartTotal, user: req.session?.user?.fname})
@@ -82,7 +81,6 @@ const changeQuantity = async(req, res) => {
     for(let item of product.skus){
       if(item._id.toString() == req.body.skuId){
         if(item.totalStock-quantity <= 0 && req.body.amount>0){
-          console.log('entered')
           return res.json({successStatus: false})
         }
       }
@@ -103,7 +101,6 @@ const changeQuantity = async(req, res) => {
         array[index].skus = temp
       })
       const total = cart.cart.reduce((sum, item) => sum += (item.productId.offerPercent ? item.skus[0].price * (1 - item.productId.offerPercent/100) : item.skus[0].price) * item.quantity, 0)
-      console.log(total)
       return res.json({
         successStatus: true,
         quantity: quantity + req.body.amount,

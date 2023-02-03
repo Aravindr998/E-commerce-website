@@ -1,17 +1,8 @@
 const userModel = require('../models/users')
 const productModel = require('../models/products')
-const categoryModel = require('../models/categories')
-const bannerModel = require('../models/banners')
 const orderModel = require('../models/orders')
-const couponModel = require('../models/coupons')
-const paymentModel = require('../models/payment')
-const mongoose = require('mongoose')
 const fs = require('fs')
-const { promisify } = require('util')
-const unlinkAsync = promisify(fs.unlink)
-const path = require('path')
 const { Parser, transforms: { unwind }  } = require('json2csv')
-const Razorpay = require('razorpay')
 
 const getLogin = (req, res) => {
   if(req.session.Errmessage){
@@ -23,35 +14,13 @@ const getLogin = (req, res) => {
     res.render('admin/admin-login', {message})
   }
 }
-
-
-
 const redirectHomepage = async(req, res) => {
   return res.redirect('/admin')
 }
-
-
-
-//user management
-
 const logoutAdmin = (req, res) => {
   req.session.admin = null
   res.redirect('/admin')
 }
-
-//category management
-
-
-
-//banner management
-
-
-//order management
-
-
-
-
-
 const getDashboard = async(req, res) => {
   try {
     const orders = await orderModel.aggregate([
@@ -100,7 +69,6 @@ const getOrderDetails = async(req, res) => {
       }
 
     ])
-    console.log(orders);
     res.json({orders})
   } catch (error) {
     console.log(error)
@@ -141,7 +109,6 @@ const getProductDetails = async(req, res) => {
         }
       }
     ])
-    console.log(products)
     res.json({products})
   } catch (error) {
     console.log(error)
@@ -241,7 +208,6 @@ const getSalesReport = async(req, res) => {
     const csv = json2csvParser.parse(orders)
     fs.writeFileSync('./public/files/data.csv', csv)
     res.download('./public/files/data.csv', 'Sales Report.csv')
-    console.log(orders)
   } catch (error) {
     console.log(error)
   }

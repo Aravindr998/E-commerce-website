@@ -4,6 +4,8 @@ const userModel = require('../models/users')
 const mongoose = require('mongoose')
 
 const getProductsPage = async(req, res) => {
+  const fromValue = req.session.from || ''
+  const toValue = req.session.to || ''
   try {
     let searchKey
     let products
@@ -72,10 +74,7 @@ const getProductsPage = async(req, res) => {
     }else{
       category = categoryArray
     }
-    console.log(from, to, category)
-    console.log(req.session.from, req.session.to, req.session.category)
     if(req.session.from || req.session.to || req.session.category){
-      console.log('entered')
       req.session.from = null
       req.session.to = null
       req.session.category = null
@@ -100,7 +99,7 @@ const getProductsPage = async(req, res) => {
         }
       ])
     }
-    res.render('users/product-page', {products, categories, user: req.session?.user?.fname})
+    res.render('users/product-page', {products, categories, user: req.session?.user?.fname, fromValue, toValue})
   } catch (error) {
    console.log(error) 
   }
@@ -127,7 +126,6 @@ const getDetailsPage = async(req, res) => {
         }
       }
     ])
-    console.log(cart)
     product.skus.forEach((item, index, array) => {
       if(item.isDeleted){
         array.splice(index,1)

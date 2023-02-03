@@ -76,7 +76,7 @@ async function addToCart(id){
   const button = document.getElementById(id)
   const prodId = button.dataset.prodid
   const skuId = button.dataset.skuid
-  const url = 'http://localhost:4000/cart/add/' + prodId + '/' + skuId
+  const url = '/cart/add/' + prodId + '/' + skuId
   const body = {
     prodId,
     skuId
@@ -118,7 +118,7 @@ async function changeQty(id, amount, count){
   let reduceButton = document.getElementById(idb)
   const data = button.dataset.id
   const prodId = button.dataset.prodid
-  const url = 'http://localhost:4000/cart/update/'+data
+  const url = '/cart/update/'+data
   const body = {
     skuId: data,
     amount,
@@ -154,7 +154,7 @@ async function changeQty(id, amount, count){
 }
 
 async function removeProduct(id, prodId, skuId) {
-  const url = 'http://localhost:4000/cart/remove/' + prodId + '/' + skuId
+  const url = '/cart/remove/' + prodId + '/' + skuId
   body = {
     prodId,
     skuId
@@ -169,7 +169,7 @@ async function removeProduct(id, prodId, skuId) {
     })
     const res = await response.json()
     if(res.successStatus){
-      window.location.href = 'http://localhost:4000/cart'
+      window.location.href = '/cart'
     }else{
       document.querySelector('#error').innerHTML = 'Some error occured. Please try again later'
     }
@@ -179,7 +179,7 @@ async function removeProduct(id, prodId, skuId) {
 }
 
 async function moveToWishlist(id, prodId, skuId){
-  const url = 'http://localhost:4000/cart/wishlist/add'
+  const url = '/cart/wishlist/add'
   const body = {
     prodId,
     skuId
@@ -194,7 +194,7 @@ async function moveToWishlist(id, prodId, skuId){
     })
     const res = await response.json()
     if(res.successStatus){
-      window.location.href = 'http://localhost:4000/cart'
+      window.location.href = '/cart'
     }else{
       document.querySelector('#error').innerHTML = 'Some error occured. Please try again later'
     }
@@ -204,7 +204,7 @@ async function moveToWishlist(id, prodId, skuId){
 }
 
 async function moveToCart(id, prodId, skuId){
-  const url = 'http://localhost:4000/wishlist/cart/add/'+prodId+'/'+skuId
+  const url = '/wishlist/cart/add/'+prodId+'/'+skuId
   const body = {
     prodId,
     skuId
@@ -219,7 +219,7 @@ async function moveToCart(id, prodId, skuId){
   })
   const res = await response.json()
   if(res.successStatus){
-    window.location.href = 'http://localhost:4000/wishlist'
+    window.location.href = '/wishlist'
   }else{
     document.getElementById('error').innerHTML = 'Some error occured. Please try again later'
   }
@@ -230,7 +230,7 @@ async function moveToCart(id, prodId, skuId){
 
 async function addToWishlist(id, prodId, skuId){
   const button = document.getElementById(id)
-  const url = 'http://localhost:4000/products/wishlist/add'
+  const url = '/products/wishlist/add'
   const body = {
     prodId,
     skuId
@@ -262,7 +262,7 @@ async function addToWishlist(id, prodId, skuId){
 }
 
 async function removeFromCart(id, prodId, skuId){
-  const url = 'http://localhost:4000/wishlist/remove'
+  const url = '/wishlist/remove'
   const body = {
     prodId,
     skuId
@@ -287,7 +287,7 @@ async function removeFromCart(id, prodId, skuId){
 }
 
 async function cancelOrder(id){
-  const url = 'http://localhost:4000/orders/cancel'
+  const url = '/orders/cancel'
   const body = {
     id
   } 
@@ -311,7 +311,7 @@ async function cancelOrder(id){
 }
 
 async function addCoupon(id){
-  const url = 'http://localhost:4000/checkout/coupons'
+  const url = '/checkout/coupons'
   const error = document.querySelector('#coupon-error')
   const response = await fetch(url, {
     method: 'PATCH',

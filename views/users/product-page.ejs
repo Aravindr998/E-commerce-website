@@ -17,10 +17,10 @@
         <p>Price Filter</p>
         <form action="/products/filter" method="POST" class="row">
           <div class=" col-6">
-            <input class="form-control range-form" type="text" name="" id="from1" placeholder="from">
+            <input class="form-control range-form" type="text" name="" id="from1" placeholder="from" value="<%= fromValue %>">
           </div>
           <div class=" col-6">
-            <input class="form-control range-form" type="text" name="" id="to1" placeholder="to">
+            <input class="form-control range-form" type="text" name="" id="to1" placeholder="to" value="<%= toValue %>">
           </div>
           <div class="d-flex flex-column">
             <p>Categories</p>
@@ -46,10 +46,10 @@
         <p>Price Filter</p>
         <form action="/products/filter" method="GET" class="row">
           <div class=" col-6">
-            <input class="form-control range-form" type="number" name="from" id="from2" placeholder="from">
+            <input class="form-control range-form" type="number" name="from" id="from2" placeholder="from" value="<%= fromValue %>">
           </div>
           <div class=" col-6">
-            <input class="form-control range-form" type="number" name="to" id="to2" placeholder="to">
+            <input class="form-control range-form" type="number" name="to" id="to2" placeholder="to" value="<%= toValue %>">
           </div>
           <div class="d-flex flex-column pt-3">
             <p>Categories</p>

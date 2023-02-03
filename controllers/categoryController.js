@@ -20,16 +20,18 @@ const getCategoriesPage = async(req, res) => {
 }
 
 const addNewCategory = async(req, res) => {
-  const category = new categoryModel({
-    categoryName: req.body.category
+  let {category} = req.body
+  category = category.trim()
+  const categories = new categoryModel({
+    categoryName: category
   })
   try {
-    const existing = await categoryModel.find({categoryName: new RegExp(req.body.category, 'i')})
+    const existing = await categoryModel.find({categoryName: new RegExp(category, 'i')})
     if(existing.length>0){
       req.session.Errmessage = 'Category already exists'
       return res.redirect('/admin/categories')
     }
-    await category.save()
+    await categories.save()
     res.redirect('/admin/categories')
   } catch (error) {
     req.session.Errmessage = error.errors.categoryName.properties.message

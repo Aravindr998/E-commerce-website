@@ -7,20 +7,33 @@ fetch('/admin/order-details',{
 .then(response => response.json())
 .then(response => {
   console.log(response)
-  const label = response.orders.map( item => {
+  const labels = response.orders.map( item => {
     const check = new Date(item.date)
     const now = new Date()
     if(check.getFullYear() == now.getFullYear() && check.getMonth() == now.getMonth()){
       return new Date(item.date).toLocaleDateString('en-GB')
     }
   })
-  const data = response.orders.map( item => {
+  const datas = response.orders.map( item => {
     const check = new Date(item.date)
     const now = new Date()
     if(check.getFullYear() == now.getFullYear() && check.getMonth() == now.getMonth()){
       return item.totalSpent
     }
   })
+  const data = []
+  labels.forEach( (item, index) => {
+    if(item!= undefined){
+      data.push(datas[index]) 
+    }
+  })
+  console.log(data)
+  const label = labels.filter( (item, index) => {
+    if(item!= undefined){
+      return item
+    }
+  })
+  console.log(label)
   new Chart("amountSpent", {
     type: "bar",
     data: {

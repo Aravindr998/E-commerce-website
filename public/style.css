@@ -324,7 +324,10 @@ footer div div div p:first-child{
 }
 
 .cart-images{
-  max-height: 14rem;
+  max-height: 12rem;
+}
+.wishlist-images{
+  max-height: 10rem;
 }
 
 .button-link{
@@ -355,6 +358,7 @@ footer div div div p:first-child{
 
 .success-tick{
   width: 10rem;
+  height: 10rem;
 }
 
 .dashboard-icons{
@@ -438,4 +442,26 @@ footer div div div p:first-child{
 }
 .order-details{
   max-width: 20rem;
+}
+
+.preload{
+  position: fixed;
+  top: 0;
+  width: 100%;
+  height: 100vh;
+  background: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+}
+
+.preloader{
+  width: 15rem;
+  height: 15rem;
+}
+
+.preload-finish{
+  opacity: 0;
+  pointer-events: none;
 }

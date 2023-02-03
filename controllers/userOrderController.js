@@ -31,7 +31,6 @@ const getOrderDetails = async(req, res) => {
     const order = await orderModel.findById(id)
     .populate('payment')
     .populate('couponId')
-    console.log(order.couponId)
     let discount
     const total = order.items.reduce((sum, item) => sum+=item.price * item.quantity, 0)
     if(order.couponId){
@@ -56,7 +55,6 @@ const cancelOrder = async(req, res) => {
         isCancelled: true
       }
     })
-    console.log(order)
     for(let item of order.items){
       await productModel.findOneAndUpdate({
         skus: {
@@ -72,7 +70,6 @@ const cancelOrder = async(req, res) => {
       })
     }
     if(order.paymentMethod == 'Razorpay' && order.paymentVerified == true){
-      console.log('entered')
       let refund
       const payment = await paymentModel.findOne({orderId: order._id})
       const instance = new Razorpay({ key_id: process.env.RAZORPAY_KEY_ID, key_secret: process.env.RAZORPAY_SECRET_KEY })
@@ -130,7 +127,6 @@ const createOrder = async(req, res) => {
       })
     }
   const total = cart.cart.reduce((sum, item) => sum+=(item.productId.offerPercent ? Math.round(item.skus[0].price * (1 - item.productId.offerPercent/100)) : item.skus[0].price) * item.quantity, 0)
-  console.log(total)
     const user = users[0]
     const order = new orderModel({
       customerId: req.session.user._id,
@@ -251,7 +247,6 @@ const createOrder = async(req, res) => {
         console.log(err)
         return res.json({successStatus: false})
       }
-      console.log(orderInstance)
       return res.json({
         successStatus: true,
         orderInstance,
@@ -271,10 +266,8 @@ const downloadInvoice = async(req, res) => {
 
 const returnOrder = async(req, res) => {
   const {id} = req.body
-  console.log(id)
   try {
     const order = await orderModel.findOneAndUpdate({_id: id}, {$set: {return: true, returnStatus: 'Requested'}})
-    console.log(order)
     res.json({successStatus: true})
   } catch (error) {
     console.log(error)

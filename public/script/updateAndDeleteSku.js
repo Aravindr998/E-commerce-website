@@ -1,11 +1,8 @@
-document.addEventListener('submit', (e)=>{
-  e.preventDefault()
-})
 function updateSku(id){
-  const data = document.getElementById(id).dataset.url
-  const url = 'http://localhost:4000/admin/products/edit/skus/' + data
   const form = document.getElementById('form')
   const formData = new FormData(form)
+  const data = document.getElementById(id).dataset.url
+  const url = '/admin/products/edit/skus/' + data
   const input1 = document.querySelector('#image1')
   const input2 = document.querySelector('#image2')
   const input3 = document.querySelector('#image3')
@@ -32,7 +29,7 @@ function updateSku(id){
 async function deleteSku(id){
   const data = document.getElementById(id).dataset.url
   const prodId = document.getElementById(id).dataset.prodid
-  const url = 'http://localhost:4000/admin/products/delete/skus/'+ prodId + '/' + data
+  const url = '/admin/products/delete/skus/'+ prodId + '/' + data
   fetch(url, {
     method: 'PATCH',
     headers: {

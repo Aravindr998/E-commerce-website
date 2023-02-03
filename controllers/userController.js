@@ -207,9 +207,6 @@ const logoutUser = (req, res) => {
 }
 
 const checkOtp = async (req, res) => {
-  console.log('check otp')
-  console.log(otp)
-  console.log(req.body.otp)
   if(req.body.otp == otp){
     const user = new userModel({
       fname: req.body.fname,
@@ -239,16 +236,12 @@ const checkOtp = async (req, res) => {
 }
 
 const generateOtp = (req, res, next) => {
-  console.log('generate otp')
-  console.log(req.body.otp)
   if(req.body.otpEntered){
     next()
   }else{
     otp = Math.floor(100000 + Math.random()*900000)
-    console.log(otp)
     sendOtp(otp, req.body.phone)
     .then((response)=>{
-      console.log(response.data)
       next()
     })
     .catch((error) => {
@@ -262,7 +255,6 @@ const resendOtp = (req, res, next) => {
   otp = Math.floor(100000 + Math.random()*900000)
   sendOtp(otp, req.body.phone)
   .then((response)=>{
-    console.log(response.data)
     if(response.data.return){
       return res.json({message: "OTP sent successfully"})
     }else{
@@ -277,8 +269,6 @@ const resendOtp = (req, res, next) => {
 
 
 function sendOtp(otp, number){
-  console.log('sendotp')
-  console.log(otp)
   const body = {
     "authorization" : process.env.AUTHORIZATION_KEY,
     "variables_values" : otp,
@@ -317,7 +307,6 @@ const checkUser = async(req, res) => {
     }else{
       const otp = generateMailOtp()
       req.session.emailOtp = otp
-      console.log(otp)
       try {
         const info = await sendMail(user[0].email, otp)
       } catch (error) {

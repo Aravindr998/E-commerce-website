@@ -10,7 +10,7 @@ document.addEventListener('submit', (e) =>{
     e.preventDefault()
     console.log('inside queryselector')
     confirmPassword = document.querySelector('#confirm-password').value
-    const url = 'http://localhost:4000/register'
+    const url = '/register'
     fetch(url, {
       method: 'POST',
       headers: {
@@ -38,7 +38,7 @@ document.addEventListener('submit', (e) =>{
     console.log('inside else case')
     e.preventDefault()
     const otp = document.querySelector('#otp').value
-    const url = 'http://localhost:4000/register/otp'
+    const url = '/register/otp'
     fetch(url, {
       method: 'POST',
       headers: {
@@ -70,7 +70,7 @@ document.addEventListener('submit', (e) =>{
 function resendOtp(){
   const otp = document.querySelector('#otp').value
   const phone = document.querySelector('#phone').value
-  const url = 'http://localhost:4000/register/otp/resend'
+  const url = '/register/otp/resend'
   fetch(url, {
     method: 'POST',
     headers: {

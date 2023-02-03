@@ -69,7 +69,11 @@
           <p>₹<%= total %> </p>
           <p>₹<%= Math.round(total*0.18) %> </p>
           <% if(order.couponId) {%> 
-          <p>-₹<%= Math.round(discount) %>:</p>
+          <% if(order.couponId.isPercentage) {%> 
+          <p>-₹<%= Math.round(total*order.couponId.discount/100) %>:</p>
+          <% }else{ %>
+            <p>-₹<%= order.couponId.discount %></p>
+            <% } %>  
           <% } %> 
           <p class="fw-bold">₹<%= order.totalAmount %> </p>
         </div>

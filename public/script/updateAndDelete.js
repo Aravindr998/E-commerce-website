@@ -7,7 +7,7 @@ function updateProduct(){
   const title = document.querySelector('#title').value
   const warranty = document.querySelector('#warranty').value
   const category = document.querySelector('#category').value
-  const url = 'http://localhost:4000/admin/products/edit/' + document.querySelector('#update-button').dataset.url
+  const url = '/admin/products/edit/' + document.querySelector('#update-button').dataset.url
   const error = document.querySelector('#error')
   body = {
     title,
@@ -33,7 +33,7 @@ function updateProduct(){
 
 async function deleteProduct(id) {
   const data = document.getElementById(id).dataset.url
-  const url = 'http://localhost:4000/admin/products/delete/' + data
+  const url = '/admin/products/delete/' + data
   const response = await fetch(url, {
     method: 'PATCH',
     headers: {

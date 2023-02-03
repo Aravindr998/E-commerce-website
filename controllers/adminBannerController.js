@@ -17,7 +17,8 @@ const getBannersPage = async(req, res) => {
 
 const saveBanner = async(req, res) => {
   try {
-    if(!req.body.name){
+    const {name, caption} = req.body
+    if(!name){
       req.session.Errmessage = 'Name cannot be empty'
       return res.redirect('/admin/banner')
     }else if(!req.file){
@@ -25,10 +26,9 @@ const saveBanner = async(req, res) => {
       return res.redirect('/admin/banner')
     }
     const paths = req.file.path.slice(7).replace(new RegExp('\\' + path.sep, 'g'), '/')
-    console.log(paths)
     const banner = new bannerModel({
-      name: req.body.name,
-      caption: req.body.caption,
+      name,
+      caption,
       image: paths
     })
     await banner.save()
@@ -42,7 +42,6 @@ const setCurrentBanner = async(req, res) => {
   try {
     await bannerModel.updateMany({setCurrent: true}, {$set: {setCurrent: false}})
     await bannerModel.findOneAndUpdate({_id: req.body.bannerId}, {$set: {setCurrent: true}})
-    console.log('done')
     res.json({successStatus: true})
   } catch (error) {
     console.log(error)

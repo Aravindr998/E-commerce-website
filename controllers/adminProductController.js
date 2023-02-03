@@ -1,6 +1,9 @@
 const productModel = require('../models/products')
 const categoryModel = require('../models/categories')
 const mongoose = require('mongoose')
+const fs = require('fs')
+const { promisify } = require('util')
+const unlinkAsync = promisify(fs.unlink)
 
 const getHomepage = async (req, res) => {
   try {
@@ -16,7 +19,6 @@ const getAddProducts = async (req, res) => {
     if(req.session.Errmessage){
       const message = req.session.Errmessage
       const product = req.session.addProducts
-      console.log(product)
       let skus ={}
       product.skus.forEach(item => {
         skus = item
@@ -39,12 +41,10 @@ const addProducts = async(req, res) => {
   try {    
     const existing = await productModel.find({title: req.body.title})
     const images = []
-    console.log(req.files)
     for(key in req.files){
       const paths = req.files[key][0].path
       images.push(paths.slice(7))
     }
-      console.log(images)
       const product = new productModel({
         title: req.body.title,
         warranty: req.body.warranty,
@@ -120,14 +120,12 @@ const newSku = async (req, res) => {
 
 const addNewSku = async (req, res) => {
   try {     
-    console.log('in add new sku')
     const existing = await productModel.find({title: req.body.title})
     const images = []
     for(key in req.files){
       const paths = req.files[key][0].path
       images.push(paths.slice(7))
     }
-      console.log(images)
       const product = new productModel({
         title: req.body.title,
         warranty: req.body.warranty,
@@ -185,8 +183,6 @@ const addNewSku = async (req, res) => {
 const saveSku = async(req, res, next) => {
   try {
     const product = await productModel.findOne({title: req.body.title})
-    console.log(product)
-    console.log(req.body.title)
     const images = []
     for(key in req.files){
       const paths = req.files[key][0].path
@@ -254,8 +250,6 @@ const saveSku = async(req, res, next) => {
 const saveSku2 = async(req, res, next) => {
   try {
     const product = await productModel.findOne({title: req.body.title})
-    console.log(product)
-    console.log(req.body.title)
     const images = []
     for(key in req.files){
       const paths = req.files[key][0].path
@@ -325,7 +319,6 @@ const getDetailsPage = async(req, res) => {
     const id = req.params.id
     const product = await productModel.findById({_id: id})
     .populate('categoryId')
-    console.log(product)
     if(product?.title){
       product.skus.forEach((item, index, array)=> {
         if(item.isDeleted == true){
@@ -361,7 +354,6 @@ const updateProduct = async (req, res) => {
       warranty: req.body.warranty,
       categoryId: req.body.category
     }, {runValidators: true})
-    console.log('product updated')
     return res.json({
       successStatus: true,
       redirect: '/admin/products/view/'+id
@@ -498,7 +490,6 @@ const getAddSkusPage = async (req, res) => {
     const product = products[0]
     const message = ""
     const skus = {}
-    console.log(product)
     res.render('admin/new-sku', {product, categories, skus, message})
   } catch (error) {
     console.log(error)
@@ -562,9 +553,7 @@ const deleteSku = async (req, res) => {
 }
 
 const addProductOffer = async(req, res) => {
-  console.log('entered')
   const {id, percent} = req.body
-  console.log(id)
   if(!percent){
     return res.json({
       successStatus: false,

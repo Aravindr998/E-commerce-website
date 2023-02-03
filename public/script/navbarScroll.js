@@ -20,4 +20,3 @@ document.querySelector('button.navbar-toggler').addEventListener('click', (e) =>
     document.getElementById('navbar').style.backgroundColor = 'white'
   }
 })
-

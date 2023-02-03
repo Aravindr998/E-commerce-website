@@ -16,7 +16,6 @@ const getCheckoutPage = async(req, res) => {
   if(req.session.couponApplied){
     discount = req.session.couponApplied
   }
-  console.log(discount)
   try {
     const user = await userModel.findById(req.session.user._id)
     let skuId = []
@@ -123,7 +122,6 @@ const checkoutCod = async(req, res) => {
         })
       }
     const total = cart.cart.reduce((sum, item) => sum+=(item.productId.offerPercent ? Math.round(item.skus[0].price * (1 - item.productId.offerPercent/100)) : item.skus[0].price) * item.quantity, 0)
-    console.log(total)
     const user = users[0]
     const order = new orderModel({
       customerId: req.session.user._id,
@@ -290,9 +288,7 @@ const addCoupon = async(req, res) => {
         message: 'You have already availed this offer'
       })
     }
-    console.log(user.cart[0].skus)
     const total = user.cart.reduce((sum, item) => sum+=(item.productId.offerPercent ? Math.round(item.skus[0].price * (1 - item.productId.offerPercent/100)) : item.skus[0].price) * item.quantity, 0)
-    console.log(total)
     if(coupon.minPurchaseValue){
       if(total < coupon.minPurchaseValue){
         return res.json({
@@ -310,7 +306,6 @@ const addCoupon = async(req, res) => {
         couponId: coupon._id,
         couponCode: coupon.code
       }
-      console.log(req.session.couponApplied)
       return res.json({
         successStatus: true
       })
@@ -331,7 +326,6 @@ const getFailurePage = async(req, res) => {
 
 const verifyPayment = async(req, res) => {
   try {
-    console.log(req.body.payment)
     let hmac = crypto.createHmac('sha256', process.env.RAZORPAY_SECRET_KEY)
     hmac.update(req.body.payment['razorpay_order_id']+'|'+req.body.payment['razorpay_payment_id'])
     hmac = hmac.digest('hex')
@@ -407,8 +401,6 @@ const cancelPayment = async(req, res) => {
 }
 
 const paymentFailure = async(req, res) => {
-  console.log('on payment cancelled page')
-  console.log(req.body.order)
   try {
     const payment = new paymentModel({
       orderId: req.body.order.receipt,
@@ -423,7 +415,6 @@ const paymentFailure = async(req, res) => {
         isCancelled: true,
       }
     })
-    console.log(order)
     res.json({successStatus: true})
   } catch (error) {
     console.log(error)
