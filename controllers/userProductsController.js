@@ -111,21 +111,24 @@ const getDetailsPage = async(req, res) => {
     const skuId = req.params.skuid
     const product = await productModel.findById(prodId)
     .populate('categoryId')
-    const cart = await userModel.aggregate([
-      {
-        $match: {
-          _id: mongoose.Types.ObjectId(req.session.user._id)
+    let cart = {}
+    if(req.session.user){
+      cart = await userModel.aggregate([
+        {
+          $match: {
+            _id: mongoose.Types.ObjectId(req.session.user._id)
+          }
+        },
+        {
+          $unwind: '$cart'
+        },
+        {
+          $match: {
+            'cart.skuId': mongoose.Types.ObjectId(skuId)
+          }
         }
-      },
-      {
-        $unwind: '$cart'
-      },
-      {
-        $match: {
-          'cart.skuId': mongoose.Types.ObjectId(skuId)
-        }
-      }
-    ])
+      ])
+    }
     product.skus.forEach((item, index, array) => {
       if(item.isDeleted){
         array.splice(index,1)
