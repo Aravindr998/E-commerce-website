@@ -216,6 +216,14 @@ const getPdfSalesReport = (req, res) => {
   res.download('./public/files/sales-report.pdf', 'Sale Report.pdf')
 }
 
+const getPageNotFound = (req, res) => {
+  let admin = false
+  if(req.session.admin){
+    admin = true
+  }
+  res.render('admin/404', {admin})
+}
+
 module.exports = {
   getLogin,
   redirectHomepage,
@@ -224,5 +232,6 @@ module.exports = {
   getOrderDetails,
   getProductDetails,
   getSalesReport,
-  getPdfSalesReport
+  getPdfSalesReport,
+  getPageNotFound
 }

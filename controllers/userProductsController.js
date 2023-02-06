@@ -99,6 +99,12 @@ const getProductsPage = async(req, res) => {
         }
       ])
     }
+    if(req.session.user){
+      const user = await userModel.findById(req.session.user._id)
+      if(user.isBlocked){
+        req.session.user = null
+      }
+    }
     res.render('users/product-page', {products, categories, user: req.session?.user?.fname, fromValue, toValue})
   } catch (error) {
    console.log(error) 
@@ -140,6 +146,12 @@ const getDetailsPage = async(req, res) => {
         sku = item
       }
     })
+    if(req.session.user){
+      const user = await userModel.findById(req.session.user._id)
+      if(user.isBlocked){
+        req.session.user = null
+      }
+    }
     res.render('users/product-details', {product, cart, sku, user: req.session?.user?.fname})
   } catch (error) {
     console.log(error)

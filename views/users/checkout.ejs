@@ -41,12 +41,12 @@
       <div class="col-sm-6">
         <div class="col-12">
           <div class="card p-4">
-            <div class="col-12 my-2 d-flex justify-content-between">
-              <h5>Select address</h5>
-              <a class="sub-button text-decoration-none" href="/dashboard/address/add">Add Address</a>
-            </div>
             <% let count = 0 %> 
             <% if(userDetails.shippingAddress.length>0){ %> 
+              <div class="col-12 my-2 d-flex justify-content-between">
+                <h5>Select address</h5>
+                <a class="sub-button text-decoration-none" href="/dashboard/address/add">Add Address</a>
+              </div>
             <% userDetails.shippingAddress.forEach((address, index, array) => { %> 
               <% count++ %> 
             <div class="form-check">

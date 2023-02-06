@@ -1,3 +1,5 @@
+const userModel = require('../models/users')
+
 const isUserLoggedin = (req, res, next) => {
   if(req.session.user){
     next()
@@ -19,6 +21,22 @@ const isLoggedin = (req, res, next) =>{
     return res.redirect('/')
   }else{
     next()
+  }
+}
+
+const isUserBlocked = async(req, res, next) => {
+  try {
+    if(req.session.user){
+      const user = await userModel.findById(req.session.user._id)
+      if(user.isBlocked){
+        req.session.user = null
+      }
+      next()
+    }else{
+      next()
+    }
+  } catch (error) {
+    
   }
 }
 
@@ -52,5 +70,6 @@ module.exports = {
   authenticate,
   isLoggedin,
   validateAddress,
-  isUserLoggedin
+  isUserLoggedin,
+  isUserBlocked
 }

@@ -15,12 +15,12 @@
     <div class="col-12 d-sm-none">
       <div class="col-12 pt-1 collapse" id="filters">
         <p>Price Filter</p>
-        <form action="/products/filter" method="POST" class="row">
+        <form action="/products/filter" method="GET" class="row">
           <div class=" col-6">
-            <input class="form-control range-form" type="text" name="" id="from1" placeholder="from" value="<%= fromValue %>">
+            <input class="form-control range-form" type="text" name="from" id="from1" placeholder="from" value="<%= fromValue %>">
           </div>
           <div class=" col-6">
-            <input class="form-control range-form" type="text" name="" id="to1" placeholder="to" value="<%= toValue %>">
+            <input class="form-control range-form" type="text" name="to" id="to1" placeholder="to" value="<%= toValue %>">
           </div>
           <div class="d-flex flex-column">
             <p>Categories</p>

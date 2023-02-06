@@ -125,4 +125,6 @@ router.patch('/returns', authenticate, returnController.acceptReturn)
 
 router.patch('/returns/status', authenticate, returnController.changeReturnStatus)
 
+router.all('*', adminController.getPageNotFound)
+
 module.exports = router

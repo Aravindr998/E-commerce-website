@@ -419,6 +419,10 @@ function sendMail(mail, otp){
   })
 }
 
+const getPageNotFound = (req, res) => {
+    res.render('users/404', {user: req.session?.user?.fname})
+}
+
 module.exports = {
   getHomepage,
   getLogin,
@@ -435,5 +439,6 @@ module.exports = {
   getEnterOtpPage,
   checkMailOtp,
   getResetPasswordPage,
-  resetPassword
+  resetPassword,
+  getPageNotFound
 }
