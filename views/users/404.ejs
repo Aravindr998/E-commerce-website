@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('../partials/head') %> 
+<body class="pt-5">
+<% if(user){ %> 
+<%- include('../partials/user-navbar') %> 
+<% }else{ %>
+<%- include('../partials/guest-navbar') %>
+<% } %>  
+<section class="container">
+<%- include('../partials/404 user') %> 
+</section>
+<%- include('../partials/footer') %> 
+</body>
+</html>
