@@ -1,6 +1,6 @@
 const express = require('express')
 const userController = require('../controllers/userController')
-const { authenticate, isLoggedin, validateAddress, isUserLoggedin, isUserBlocked } = require('../middlewares/userAuth')
+const { authenticate, isLoggedin, validateAddress, validateUpdateAddress, isUserLoggedin, isUserBlocked } = require('../middlewares/userAuth')
 const userMiddlewares = require('../middlewares/userMiddlewares')
 const cartController = require('../controllers/usercartController')
 const wishlistController = require('../controllers/userwishlistController')
@@ -63,7 +63,7 @@ router.post('/dashboard/address/add', isUserBlocked, authenticate, validateAddre
 
 router.get('/dashboard/address/edit/:id', isUserBlocked, authenticate, dashboardController.getEditAddressPage)
 
-router.post('/dashboard/address/update/:id', isUserBlocked, authenticate, validateAddress, dashboardController.updateAddress)
+router.post('/dashboard/address/update/:id', isUserBlocked, authenticate, validateUpdateAddress, dashboardController.updateAddress)
 
 router.get('/checkout', isUserBlocked, authenticate, userMiddlewares.checkCoupon, checkoutController.getCheckoutPage)
 

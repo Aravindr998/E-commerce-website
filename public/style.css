@@ -465,3 +465,7 @@ footer div div div p:first-child{
   opacity: 0;
   pointer-events: none;
 }
+
+.fill-black{
+  fill: black;
+}

@@ -17,6 +17,7 @@
           <a class="text-decoration-none" href="/dashboard/address/manage">Manage Address</a>
         </div>
       </div>
+      <% if(orders.length >0) {%>
       <% orders.forEach(order => { %> 
         <div class="col-12 my-2">
           <a href="/orders/<%= order._id %> " class="text-decoration-none">
@@ -63,6 +64,11 @@
         </a>
       </div>
       <% }) %> 
+      <% }else {%>
+        <div class="text-center">
+          <p class="fw-bold">No orders to show</p>
+        </div>
+      <% } %>
     </div>
   </section>
 </div>

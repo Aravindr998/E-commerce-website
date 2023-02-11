@@ -6,6 +6,7 @@ const mongoose = require('mongoose')
 const getProductsPage = async(req, res) => {
   const fromValue = req.session.from || ''
   const toValue = req.session.to || ''
+  const checked = req.session.category || []
   try {
     let searchKey
     let products
@@ -105,7 +106,7 @@ const getProductsPage = async(req, res) => {
         req.session.user = null
       }
     }
-    res.render('users/product-page', {products, categories, user: req.session?.user?.fname, fromValue, toValue})
+    res.render('users/product-page', {products, categories, user: req.session?.user?.fname, fromValue, toValue, checked})
   } catch (error) {
    console.log(error) 
   }
@@ -117,7 +118,7 @@ const getDetailsPage = async(req, res) => {
     const skuId = req.params.skuid
     const product = await productModel.findById(prodId)
     .populate('categoryId')
-    let cart = {}
+    let cart = []
     if(req.session.user){
       cart = await userModel.aggregate([
         {
@@ -146,13 +147,32 @@ const getDetailsPage = async(req, res) => {
         sku = item
       }
     })
+    let wishlist = false
     if(req.session.user){
       const user = await userModel.findById(req.session.user._id)
       if(user.isBlocked){
         req.session.user = null
       }
+      const users = await userModel.aggregate([
+        {
+          $match: {
+            _id: mongoose.Types.ObjectId(req.session.user._id)
+          }
+        },
+        {
+          $unwind: '$wishlist'
+        },
+        {
+          $match: {
+            'wishlist.skuId': mongoose.Types.ObjectId(skuId)
+          }
+        }
+      ])
+      if(users.length>0){
+        wishlist = true
+      }
     }
-    res.render('users/product-details', {product, cart, sku, user: req.session?.user?.fname})
+    res.render('users/product-details', {product, cart, sku, user: req.session?.user?.fname, wishlist})
   } catch (error) {
     console.log(error)
   }

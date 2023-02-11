@@ -55,7 +55,7 @@
             <p>Categories</p>
             <% categories.forEach(item => { %> 
             <label for="<%= item._id %>">
-              <input id="<%= item._id %>" class="form-check-input" type="checkbox" name="category[]" value="<%= item._id %>"> 
+              <input id="<%= item._id %>" class="form-check-input" type="checkbox" name="category[]" value="<%= item._id %>" <%= checked.includes(item.id)?'checked': '' %>> 
               <%= item.categoryName %> 
             </label>
             <% }) %> 

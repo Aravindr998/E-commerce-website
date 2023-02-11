@@ -230,34 +230,57 @@ async function moveToCart(id, prodId, skuId){
 
 async function addToWishlist(id, prodId, skuId){
   const button = document.getElementById(id)
-  const url = '/products/wishlist/add'
-  const body = {
-    prodId,
-    skuId
-  }
-  const response = await fetch(url, {
-    method: 'PATCH',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(body)
-  })
-  const res = await response.json()
-  if(res.successStatus){
-    document.querySelector('.added-to-cart').classList.add('alert-success')
-    document.querySelector('.added-to-cart p').innerHTML = 'Item added to wishlist!'
-    document.querySelector('.added-to-cart').style.transform = 'translateY(0rem)'
-    document.querySelector('.added-to-cart').style.visibility = 'visible'
-    console.log(button)
-    button.removeAttribute('onclick')
-    document.querySelector('svg.wishlist').style.fill = 'black'
-  }else if(res.redirect){
-    window.location.href = res.redirect
+  if(button.querySelector('.wishlist').classList.contains('fill-black')){
+    console.log('first')
+    const url = '/wishlist/remove'
+    const body = {
+      skuId
+    }
+    const response = await fetch(url, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(body)
+    })
+    const res = await response.json()
+    if(res.successStatus){
+      button.querySelector('.wishlist').classList.remove('fill-black')
+    }else{
+      document.querySelector('.added-to-cart').classList.add('alert-danger')
+      document.querySelector('.added-to-cart p').innerHTML = 'Some error occured. Please try again later'
+      document.querySelector('.added-to-cart').style.transform = 'translateY(0rem)'
+      document.querySelector('.added-to-cart').style.visibility = 'visible'
+    }
   }else{
-    document.querySelector('.added-to-cart').classList.add('alert-danger')
-    document.querySelector('.added-to-cart p').innerHTML = 'Some error occured. Please try again later'
-    document.querySelector('.added-to-cart').style.transform = 'translateY(0rem)'
-    document.querySelector('.added-to-cart').style.visibility = 'visible'
+    console.log('second')
+    const url = '/products/wishlist/add'
+    const body = {
+      prodId,
+      skuId
+    }
+    const response = await fetch(url, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(body)
+    })
+    const res = await response.json()
+    if(res.successStatus){
+      document.querySelector('.added-to-cart').classList.add('alert-success')
+      document.querySelector('.added-to-cart p').innerHTML = 'Item added to wishlist!'
+      document.querySelector('.added-to-cart').style.transform = 'translateY(0rem)'
+      document.querySelector('.added-to-cart').style.visibility = 'visible'
+      document.querySelector('svg.wishlist').classList.add('fill-black')
+    }else if(res.redirect){
+      window.location.href = res.redirect
+    }else{
+      document.querySelector('.added-to-cart').classList.add('alert-danger')
+      document.querySelector('.added-to-cart p').innerHTML = 'Some error occured. Please try again later'
+      document.querySelector('.added-to-cart').style.transform = 'translateY(0rem)'
+      document.querySelector('.added-to-cart').style.visibility = 'visible'
+    }
   }
 }
 
