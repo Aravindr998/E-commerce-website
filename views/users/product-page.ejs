@@ -26,7 +26,7 @@
             <p>Categories</p>
             <% categories.forEach(item => { %> 
             <label for="brand">
-              <input class="form-check-input" type="checkbox" name="<%= item._id %> "> 
+              <input class="form-check-input" type="checkbox" name="category[]" value="<%= item._id %>" <%= checked.includes(item.id)?'checked': '' %>> 
               <%= item.categoryName %> 
             </label>
             <% }) %> 
@@ -98,5 +98,8 @@
   </div>
 </section>
 <%- include('../partials/footer') %> 
+<script>
+  document.querySelector('input[type="search"]').value = '<%= search %>'
+</script>
 </body>
 </html>

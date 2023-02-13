@@ -7,6 +7,7 @@ const getProductsPage = async(req, res) => {
   const fromValue = req.session.from || ''
   const toValue = req.session.to || ''
   const checked = req.session.category || []
+  const search = req.session.searchKey || ''
   try {
     let searchKey
     let products
@@ -106,7 +107,7 @@ const getProductsPage = async(req, res) => {
         req.session.user = null
       }
     }
-    res.render('users/product-page', {products, categories, user: req.session?.user?.fname, fromValue, toValue, checked})
+    res.render('users/product-page', {products, categories, user: req.session?.user?.fname, fromValue, toValue, checked, search})
   } catch (error) {
    console.log(error) 
   }
